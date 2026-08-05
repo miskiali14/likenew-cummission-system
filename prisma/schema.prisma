@@ -1,0 +1,93 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  SALES
+  QUALITY_CONTROL
+}
+
+enum Department {
+  WASHING
+  IRONING
+}
+
+enum Shift {
+  SHIFT_1
+  SHIFT_2
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id        String     @id @default(uuid())
+  fullName  String
+  email     String     @unique
+  password  String
+  role      Role
+  branch    String?    // HQ or KM5 (null for Admin)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Employee {
+  id         String     @id @default(uuid())
+  name       String
+  branch     String     // HQ or KM5
+  department Department
+  rate       Float      // Commission rate per piece
+  status     UserStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now())
+
+  logs       Log[]
+}
+
+// The person (Sales or QC staff) who personally registered a Log — distinct from
+// the Employee who did the laundry work. Shared branch logins (e.g. "Sales HQ")
+// are used by several people day to day, so this tracks who actually logged it.
+model Registrar {
+  id        String     @id @default(uuid())
+  name      String
+  branch    String     // HQ or KM5
+  role      Role       // SALES or QUALITY_CONTROL
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+
+  logs      Log[]
+}
+
+model Log {
+  id              String     @id @default(uuid())
+  orderId         Int
+  quantity        Int
+  date            String     // YYYY-MM-DD
+  shift           Shift
+  durationMinutes Int
+  department      Department
+  branch          String
+
+  assignedBy      String     // Legacy free-text fallback (pre-Registrar-link records)
+  staffName       String     // Legacy free-text fallback (pre-Employee-link records)
+
+  employeeId      String?
+  employee        Employee?  @relation(fields: [employeeId], references: [id])
+
+  registrarId     String?
+  registrar       Registrar? @relation(fields: [registrarId], references: [id])
+
+  createdAt       DateTime   @default(now())
+
+  @@index([orderId, department, branch])
+  @@index([employeeId])
+  @@index([registrarId])
+}

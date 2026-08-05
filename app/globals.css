@@ -10,6 +10,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Likenew Laundry brand palette — sampled from the logo (public/likenew-logo.png) */
+  --color-brand-50: #f3f0f7;
+  --color-brand-100: #e8e1ef;
+  --color-brand-200: #cdc0dc;
+  --color-brand-300: #b39fc9;
+  --color-brand-400: #967ab5;
+  --color-brand-500: #8160a6;
+  --color-brand-600: #6d4698;
+  --color-brand-700: #5d3c82;
+  --color-brand-800: #4f326e;
+  --color-brand-900: #3c2654;
 }
 
 @media (prefers-color-scheme: dark) {
