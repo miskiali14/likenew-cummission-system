@@ -1,3 +1,11 @@
+# Likenew Laundry — Commission System
+
+Branch-isolated laundry management system (HQ / KM5) with employee commission tracking, built on Next.js + Express (merged into a single server) and Prisma/PostgreSQL.
+
+Run locally with `npm install` then `npm run dev` (single server on port 3000, no separate backend process).
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
