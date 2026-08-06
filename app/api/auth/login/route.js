@@ -6,6 +6,10 @@ import prisma from '@/lib/prisma';
 export async function POST(request) {
   const { email, password } = await request.json();
 
+  if (!email || !password) {
+    return NextResponse.json({ message: 'Please enter your email and password' }, { status: 400 });
+  }
+
   try {
     const user = await prisma.user.findUnique({ where: { email } });
 

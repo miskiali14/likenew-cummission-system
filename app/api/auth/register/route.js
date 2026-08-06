@@ -5,6 +5,13 @@ import prisma from '@/lib/prisma';
 export async function POST(request) {
   const { fullName, email, password, role, branch } = await request.json();
 
+  if (!fullName || !email || !password) {
+    return NextResponse.json(
+      { message: 'Please provide a full name, email, and password' },
+      { status: 400 }
+    );
+  }
+
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
