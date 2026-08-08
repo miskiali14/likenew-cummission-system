@@ -338,6 +338,9 @@ export default function DashboardPage() {
   const [selectedBranch, setSelectedBranch] = useState('All');
   const [selectedDept, setSelectedDept] = useState('All');
   const [selectedDate, setSelectedDate] = useState('');
+  // Independent date filter for "All Registered Logs" — defaults to showing
+  // every date; Admin can narrow it down to one specific day.
+  const [allLogsDate, setAllLogsDate] = useState('');
   const [stats, setStats] = useState({ washing: 0, ironing: 0, totalOrders: 0, totalCommission: 0 });
   const [logs, setLogs] = useState([]);
   const [staffSummary, setStaffSummary] = useState([]);
@@ -477,7 +480,7 @@ export default function DashboardPage() {
 
       const results = await Promise.allSettled([
         API.get(`/logs/stats?branch=${branchParam}`),
-        API.get(`/logs/all?branch=${branchParam}&department=${deptParam}`),
+        API.get(`/logs/all?branch=${branchParam}&department=${deptParam}&date=${allLogsDate}`),
         API.get(`/logs/staff-summary?branch=${branchParam}&department=${deptParam}&date=${dateParam}`)
       ]);
 
@@ -503,7 +506,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedBranch, selectedDept, selectedDate]);
+  }, [selectedBranch, selectedDept, selectedDate, allLogsDate]);
 
   // Safe Staff Data Fetching
   const fetchRoleLogs = useCallback(async () => {
@@ -863,7 +866,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-slate-500">View and manage all registered logs from KM5 and HQ branches</p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Filter size={16} className="text-slate-500" />
                   <span className="text-xs font-semibold text-slate-600">Department:</span>
                   <select
@@ -875,6 +878,21 @@ export default function DashboardPage() {
                     <option value="WASHING">Washing</option>
                     <option value="IRONING">Ironing</option>
                   </select>
+                  <span className="text-xs font-semibold text-slate-600 ml-1">Date:</span>
+                  <input
+                    type="date"
+                    value={allLogsDate}
+                    onChange={(e) => setAllLogsDate(e.target.value)}
+                    className="border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 rounded-xl p-2 focus:outline-none"
+                  />
+                  {allLogsDate && (
+                    <button
+                      onClick={() => setAllLogsDate('')}
+                      className="text-xs font-medium text-brand-600 hover:text-brand-700 underline"
+                    >
+                      All Dates
+                    </button>
+                  )}
                   {logs.length > 0 && (
                     <button
                       onClick={() =>

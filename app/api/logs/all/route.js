@@ -12,10 +12,12 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const branch = resolveBranch(auth.user, searchParams);
     const department = searchParams.get('department');
+    const date = searchParams.get('date');
 
     const whereClause = {};
     if (branch) whereClause.branch = branch;
     if (department && department !== 'All') whereClause.department = department;
+    if (date) whereClause.date = date;
 
     const logs = await prisma.log.findMany({
       where: whereClause,
