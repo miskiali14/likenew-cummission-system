@@ -4,10 +4,10 @@ import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { todayStr } from '@/lib/date';
 
-// Washing Logs — Sales & Admin. Sales only ever sees today's orders; Admin
-// sees full history (they have "All Registered Logs" for that).
+// Washing Logs — Sales, Viewer & Admin. Sales/Viewer only ever see today's
+// orders; Admin sees full history (they have "All Registered Logs" for that).
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'VIEWER']);
   if (auth.response) return auth.response;
 
   try {

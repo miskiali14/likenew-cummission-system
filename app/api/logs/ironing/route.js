@@ -4,10 +4,10 @@ import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { todayStr } from '@/lib/date';
 
-// Ironing Logs — QC & Admin. QC only ever sees today's orders; Admin sees
-// full history (they have "All Registered Logs" for that).
+// Ironing Logs — QC, Viewer & Admin. QC/Viewer only ever see today's orders;
+// Admin sees full history (they have "All Registered Logs" for that).
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'QUALITY_CONTROL']);
+  const auth = requireAuth(request, ['ADMIN', 'QUALITY_CONTROL', 'VIEWER']);
   if (auth.response) return auth.response;
 
   try {

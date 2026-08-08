@@ -4,10 +4,10 @@ import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { todayStr } from '@/lib/date';
 
-// Staff Summary Controller — Admin, Sales, QC. Sales/QC can only ever see
-// today's report; Admin can pick any date.
+// Staff Summary Controller — Admin, Sales, QC, Viewer. Sales/QC/Viewer can
+// only ever see today's report; Admin can pick any date.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'QUALITY_CONTROL']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'QUALITY_CONTROL', 'VIEWER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 

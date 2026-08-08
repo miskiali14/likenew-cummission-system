@@ -223,6 +223,7 @@ export default function UsersPage() {
                     <option value="SALES">SALES</option>
                     <option value="ADMIN">ADMIN</option>
                     <option value="QUALITY_CONTROL">QUALITY CONTROL</option>
+                    <option value="VIEWER">VIEWER (read-only)</option>
                   </select>
                 </div>
 

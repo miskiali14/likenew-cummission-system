@@ -58,6 +58,16 @@ export default function Sidebar({ user }) {
               </Link>
             </>
           )}
+
+          {/* ================= VIEWER (read-only) ================= */}
+          {userRole === 'VIEWER' && (
+            <>
+              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Viewer</div>
+              <Link href="/dashboard" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard')}`}>
+                👁️ Branch Overview
+              </Link>
+            </>
+          )}
         </nav>
       </div>
 

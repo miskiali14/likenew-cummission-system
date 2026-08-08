@@ -440,7 +440,9 @@ export default function DashboardPage() {
   }, [currentBranch, user?.role]);
 
   useEffect(() => {
-    if (user && user.role !== 'ADMIN') {
+    // Only roles that actually register logs need the Employee/Registrar
+    // pickers — Viewer is read-only and never creates a log.
+    if (user && (user.role === 'SALES' || user.role === 'QUALITY_CONTROL')) {
       fetchEmployees();
       fetchRegistrars();
     }
@@ -508,14 +510,26 @@ export default function DashboardPage() {
     }
   }, [selectedBranch, selectedDept, selectedDate, allLogsDate]);
 
-  // Safe Staff Data Fetching
+  // Safe Staff Data Fetching. Viewer sees both departments combined
+  // (read-only); Sales/QC see only their own department.
   const fetchRoleLogs = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const endpoint = user.role === 'QUALITY_CONTROL' ? '/logs/ironing' : '/logs/washing';
-      const res = await API.get(`${endpoint}?branch=${currentBranch}`);
-      setLogs(res.data || []);
+      if (user.role === 'VIEWER') {
+        const [washingRes, ironingRes] = await Promise.all([
+          API.get(`/logs/washing?branch=${currentBranch}`),
+          API.get(`/logs/ironing?branch=${currentBranch}`),
+        ]);
+        const combined = [...(washingRes.data || []), ...(ironingRes.data || [])].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setLogs(combined);
+      } else {
+        const endpoint = user.role === 'QUALITY_CONTROL' ? '/logs/ironing' : '/logs/washing';
+        const res = await API.get(`${endpoint}?branch=${currentBranch}`);
+        setLogs(res.data || []);
+      }
     } catch (err) {
       console.error('Error fetching logs:', err);
     } finally {
@@ -544,12 +558,14 @@ export default function DashboardPage() {
     }
   }, [formData.registrarId]);
 
-  // Fetching the Staff Summary Report for SALES / QUALITY_CONTROL users,
-  // scoped to their own branch & department, so they also see the report.
+  // Fetching the Staff Summary Report for SALES / QUALITY_CONTROL / VIEWER
+  // users, scoped to their own branch. Viewer sees both departments combined;
+  // Sales/QC see only their own department.
   const fetchMyBranchStaffSummary = useCallback(async () => {
     try {
+      const deptParam = user?.role === 'VIEWER' ? 'All' : currentDept;
       const res = await API.get(
-        `/logs/staff-summary?branch=${currentBranch}&department=${currentDept}&date=${selectedDate || ''}`
+        `/logs/staff-summary?branch=${currentBranch}&department=${deptParam}&date=${selectedDate || ''}`
       );
       setStaffSummary(res.data || []);
     } catch (err) {
@@ -557,13 +573,16 @@ export default function DashboardPage() {
       console.error(debugInfo);
       alert('STAFF SUMMARY DEBUG:\n\n' + debugInfo);
     }
-  }, [currentBranch, currentDept, selectedDate]);
+  }, [currentBranch, currentDept, selectedDate, user?.role]);
 
   // Main Effect for fetching Dashboard Data
   useEffect(() => {
     if (user) {
       if (user.role === 'ADMIN') {
         fetchAdminDashboardData();
+      } else if (user.role === 'VIEWER') {
+        fetchRoleLogs();
+        fetchMyBranchStaffSummary();
       } else {
         fetchRoleLogs();
         fetchMyLogs();
@@ -1025,7 +1044,7 @@ export default function DashboardPage() {
         )}
 
         {/* STAFF (SALES / QUALITY CONTROL) DASHBOARD */}
-        {user?.role !== 'ADMIN' && (
+        {user?.role !== 'ADMIN' && user?.role !== 'VIEWER' && (
           <div className="space-y-8">
             {/* Form */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
@@ -1260,6 +1279,105 @@ export default function DashboardPage() {
                         <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
                         <td className="py-3 px-2 text-brand-800">{logsTotals.totalMinutes} Min</td>
                         <td></td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIEWER DASHBOARD — read-only, both departments, today only */}
+        {user?.role === 'VIEWER' && (
+          <div className="space-y-8">
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center gap-3">
+              <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+                <Users size={22} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">{currentBranch} Branch — Read-Only View</h2>
+                <p className="text-xs text-slate-500">
+                  You can view today's Washing and Ironing activity for {currentBranch}. Viewing only — no changes can be made.
+                </p>
+              </div>
+            </div>
+
+            {/* STAFF SUMMARY — both departments combined, today only */}
+            <StaffSummaryReport
+              staffSummary={staffSummary}
+              title={`${currentBranch} Branch Report — Today`}
+              subtitle="How everyone in your branch is performing today (Washing & Ironing)"
+              showBranchColumn={false}
+            />
+
+            {/* TODAY'S LOGS — both departments, no actions */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-md font-bold text-slate-800 mb-4">
+                Today's Logs — {currentBranch} Branch (Washing &amp; Ironing)
+              </h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase">
+                      <th className="py-3 px-2">Order ID</th>
+                      <th className="py-3 px-2">Department</th>
+                      <th className="py-3 px-2">Staff</th>
+                      <th className="py-3 px-2">Qty</th>
+                      <th className="py-3 px-2">Duration (Min)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="text-center py-6 text-slate-400">
+                          No logs registered today for {currentBranch} branch yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      groupLogsByStaff(logs).flatMap((group) =>
+                        group.orders.map((item, idx) => (
+                          <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
+                            <td className="py-3 px-2 font-semibold text-slate-800">#{item.orderId}</td>
+                            <td className="py-3 px-2">
+                              <span
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                                  item.department === 'IRONING'
+                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                }`}
+                              >
+                                {item.department}
+                              </span>
+                            </td>
+                            {idx === 0 && (
+                              <td className="py-3 px-2 align-top" rowSpan={group.orders.length}>
+                                {group.staffName}
+                                {group.orders.length > 1 && (
+                                  <span className="ml-1.5 text-[11px] font-semibold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full">
+                                    {group.orders.length} orders
+                                  </span>
+                                )}
+                              </td>
+                            )}
+                            <td className="py-3 px-2">{item.quantity}</td>
+                            <td className="py-3 px-2 font-medium">
+                              {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
+                                <span className="text-slate-400 italic">Not set</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )
+                    )}
+                  </tbody>
+                  {logs.length > 0 && (
+                    <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
+                      <tr>
+                        <td colSpan="3" className="py-3 px-2 text-slate-800">Total ({logs.length} Orders):</td>
+                        <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
+                        <td className="py-3 px-2 text-brand-800">{logsTotals.totalMinutes} Min</td>
                       </tr>
                     </tfoot>
                   )}
