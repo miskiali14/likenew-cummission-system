@@ -19,6 +19,7 @@ export default function UsersPage() {
     password: '',
     role: 'SALES',
     branch: 'HQ',
+    department: '',
   });
 
   const showToast = (type, message) => {
@@ -66,7 +67,7 @@ export default function UsersPage() {
     try {
       await API.post('/users', formData);
       setShowModal(false);
-      setFormData({ name: '', email: '', password: '', role: 'SALES', branch: 'HQ' });
+      setFormData({ name: '', email: '', password: '', role: 'SALES', branch: 'HQ', department: '' });
       showToast('success', 'New user created successfully!');
       fetchUsers();
     } catch (err) {
@@ -135,6 +136,7 @@ export default function UsersPage() {
                 <th className="p-4">Email</th>
                 <th className="p-4">Role</th>
                 <th className="p-4">Branch</th>
+                <th className="p-4">Department</th>
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -156,6 +158,9 @@ export default function UsersPage() {
                     <span className="inline-flex items-center gap-1 text-gray-600">
                       <Building size={14} /> {u.branch || '—'}
                     </span>
+                  </td>
+                  <td className="p-4 text-gray-500">
+                    {u.role === 'VIEWER' ? (u.department || 'Both') : '—'}
                   </td>
                   <td className="p-4 text-right">
                     <button
@@ -241,6 +246,21 @@ export default function UsersPage() {
                   </div>
                 )}
               </div>
+
+              {formData.role === 'VIEWER' && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Department Access</label>
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  >
+                    <option value="">Both (Washing &amp; Ironing)</option>
+                    <option value="WASHING">Washing only</option>
+                    <option value="IRONING">Ironing only</option>
+                  </select>
+                </div>
+              )}
 
               <div className="flex justify-end gap-2 pt-2">
                 <button

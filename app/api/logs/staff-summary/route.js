@@ -14,7 +14,10 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const branch = resolveBranch(user, searchParams);
-    const department = searchParams.get('department');
+    // A department-scoped Viewer is forced to their assigned department,
+    // regardless of what the client requests.
+    const department =
+      user.role === 'VIEWER' && user.department ? user.department : searchParams.get('department');
     const date = user.role === 'ADMIN' ? searchParams.get('date') : todayStr();
 
     const whereClause = {};

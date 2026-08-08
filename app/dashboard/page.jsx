@@ -510,13 +510,14 @@ export default function DashboardPage() {
     }
   }, [selectedBranch, selectedDept, selectedDate, allLogsDate]);
 
-  // Safe Staff Data Fetching. Viewer sees both departments combined
-  // (read-only); Sales/QC see only their own department.
+  // Safe Staff Data Fetching. A Viewer with no assigned department sees both
+  // combined (read-only); a department-scoped Viewer (or Sales/QC) sees only
+  // their own department.
   const fetchRoleLogs = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
-      if (user.role === 'VIEWER') {
+      if (user.role === 'VIEWER' && !user.department) {
         const [washingRes, ironingRes] = await Promise.all([
           API.get(`/logs/washing?branch=${currentBranch}`),
           API.get(`/logs/ironing?branch=${currentBranch}`),
@@ -526,7 +527,8 @@ export default function DashboardPage() {
         );
         setLogs(combined);
       } else {
-        const endpoint = user.role === 'QUALITY_CONTROL' ? '/logs/ironing' : '/logs/washing';
+        const dept = user.role === 'VIEWER' ? user.department : user.role;
+        const endpoint = dept === 'IRONING' || dept === 'QUALITY_CONTROL' ? '/logs/ironing' : '/logs/washing';
         const res = await API.get(`${endpoint}?branch=${currentBranch}`);
         setLogs(res.data || []);
       }
@@ -563,7 +565,7 @@ export default function DashboardPage() {
   // Sales/QC see only their own department.
   const fetchMyBranchStaffSummary = useCallback(async () => {
     try {
-      const deptParam = user?.role === 'VIEWER' ? 'All' : currentDept;
+      const deptParam = user?.role === 'VIEWER' ? (user?.department || 'All') : currentDept;
       const res = await API.get(
         `/logs/staff-summary?branch=${currentBranch}&department=${deptParam}&date=${selectedDate || ''}`
       );
@@ -1288,7 +1290,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* VIEWER DASHBOARD — read-only, both departments, today only */}
+        {/* VIEWER DASHBOARD — read-only, today only. Combined (both depts) if
+            no department is assigned, otherwise scoped to just one. */}
         {user?.role === 'VIEWER' && (
           <div className="space-y-8">
             <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center gap-3">
@@ -1298,23 +1301,23 @@ export default function DashboardPage() {
               <div>
                 <h2 className="text-lg font-bold text-slate-800">{currentBranch} Branch — Read-Only View</h2>
                 <p className="text-xs text-slate-500">
-                  You can view today's Washing and Ironing activity for {currentBranch}. Viewing only — no changes can be made.
+                  You can view today's {user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing and Ironing'} activity for {currentBranch}. Viewing only — no changes can be made.
                 </p>
               </div>
             </div>
 
-            {/* STAFF SUMMARY — both departments combined, today only */}
+            {/* STAFF SUMMARY — today only, scoped to assigned department (or both) */}
             <StaffSummaryReport
               staffSummary={staffSummary}
               title={`${currentBranch} Branch Report — Today`}
-              subtitle="How everyone in your branch is performing today (Washing & Ironing)"
+              subtitle={`How everyone in your branch is performing today${user?.department ? '' : ' (Washing & Ironing)'}`}
               showBranchColumn={false}
             />
 
-            {/* TODAY'S LOGS — both departments, no actions */}
+            {/* TODAY'S LOGS — no actions */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
               <h3 className="text-md font-bold text-slate-800 mb-4">
-                Today's Logs — {currentBranch} Branch (Washing &amp; Ironing)
+                Today's Logs — {currentBranch} Branch ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
               </h3>
 
               <div className="overflow-x-auto">
@@ -1322,7 +1325,7 @@ export default function DashboardPage() {
                   <thead>
                     <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase">
                       <th className="py-3 px-2">Order ID</th>
-                      <th className="py-3 px-2">Department</th>
+                      {!user?.department && <th className="py-3 px-2">Department</th>}
                       <th className="py-3 px-2">Staff</th>
                       <th className="py-3 px-2">Qty</th>
                       <th className="py-3 px-2">Duration (Min)</th>
@@ -1331,7 +1334,7 @@ export default function DashboardPage() {
                   <tbody>
                     {logs.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="text-center py-6 text-slate-400">
+                        <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400">
                           No logs registered today for {currentBranch} branch yet.
                         </td>
                       </tr>
@@ -1340,17 +1343,19 @@ export default function DashboardPage() {
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
                             <td className="py-3 px-2 font-semibold text-slate-800">#{item.orderId}</td>
-                            <td className="py-3 px-2">
-                              <span
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
-                                  item.department === 'IRONING'
-                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
-                                }`}
-                              >
-                                {item.department}
-                              </span>
-                            </td>
+                            {!user?.department && (
+                              <td className="py-3 px-2">
+                                <span
+                                  className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                                    item.department === 'IRONING'
+                                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                      : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                  }`}
+                                >
+                                  {item.department}
+                                </span>
+                              </td>
+                            )}
                             {idx === 0 && (
                               <td className="py-3 px-2 align-top" rowSpan={group.orders.length}>
                                 {group.staffName}
@@ -1375,7 +1380,7 @@ export default function DashboardPage() {
                   {logs.length > 0 && (
                     <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
                       <tr>
-                        <td colSpan="3" className="py-3 px-2 text-slate-800">Total ({logs.length} Orders):</td>
+                        <td colSpan={user?.department ? 2 : 3} className="py-3 px-2 text-slate-800">Total ({logs.length} Orders):</td>
                         <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
                         <td className="py-3 px-2 text-brand-800">{logsTotals.totalMinutes} Min</td>
                       </tr>

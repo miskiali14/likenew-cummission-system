@@ -16,6 +16,7 @@ export async function GET(request) {
         email: true,
         role: true,
         branch: true,
+        department: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' },
@@ -37,7 +38,7 @@ export async function POST(request) {
   if (auth.response) return auth.response;
 
   try {
-    const { name, email, password, role, branch } = await request.json();
+    const { name, email, password, role, branch, department } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -60,6 +61,7 @@ export async function POST(request) {
         password: hashedPassword,
         role: role || 'SALES',
         branch: role === 'ADMIN' ? null : (branch || 'HQ'),
+        department: role === 'VIEWER' && department ? department : null,
       },
       select: {
         id: true,
@@ -67,6 +69,7 @@ export async function POST(request) {
         email: true,
         role: true,
         branch: true,
+        department: true,
       },
     });
 

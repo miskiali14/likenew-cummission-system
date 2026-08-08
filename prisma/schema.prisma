@@ -30,15 +30,16 @@ enum UserStatus {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  fullName  String
-  email     String     @unique
-  password  String
-  role      Role
-  branch    String?    // HQ or KM5 (null for Admin)
-  status    UserStatus @default(ACTIVE)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id         String      @id @default(uuid())
+  fullName   String
+  email      String      @unique
+  password   String
+  role       Role
+  branch     String?     // HQ or KM5 (null for Admin)
+  department Department? // VIEWER only: scopes them to one department. Null = both.
+  status     UserStatus  @default(ACTIVE)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 model Employee {

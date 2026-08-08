@@ -27,7 +27,14 @@ export async function POST(request) {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, branch: user.branch, fullName: user.fullName },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        branch: user.branch,
+        department: user.department,
+        fullName: user.fullName,
+      },
       process.env.JWT_SECRET || 'supersecretkey',
       { expiresIn: '1d' }
     );
@@ -41,6 +48,7 @@ export async function POST(request) {
         email: user.email,
         role: user.role,
         branch: user.branch,
+        department: user.department,
       },
     });
   } catch (error) {
