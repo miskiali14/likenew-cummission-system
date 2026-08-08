@@ -65,7 +65,10 @@ export async function POST(request) {
         shift,
         staffName: employee.name,
         employeeId: employee.id,
-        durationMinutes: Number(durationMinutes),
+        durationMinutes:
+          durationMinutes === undefined || durationMinutes === null || durationMinutes === ''
+            ? null
+            : Number(durationMinutes),
         department,
         branch,
       },

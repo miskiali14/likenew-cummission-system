@@ -407,6 +407,8 @@ export default function DashboardPage() {
   // Dynamic Staff Memoization
   const currentBranch = user?.branch || 'HQ';
   const currentDept = user?.role === 'QUALITY_CONTROL' ? 'IRONING' : 'WASHING';
+  // Sales/QC can only edit or delete orders registered today; Admin has no such limit.
+  const todayStr = new Date().toISOString().split('T')[0];
 
   // Fetch real Employees for this branch/department (replaces the old hardcoded staff list)
   const fetchEmployees = useCallback(async () => {
@@ -583,10 +585,9 @@ export default function DashboardPage() {
 
     const orderIdNum = Number(formData.orderId);
     const quantityNum = Number(formData.quantity);
-    const durationNum = Number(formData.durationMinutes);
 
-    if (!orderIdNum || !quantityNum || !durationNum) {
-      alert('Please enter valid positive numbers for Order ID, Quantity, and Duration!');
+    if (!orderIdNum || !quantityNum) {
+      alert('Please enter valid positive numbers for Order ID and Quantity!');
       return;
     }
 
@@ -609,7 +610,7 @@ export default function DashboardPage() {
         registrarId: formData.registrarId,
         shift: formData.shift,
         employeeId: formData.employeeId,
-        durationMinutes: durationNum,
+        durationMinutes: formData.durationMinutes === '' ? null : Number(formData.durationMinutes),
       };
 
       await API.post('/logs', payload);
@@ -644,12 +645,16 @@ export default function DashboardPage() {
       await API.patch(`/logs/${logId}`, { durationMinutes: parsedDuration });
       setEditingLogId(null);
       setNewDuration('');
-      fetchRoleLogs();
-      fetchMyLogs();
-      fetchMyBranchStaffSummary();
+      if (user?.role === 'ADMIN') {
+        fetchAdminDashboardData();
+      } else {
+        fetchRoleLogs();
+        fetchMyLogs();
+        fetchMyBranchStaffSummary();
+      }
     } catch (err) {
       console.error('Update Error:', err.response?.data);
-      alert('An error occurred while updating duration');
+      alert(err.response?.data?.message || 'An error occurred while updating duration');
     }
   };
 
@@ -658,7 +663,13 @@ export default function DashboardPage() {
 
     try {
       await API.delete(`/logs/${logId}`);
-      fetchAdminDashboardData();
+      if (user?.role === 'ADMIN') {
+        fetchAdminDashboardData();
+      } else {
+        fetchRoleLogs();
+        fetchMyLogs();
+        fetchMyBranchStaffSummary();
+      }
     } catch (err) {
       console.error('Delete Error:', err.response?.data);
       alert(err.response?.data?.message || 'An error occurred while deleting the log');
@@ -914,21 +925,74 @@ export default function DashboardPage() {
                             )}
                             <td className="py-3 px-3">{item.quantity}</td>
                             <td className="py-3 px-3">
-                              <span className="flex items-center gap-1 text-slate-600">
-                                <Clock size={14} className="text-slate-400" />
-                                {item.durationMinutes} Min
-                              </span>
+                              {editingLogId === item.id ? (
+                                <input
+                                  type="number"
+                                  value={newDuration}
+                                  onChange={(e) => setNewDuration(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleUpdateDuration(item.id);
+                                    if (e.key === 'Escape') {
+                                      setEditingLogId(null);
+                                      setNewDuration('');
+                                    }
+                                  }}
+                                  className="w-20 border border-brand-400 rounded-lg p-1 text-sm focus:outline-none"
+                                  autoFocus
+                                />
+                              ) : (
+                                <span className="flex items-center gap-1 text-slate-600">
+                                  <Clock size={14} className="text-slate-400" />
+                                  {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
+                                    <span className="text-slate-400 italic">Not set</span>
+                                  )}
+                                </span>
+                              )}
                             </td>
                             <td className="py-3 px-3 text-slate-500">{item.assignedBy}</td>
                             <td className="py-3 px-3 text-slate-500">{item.date}</td>
                             <td className="py-3 px-3 text-right">
-                              <button
-                                onClick={() => handleDeleteLog(item.id)}
-                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                                title="Delete Log"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                              {editingLogId === item.id ? (
+                                <div className="flex items-center justify-end gap-1">
+                                  <button
+                                    onClick={() => handleUpdateDuration(item.id)}
+                                    className="p-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200"
+                                    title="Save"
+                                  >
+                                    <Check size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setEditingLogId(null);
+                                      setNewDuration('');
+                                    }}
+                                    className="p-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                                    title="Cancel"
+                                  >
+                                    <X size={16} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-end gap-1">
+                                  <button
+                                    onClick={() => {
+                                      setEditingLogId(item.id);
+                                      setNewDuration(item.durationMinutes ?? '');
+                                    }}
+                                    className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition"
+                                    title="Edit Duration"
+                                  >
+                                    <Edit2 size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteLog(item.id)}
+                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                    title="Delete Log"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         ))
@@ -1048,11 +1112,10 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">7. Duration (Min)</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">7. Duration (Min) — optional</label>
                   <input
                     type="number"
-                    required
-                    placeholder="E.g. 45"
+                    placeholder="Leave blank if not known yet"
                     value={formData.durationMinutes}
                     onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
                     className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
@@ -1167,7 +1230,9 @@ export default function DashboardPage() {
                                   autoFocus
                                 />
                               ) : (
-                                `${item.durationMinutes} Min`
+                                item.durationMinutes != null ? `${item.durationMinutes} Min` : (
+                                  <span className="text-slate-400 italic">Not set</span>
+                                )
                               )}
                             </td>
                             <td className="py-3 px-2">
@@ -1191,17 +1256,28 @@ export default function DashboardPage() {
                                     <X size={16} />
                                   </button>
                                 </div>
+                              ) : item.date !== todayStr ? (
+                                <span className="text-[11px] text-slate-400 italic">Locked</span>
                               ) : (
-                                <button
-                                  onClick={() => {
-                                    setEditingLogId(item.id);
-                                    setNewDuration(item.durationMinutes);
-                                  }}
-                                  className="p-1 text-slate-400 hover:text-brand-600 rounded"
-                                  title="Edit Duration"
-                                >
-                                  <Edit2 size={16} />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => {
+                                      setEditingLogId(item.id);
+                                      setNewDuration(item.durationMinutes ?? '');
+                                    }}
+                                    className="p-1 text-slate-400 hover:text-brand-600 rounded"
+                                    title="Edit Duration"
+                                  >
+                                    <Edit2 size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteLog(item.id)}
+                                    className="p-1 text-slate-400 hover:text-red-600 rounded"
+                                    title="Delete Log"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
                               )}
                             </td>
                           </tr>

@@ -72,7 +72,7 @@ model Log {
   quantity        Int
   date            String     // YYYY-MM-DD
   shift           Shift
-  durationMinutes Int
+  durationMinutes Int?
   department      Department
   branch          String
 
