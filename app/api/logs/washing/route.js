@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
+import { todayStr } from '@/lib/date';
 
-// Washing Logs — Sales & Admin
+// Washing Logs — Sales & Admin. Sales only ever sees today's orders; Admin
+// sees full history (they have "All Registered Logs" for that).
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES']);
   if (auth.response) return auth.response;
@@ -13,6 +15,7 @@ export async function GET(request) {
     const branch = resolveBranch(auth.user, searchParams);
     const whereClause = { department: 'WASHING' };
     if (branch) whereClause.branch = branch;
+    if (auth.user.role !== 'ADMIN') whereClause.date = todayStr();
 
     const logs = await prisma.log.findMany({
       where: whereClause,

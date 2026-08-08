@@ -1046,13 +1046,13 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">3. Date</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">3. Date (today only)</label>
                   <input
                     type="date"
                     required
+                    disabled
                     value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-100 text-slate-500 cursor-not-allowed"
                   />
                 </div>
 
@@ -1154,20 +1154,19 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* STAFF SUMMARY — visible to SALES / QUALITY_CONTROL, scoped to their own branch & department */}
+            {/* STAFF SUMMARY — visible to SALES / QUALITY_CONTROL, scoped to their own branch & department.
+                Always today's report — only Admin can browse other dates. */}
             <StaffSummaryReport
               staffSummary={staffSummary}
-              title={`${currentBranch} Branch Report (${currentDept === 'IRONING' ? 'Ironing' : 'Washing'})`}
-              subtitle="How everyone in your branch & department is performing"
+              title={`${currentBranch} Branch Report — Today (${currentDept === 'IRONING' ? 'Ironing' : 'Washing'})`}
+              subtitle="How everyone in your branch & department is performing today"
               showBranchColumn={false}
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
             />
 
             {/* LOGS LIST FOR STAFF */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
               <h3 className="text-md font-bold text-slate-800 mb-4">
-                Logs for {currentBranch} Branch ({user?.role === 'QUALITY_CONTROL' ? 'Ironing' : 'Washing'})
+                Today's Logs — {currentBranch} Branch ({user?.role === 'QUALITY_CONTROL' ? 'Ironing' : 'Washing'})
               </h3>
 
               <div className="overflow-x-auto">
@@ -1185,7 +1184,7 @@ export default function DashboardPage() {
                     {logs.length === 0 ? (
                       <tr>
                         <td colSpan="5" className="text-center py-6 text-slate-400">
-                          No active logs found for {currentBranch} branch at this time.
+                          No logs registered today for {currentBranch} branch yet.
                         </td>
                       </tr>
                     ) : (

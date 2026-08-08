@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
+import { todayStr } from '@/lib/date';
 
-// Staff Summary Controller — Admin, Sales, QC
+// Staff Summary Controller — Admin, Sales, QC. Sales/QC can only ever see
+// today's report; Admin can pick any date.
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'QUALITY_CONTROL']);
   if (auth.response) return auth.response;
@@ -13,7 +15,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const branch = resolveBranch(user, searchParams);
     const department = searchParams.get('department');
-    const date = searchParams.get('date');
+    const date = user.role === 'ADMIN' ? searchParams.get('date') : todayStr();
 
     const whereClause = {};
     if (branch) whereClause.branch = branch;

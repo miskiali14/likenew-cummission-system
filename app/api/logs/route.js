@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { ROLE_DEPARTMENT_MAP } from '@/lib/branch';
+import { todayStr } from '@/lib/date';
 
-// Register a new log — Admin, Sales, QC
+// Register a new log — Admin, Sales, QC. Sales/QC can only register orders
+// dated today; Admin may backdate (e.g. entering missed paperwork).
 export async function POST(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'QUALITY_CONTROL']);
   if (auth.response) return auth.response;
@@ -11,9 +13,10 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { orderId, quantity, date, shift, durationMinutes, employeeId, registrarId } = body;
+    const { orderId, quantity, shift, durationMinutes, employeeId, registrarId } = body;
     const role = user.role;
 
+    const date = role === 'ADMIN' ? body.date || todayStr() : todayStr();
     const branch = role === 'ADMIN' ? (body.branch || 'HQ') : user.branch;
     const department = role === 'ADMIN' ? body.department : ROLE_DEPARTMENT_MAP[role];
     const registrarRole = role === 'ADMIN' ? body.registrarRole : role;
