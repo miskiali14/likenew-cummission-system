@@ -3,8 +3,10 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { isToday } from '@/lib/date';
 
-// Update Duration — Admin can edit any log, any date. Sales/QC can only edit
-// logs in their own branch that were registered today.
+// Update an order — Admin can edit any log, any date. Sales/QC can only edit
+// logs in their own branch that were registered today. Any of orderId,
+// quantity, shift, employeeId, durationMinutes may be included; only the
+// fields present in the body are changed.
 export async function PATCH(request, { params }) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'QUALITY_CONTROL']);
   if (auth.response) return auth.response;
@@ -12,7 +14,7 @@ export async function PATCH(request, { params }) {
 
   try {
     const { id } = await params;
-    const { durationMinutes } = await request.json();
+    const body = await request.json();
 
     const existingLog = await prisma.log.findUnique({ where: { id } });
     if (!existingLog) {
@@ -33,15 +35,33 @@ export async function PATCH(request, { params }) {
       }
     }
 
-    const updatedLog = await prisma.log.update({
-      where: { id },
-      data: {
-        durationMinutes:
-          durationMinutes === undefined || durationMinutes === null || durationMinutes === ''
-            ? null
-            : Number(durationMinutes),
-      },
-    });
+    const data = {};
+    if (body.orderId !== undefined) data.orderId = Number(body.orderId);
+    if (body.quantity !== undefined) data.quantity = Number(body.quantity);
+    if (body.shift !== undefined) data.shift = body.shift;
+    if (body.durationMinutes !== undefined) {
+      data.durationMinutes =
+        body.durationMinutes === null || body.durationMinutes === ''
+          ? null
+          : Number(body.durationMinutes);
+    }
+
+    if (body.employeeId !== undefined && body.employeeId !== existingLog.employeeId) {
+      const employee = await prisma.employee.findUnique({ where: { id: body.employeeId } });
+      if (!employee) {
+        return NextResponse.json({ message: 'Employee not found' }, { status: 404 });
+      }
+      if (employee.branch !== existingLog.branch || employee.department !== existingLog.department) {
+        return NextResponse.json(
+          { message: 'This employee does not belong to this order\'s branch/department' },
+          { status: 400 }
+        );
+      }
+      data.employeeId = employee.id;
+      data.staffName = employee.name;
+    }
+
+    const updatedLog = await prisma.log.update({ where: { id }, data });
 
     return NextResponse.json(updatedLog);
   } catch (error) {

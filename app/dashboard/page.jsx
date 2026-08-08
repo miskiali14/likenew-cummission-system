@@ -23,8 +23,6 @@ import {
   Building2, 
   Send,
   Edit2,
-  Check,
-  X,
   Clock,
   Filter,
   Users,
@@ -357,9 +355,17 @@ export default function DashboardPage() {
     logs: []
   });
 
-  // Duration editing state
-  const [editingLogId, setEditingLogId] = useState(null);
-  const [newDuration, setNewDuration] = useState('');
+  // Full order edit modal state
+  const [editingOrderLog, setEditingOrderLog] = useState(null);
+  const [editOrderForm, setEditOrderForm] = useState({
+    orderId: '',
+    quantity: '',
+    shift: 'SHIFT_1',
+    employeeId: '',
+    durationMinutes: '',
+  });
+  const [editOrderEmployees, setEditOrderEmployees] = useState([]);
+  const [savingOrderEdit, setSavingOrderEdit] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -634,17 +640,42 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUpdateDuration = async (logId) => {
-    const parsedDuration = Number(newDuration);
-    if (!newDuration || isNaN(parsedDuration) || parsedDuration <= 0) {
-      alert('Please enter a valid duration in minutes');
-      return;
-    }
-
+  const openEditOrderModal = async (log) => {
+    setEditingOrderLog(log);
+    setEditOrderForm({
+      orderId: log.orderId,
+      quantity: log.quantity,
+      shift: log.shift,
+      employeeId: log.employeeId || '',
+      durationMinutes: log.durationMinutes ?? '',
+    });
     try {
-      await API.patch(`/logs/${logId}`, { durationMinutes: parsedDuration });
-      setEditingLogId(null);
-      setNewDuration('');
+      const res = await API.get(`/employees?branch=${log.branch}&department=${log.department}`);
+      setEditOrderEmployees(res.data || []);
+    } catch (err) {
+      setEditOrderEmployees([]);
+    }
+  };
+
+  const closeEditOrderModal = () => {
+    setEditingOrderLog(null);
+    setEditOrderEmployees([]);
+  };
+
+  const handleSaveOrderEdit = async (e) => {
+    e.preventDefault();
+    if (!editingOrderLog) return;
+
+    setSavingOrderEdit(true);
+    try {
+      await API.patch(`/logs/${editingOrderLog.id}`, {
+        orderId: Number(editOrderForm.orderId),
+        quantity: Number(editOrderForm.quantity),
+        shift: editOrderForm.shift,
+        employeeId: editOrderForm.employeeId,
+        durationMinutes: editOrderForm.durationMinutes === '' ? null : Number(editOrderForm.durationMinutes),
+      });
+      closeEditOrderModal();
       if (user?.role === 'ADMIN') {
         fetchAdminDashboardData();
       } else {
@@ -654,7 +685,9 @@ export default function DashboardPage() {
       }
     } catch (err) {
       console.error('Update Error:', err.response?.data);
-      alert(err.response?.data?.message || 'An error occurred while updating duration');
+      alert(err.response?.data?.message || 'An error occurred while saving the order');
+    } finally {
+      setSavingOrderEdit(false);
     }
   };
 
@@ -925,62 +958,21 @@ export default function DashboardPage() {
                             )}
                             <td className="py-3 px-3">{item.quantity}</td>
                             <td className="py-3 px-3">
-                              {editingLogId === item.id ? (
-                                <input
-                                  type="number"
-                                  value={newDuration}
-                                  onChange={(e) => setNewDuration(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleUpdateDuration(item.id);
-                                    if (e.key === 'Escape') {
-                                      setEditingLogId(null);
-                                      setNewDuration('');
-                                    }
-                                  }}
-                                  className="w-20 border border-brand-400 rounded-lg p-1 text-sm focus:outline-none"
-                                  autoFocus
-                                />
-                              ) : (
-                                <span className="flex items-center gap-1 text-slate-600">
-                                  <Clock size={14} className="text-slate-400" />
-                                  {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                    <span className="text-slate-400 italic">Not set</span>
-                                  )}
-                                </span>
-                              )}
+                              <span className="flex items-center gap-1 text-slate-600">
+                                <Clock size={14} className="text-slate-400" />
+                                {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
+                                  <span className="text-slate-400 italic">Not set</span>
+                                )}
+                              </span>
                             </td>
                             <td className="py-3 px-3 text-slate-500">{item.assignedBy}</td>
                             <td className="py-3 px-3 text-slate-500">{item.date}</td>
                             <td className="py-3 px-3 text-right">
-                              {editingLogId === item.id ? (
                                 <div className="flex items-center justify-end gap-1">
                                   <button
-                                    onClick={() => handleUpdateDuration(item.id)}
-                                    className="p-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200"
-                                    title="Save"
-                                  >
-                                    <Check size={16} />
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setEditingLogId(null);
-                                      setNewDuration('');
-                                    }}
-                                    className="p-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
-                                    title="Cancel"
-                                  >
-                                    <X size={16} />
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="flex items-center justify-end gap-1">
-                                  <button
-                                    onClick={() => {
-                                      setEditingLogId(item.id);
-                                      setNewDuration(item.durationMinutes ?? '');
-                                    }}
+                                    onClick={() => openEditOrderModal(item)}
                                     className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition"
-                                    title="Edit Duration"
+                                    title="Edit Order"
                                   >
                                     <Edit2 size={16} />
                                   </button>
@@ -992,7 +984,6 @@ export default function DashboardPage() {
                                     <Trash2 size={16} />
                                   </button>
                                 </div>
-                              )}
                             </td>
                           </tr>
                         ))
@@ -1214,59 +1205,19 @@ export default function DashboardPage() {
                             )}
                             <td className="py-3 px-2">{item.quantity}</td>
                             <td className="py-3 px-2 font-medium">
-                              {editingLogId === item.id ? (
-                                <input
-                                  type="number"
-                                  value={newDuration}
-                                  onChange={(e) => setNewDuration(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleUpdateDuration(item.id);
-                                    if (e.key === 'Escape') {
-                                      setEditingLogId(null);
-                                      setNewDuration('');
-                                    }
-                                  }}
-                                  className="w-20 border border-brand-400 rounded-lg p-1 text-sm focus:outline-none"
-                                  autoFocus
-                                />
-                              ) : (
-                                item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                  <span className="text-slate-400 italic">Not set</span>
-                                )
+                              {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
+                                <span className="text-slate-400 italic">Not set</span>
                               )}
                             </td>
                             <td className="py-3 px-2">
-                              {editingLogId === item.id ? (
-                                <div className="flex items-center gap-1">
-                                  <button
-                                    onClick={() => handleUpdateDuration(item.id)}
-                                    className="p-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200"
-                                    title="Save"
-                                  >
-                                    <Check size={16} />
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setEditingLogId(null);
-                                      setNewDuration('');
-                                    }}
-                                    className="p-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
-                                    title="Cancel"
-                                  >
-                                    <X size={16} />
-                                  </button>
-                                </div>
-                              ) : item.date !== todayStr ? (
+                              {item.date !== todayStr ? (
                                 <span className="text-[11px] text-slate-400 italic">Locked</span>
                               ) : (
                                 <div className="flex items-center gap-1">
                                   <button
-                                    onClick={() => {
-                                      setEditingLogId(item.id);
-                                      setNewDuration(item.durationMinutes ?? '');
-                                    }}
+                                    onClick={() => openEditOrderModal(item)}
                                     className="p-1 text-slate-400 hover:text-brand-600 rounded"
-                                    title="Edit Duration"
+                                    title="Edit Order"
                                   >
                                     <Edit2 size={16} />
                                   </button>
@@ -1301,6 +1252,99 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* EDIT ORDER MODAL */}
+      {editingOrderLog && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+            <h2 className="text-xl font-bold text-slate-800">
+              Edit Order #{editingOrderLog.orderId}
+            </h2>
+            <form onSubmit={handleSaveOrderEdit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Order ID</label>
+                  <input
+                    type="number"
+                    required
+                    value={editOrderForm.orderId}
+                    onChange={(e) => setEditOrderForm({ ...editOrderForm, orderId: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    required
+                    value={editOrderForm.quantity}
+                    onChange={(e) => setEditOrderForm({ ...editOrderForm, quantity: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Shift</label>
+                  <select
+                    value={editOrderForm.shift}
+                    onChange={(e) => setEditOrderForm({ ...editOrderForm, shift: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  >
+                    <option value="SHIFT_1">SHIFT 1</option>
+                    <option value="SHIFT_2">SHIFT 2</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Duration (Min) — optional</label>
+                  <input
+                    type="number"
+                    placeholder="Leave blank if not known yet"
+                    value={editOrderForm.durationMinutes}
+                    onChange={(e) => setEditOrderForm({ ...editOrderForm, durationMinutes: e.target.value })}
+                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Staff Member</label>
+                <select
+                  required
+                  value={editOrderForm.employeeId}
+                  onChange={(e) => setEditOrderForm({ ...editOrderForm, employeeId: e.target.value })}
+                  className="w-full border border-slate-200 bg-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                >
+                  {editOrderEmployees.length === 0 && <option value="">Loading employees…</option>}
+                  {editOrderEmployees.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={closeEditOrderModal}
+                  className="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingOrderEdit}
+                  className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50"
+                >
+                  {savingOrderEdit ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
