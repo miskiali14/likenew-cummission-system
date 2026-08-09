@@ -298,8 +298,16 @@ function StaffSummaryReport({
                         />
                       </div>
                     </td>
-                    <td className="py-3 px-3 text-right font-bold text-emerald-600">{staff.totalQuantity} Pcs</td>
-                    <td className="py-3 px-3 text-right font-semibold text-slate-700">{staff.totalOrdersHandled} Orders</td>
+                    <td className="py-3 px-3 text-right">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-base">
+                        {staff.totalQuantity} Pcs
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-brand-50 border-2 border-brand-200 text-brand-700 font-extrabold text-base">
+                        {staff.totalOrdersHandled} Orders
+                      </span>
+                    </td>
                     <td className="py-3 px-3 text-right font-semibold text-brand-700">{staff.totalDuration} Min</td>
                     {showCommission && (
                       <td className="py-3 px-3 text-right font-bold text-amber-700">
