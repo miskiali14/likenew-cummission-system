@@ -995,7 +995,11 @@ export default function DashboardPage() {
                                 )}
                               </td>
                             )}
-                            <td className="py-3 px-3 font-extrabold text-emerald-700 text-base">{item.quantity}</td>
+                            <td className="py-3 px-3">
+                              <span className="inline-flex items-center justify-center min-w-[2.5rem] px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-lg">
+                                {item.quantity}
+                              </span>
+                            </td>
                             <td className="py-3 px-3">
                               <span className="flex items-center gap-1 text-slate-600">
                                 <Clock size={14} className="text-slate-400" />
@@ -1241,7 +1245,11 @@ export default function DashboardPage() {
                                 )}
                               </td>
                             )}
-                            <td className="py-3 px-2 font-extrabold text-emerald-700 text-base">{item.quantity}</td>
+                            <td className="py-3 px-2">
+                              <span className="inline-flex items-center justify-center min-w-[2.5rem] px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-lg">
+                                {item.quantity}
+                              </span>
+                            </td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
                                 <span className="text-slate-400 italic">Not set</span>
@@ -1366,7 +1374,11 @@ export default function DashboardPage() {
                                 )}
                               </td>
                             )}
-                            <td className="py-3 px-2 font-extrabold text-emerald-700 text-base">{item.quantity}</td>
+                            <td className="py-3 px-2">
+                              <span className="inline-flex items-center justify-center min-w-[2.5rem] px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-lg">
+                                {item.quantity}
+                              </span>
+                            </td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
                                 <span className="text-slate-400 italic">Not set</span>
