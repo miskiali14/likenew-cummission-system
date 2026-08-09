@@ -218,8 +218,8 @@ function StaffSummaryReport({
                     </div>
                   </div>
                   <div className="mt-3 flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-slate-900">{staff.totalQuantity}</span>
-                    <span className="text-[11px] text-slate-400">pieces handled</span>
+                    <span className="text-2xl font-extrabold text-slate-900">{staff.totalOrdersHandled}</span>
+                    <span className="text-[11px] text-slate-400">orders handled</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden">
                     <div
@@ -228,7 +228,7 @@ function StaffSummaryReport({
                     />
                   </div>
                   <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-500">
-                    <span>{staff.totalOrdersHandled} orders</span>
+                    <span>{staff.totalQuantity} pieces</span>
                     <span className="w-1 h-1 rounded-full bg-slate-300" />
                     <span>{staff.totalDuration} min</span>
                   </div>
