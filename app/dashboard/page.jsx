@@ -260,8 +260,8 @@ function StaffSummaryReport({
                   <th className="py-3 px-3">Department</th>
                   {showBranchColumn && <th className="py-3 px-3">Branch</th>}
                   <th className="py-3 px-3">Performance</th>
-                  <th className="py-3 px-3 text-right">Total Items</th>
                   <th className="py-3 px-3 text-right">Total Orders</th>
+                  <th className="py-3 px-3 text-right">Total Items</th>
                   <th className="py-3 px-3 text-right">Total Minutes</th>
                   {showCommission && <th className="py-3 px-3 text-right">Commission</th>}
                 </tr>
@@ -299,13 +299,13 @@ function StaffSummaryReport({
                       </div>
                     </td>
                     <td className="py-3 px-3 text-right">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-base">
-                        {staff.totalQuantity} Pcs
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-brand-50 border-2 border-brand-200 text-brand-700 font-extrabold text-base">
+                        {staff.totalOrdersHandled} Orders
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-brand-50 border-2 border-brand-200 text-brand-700 font-extrabold text-base">
-                        {staff.totalOrdersHandled} Orders
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-base">
+                        {staff.totalQuantity} Pcs
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right font-semibold text-brand-700">{staff.totalDuration} Min</td>
@@ -320,8 +320,8 @@ function StaffSummaryReport({
               <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
                 <tr>
                   <td colSpan={showBranchColumn ? 5 : 4} className="py-3 px-3 text-slate-800">Overall Report Total:</td>
-                  <td className="py-3 px-3 text-right text-emerald-700">{staffSummaryTotals.totalItems} Pcs</td>
                   <td className="py-3 px-3 text-right text-slate-900">{staffSummaryTotals.totalOrders} Orders</td>
+                  <td className="py-3 px-3 text-right text-emerald-700">{staffSummaryTotals.totalItems} Pcs</td>
                   <td className="py-3 px-3 text-right text-brand-800">{staffSummaryTotals.totalMinutes} Min</td>
                   {showCommission && (
                     <td className="py-3 px-3 text-right text-amber-800">
