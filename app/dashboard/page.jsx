@@ -965,7 +965,7 @@ export default function DashboardPage() {
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td className="py-3 px-3 font-semibold text-slate-800">#{item.orderId}</td>
+                            <td className="py-3 px-3 font-extrabold text-slate-900 text-base">#{item.orderId}</td>
                             <td className="py-3 px-3">
                               <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                                 {item.branch || 'HQ'}
@@ -995,7 +995,7 @@ export default function DashboardPage() {
                                 )}
                               </td>
                             )}
-                            <td className="py-3 px-3">{item.quantity}</td>
+                            <td className="py-3 px-3 font-extrabold text-emerald-700 text-base">{item.quantity}</td>
                             <td className="py-3 px-3">
                               <span className="flex items-center gap-1 text-slate-600">
                                 <Clock size={14} className="text-slate-400" />
@@ -1230,7 +1230,7 @@ export default function DashboardPage() {
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2 font-semibold text-slate-800">#{item.orderId}</td>
+                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">#{item.orderId}</td>
                             {idx === 0 && (
                               <td className="py-3 px-2 align-top" rowSpan={group.orders.length}>
                                 {group.staffName}
@@ -1241,7 +1241,7 @@ export default function DashboardPage() {
                                 )}
                               </td>
                             )}
-                            <td className="py-3 px-2">{item.quantity}</td>
+                            <td className="py-3 px-2 font-extrabold text-emerald-700 text-base">{item.quantity}</td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
                                 <span className="text-slate-400 italic">Not set</span>
@@ -1342,7 +1342,7 @@ export default function DashboardPage() {
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2 font-semibold text-slate-800">#{item.orderId}</td>
+                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">#{item.orderId}</td>
                             {!user?.department && (
                               <td className="py-3 px-2">
                                 <span
@@ -1366,7 +1366,7 @@ export default function DashboardPage() {
                                 )}
                               </td>
                             )}
-                            <td className="py-3 px-2">{item.quantity}</td>
+                            <td className="py-3 px-2 font-extrabold text-emerald-700 text-base">{item.quantity}</td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
                                 <span className="text-slate-400 italic">Not set</span>
