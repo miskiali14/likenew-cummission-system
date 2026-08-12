@@ -37,8 +37,6 @@ export async function GET(request) {
       },
     });
 
-    const isAdmin = user.role === 'ADMIN';
-
     // Merge rows whose staff name matches case-insensitively (handles accidental
     // duplicate Employee records for the same real person, e.g. "hassan nur" vs
     // "Hasan Nur") so each person's totals appear on one combined row instead of
@@ -65,27 +63,19 @@ export async function GET(request) {
       row.totalDuration += log.durationMinutes || 0;
       row.totalOrdersHandled += 1;
       // Commission is tiered per-order: each order's own quantity picks its rate.
-      if (isAdmin) {
-        row.commissionEarned += calculateOrderCommission(log.quantity);
-      }
+      row.commissionEarned += calculateOrderCommission(log.quantity);
     }
 
     const formattedSummary = Array.from(mergedByKey.values())
-      .map((row) => {
-        const result = {
-          staffName: row.staffName,
-          department: row.department,
-          branch: row.branch,
-          totalQuantity: row.totalQuantity,
-          totalDuration: row.totalDuration,
-          totalOrdersHandled: row.totalOrdersHandled,
-        };
-        // Commission amounts are Admin-only, per branch owner's decision.
-        if (isAdmin) {
-          result.commissionEarned = row.commissionEarned;
-        }
-        return result;
-      })
+      .map((row) => ({
+        staffName: row.staffName,
+        department: row.department,
+        branch: row.branch,
+        totalQuantity: row.totalQuantity,
+        totalDuration: row.totalDuration,
+        totalOrdersHandled: row.totalOrdersHandled,
+        commissionEarned: row.commissionEarned,
+      }))
       .sort((a, b) => b.totalQuantity - a.totalQuantity);
 
     return NextResponse.json(formattedSummary);
