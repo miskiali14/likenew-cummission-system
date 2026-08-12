@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { todayStr } from '@/lib/date';
+import { calculateOrderCommission } from '@/lib/commission';
 
 // Staff Summary Controller — Admin, Sales, QC, Viewer. Sales/QC/Viewer can
 // only ever see today's report; Admin can pick any date.
@@ -25,18 +26,16 @@ export async function GET(request) {
     if (department && department !== 'All') whereClause.department = department;
     if (date) whereClause.date = date;
 
-    const summary = await prisma.log.groupBy({
-      by: ['staffName', 'employeeId', 'department', 'branch'],
+    const logs = await prisma.log.findMany({
       where: whereClause,
-      _sum: { quantity: true, durationMinutes: true },
-      _count: { id: true },
+      select: {
+        staffName: true,
+        department: true,
+        branch: true,
+        quantity: true,
+        durationMinutes: true,
+      },
     });
-
-    const employeeIds = summary.map((s) => s.employeeId).filter(Boolean);
-    const employees = employeeIds.length
-      ? await prisma.employee.findMany({ where: { id: { in: employeeIds } } })
-      : [];
-    const rateByEmployeeId = Object.fromEntries(employees.map((e) => [e.id, e.rate]));
 
     const isAdmin = user.role === 'ADMIN';
 
@@ -45,32 +44,29 @@ export async function GET(request) {
     // "Hasan Nur") so each person's totals appear on one combined row instead of
     // being split across near-duplicate entries.
     const mergedByKey = new Map();
-    for (const item of summary) {
-      const normalizedName = item.staffName.trim().toLowerCase();
-      const key = `${normalizedName}|${item.department}|${item.branch}`;
-      const totalQuantity = item._sum.quantity || 0;
-      const rate = item.employeeId ? rateByEmployeeId[item.employeeId] : undefined;
+    for (const log of logs) {
+      const normalizedName = log.staffName.trim().toLowerCase();
+      const key = `${normalizedName}|${log.department}|${log.branch}`;
 
       if (!mergedByKey.has(key)) {
         mergedByKey.set(key, {
-          staffName: item.staffName.trim(),
-          department: item.department,
-          branch: item.branch,
+          staffName: log.staffName.trim(),
+          department: log.department,
+          branch: log.branch,
           totalQuantity: 0,
           totalDuration: 0,
           totalOrdersHandled: 0,
           commissionEarned: 0,
-          anyKnownRate: false,
         });
       }
 
       const row = mergedByKey.get(key);
-      row.totalQuantity += totalQuantity;
-      row.totalDuration += item._sum.durationMinutes || 0;
-      row.totalOrdersHandled += item._count.id || 0;
-      if (isAdmin && rate !== undefined) {
-        row.commissionEarned += totalQuantity * rate;
-        row.anyKnownRate = true;
+      row.totalQuantity += log.quantity || 0;
+      row.totalDuration += log.durationMinutes || 0;
+      row.totalOrdersHandled += 1;
+      // Commission is tiered per-order: each order's own quantity picks its rate.
+      if (isAdmin) {
+        row.commissionEarned += calculateOrderCommission(log.quantity);
       }
     }
 
@@ -86,7 +82,7 @@ export async function GET(request) {
         };
         // Commission amounts are Admin-only, per branch owner's decision.
         if (isAdmin) {
-          result.commissionEarned = row.anyKnownRate ? row.commissionEarned : null;
+          result.commissionEarned = row.commissionEarned;
         }
         return result;
       })

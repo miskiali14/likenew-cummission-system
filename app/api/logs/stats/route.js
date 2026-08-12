@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
+import { calculateOrderCommission } from '@/lib/commission';
 
 // Admin Stats Controller (/api/logs/stats) — ADMIN only
 export async function GET(request) {
@@ -18,13 +19,14 @@ export async function GET(request) {
       prisma.log.count({ where: { ...whereClause, department: 'IRONING' } }),
       prisma.log.count({ where: whereClause }),
       prisma.log.findMany({
-        where: { ...whereClause, employeeId: { not: null } },
-        select: { quantity: true, employee: { select: { rate: true } } },
+        where: whereClause,
+        select: { quantity: true },
       }),
     ]);
 
+    // Commission is tiered per-order: each order's own quantity picks its rate.
     const totalCommission = commissionLogs.reduce(
-      (sum, log) => sum + log.quantity * (log.employee?.rate || 0),
+      (sum, log) => sum + calculateOrderCommission(log.quantity),
       0
     );
 
