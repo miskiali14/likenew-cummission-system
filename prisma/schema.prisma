@@ -47,7 +47,6 @@ model Employee {
   name       String
   branch     String     // HQ or KM5
   department Department
-  rate       Float      // Commission rate per piece
   status     UserStatus @default(ACTIVE)
   createdAt  DateTime   @default(now())
 

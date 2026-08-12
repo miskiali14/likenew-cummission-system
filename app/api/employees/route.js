@@ -41,17 +41,17 @@ export async function POST(request) {
   if (auth.response) return auth.response;
 
   try {
-    const { name, branch, department, rate } = await request.json();
+    const { name, branch, department } = await request.json();
 
-    if (!name || !branch || !department || rate === undefined) {
+    if (!name || !branch || !department) {
       return NextResponse.json(
-        { message: 'Please fill in the name, branch, department, and rate' },
+        { message: 'Please fill in the name, branch, and department' },
         { status: 400 }
       );
     }
 
     const employee = await prisma.employee.create({
-      data: { name, branch, department, rate: Number(rate) },
+      data: { name, branch, department },
     });
 
     return NextResponse.json(employee, { status: 201 });

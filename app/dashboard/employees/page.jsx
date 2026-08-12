@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { UserPlus, Trash2, Edit2, Building, DollarSign, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { UserPlus, Trash2, Edit2, Building, AlertCircle, CheckCircle2, X } from 'lucide-react';
 
-const emptyForm = { name: '', branch: 'HQ', department: 'WASHING', rate: '' };
+const emptyForm = { name: '', branch: 'HQ', department: 'WASHING' };
 
 export default function EmployeesPage() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function EmployeesPage() {
 
   const openEditModal = (emp) => {
     setEditingId(emp.id);
-    setFormData({ name: emp.name, branch: emp.branch, department: emp.department, rate: String(emp.rate) });
+    setFormData({ name: emp.name, branch: emp.branch, department: emp.department });
     setShowModal(true);
   };
 
@@ -121,7 +121,7 @@ export default function EmployeesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Employees & Commission</h1>
-          <p className="text-sm text-gray-500">Add, edit, or remove branch staff (HQ / KM5) and their commission rate</p>
+          <p className="text-sm text-gray-500">Add, edit, or remove branch staff (HQ / KM5) — commission is calculated automatically per order</p>
         </div>
         <button
           onClick={openAddModal}
@@ -141,14 +141,13 @@ export default function EmployeesPage() {
                 <th className="p-4">Name</th>
                 <th className="p-4">Branch</th>
                 <th className="p-4">Department</th>
-                <th className="p-4">Rate (Per Piece)</th>
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-gray-400 text-sm">
+                  <td colSpan={4} className="p-6 text-center text-gray-400 text-sm">
                     No employees yet.
                   </td>
                 </tr>
@@ -170,11 +169,6 @@ export default function EmployeesPage() {
                         }`}
                       >
                         {emp.department}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
-                        <DollarSign size={14} /> {emp.rate}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -243,20 +237,6 @@ export default function EmployeesPage() {
                     <option value="IRONING">IRONING</option>
                   </select>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Commission Rate (per piece)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  required
-                  placeholder="E.g. 0.50"
-                  value={formData.rate}
-                  onChange={(e) => setFormData({ ...formData, rate: e.target.value })}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
               </div>
 
               <div className="flex justify-end gap-2 pt-2">

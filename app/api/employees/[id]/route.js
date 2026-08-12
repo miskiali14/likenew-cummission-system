@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
-// Update Employee (rate, status, etc.) — Admin only
+// Update Employee (name, branch, department, status) — Admin only
 export async function PATCH(request, { params }) {
   const auth = requireAuth(request, ['ADMIN']);
   if (auth.response) return auth.response;
 
   try {
     const { id } = await params;
-    const { name, branch, department, rate, status } = await request.json();
+    const { name, branch, department, status } = await request.json();
 
     const employee = await prisma.employee.update({
       where: { id },
@@ -17,7 +17,6 @@ export async function PATCH(request, { params }) {
         ...(name !== undefined && { name }),
         ...(branch !== undefined && { branch }),
         ...(department !== undefined && { department }),
-        ...(rate !== undefined && { rate: Number(rate) }),
         ...(status !== undefined && { status }),
       },
     });
