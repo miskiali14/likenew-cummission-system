@@ -35,6 +35,9 @@ export default function Sidebar({ user }) {
               <Link href="/dashboard/registrars" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/registrars')}`}>
                 📝 Assigned By List
               </Link>
+              <Link href="/dashboard/financial-report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/financial-report')}`}>
+                💰 Financial Report
+              </Link>
               <div className="my-3 border-t border-gray-800" />
             </>
           )}
