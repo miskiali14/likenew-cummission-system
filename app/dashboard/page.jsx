@@ -345,7 +345,7 @@ function StaffSummaryReport({
                     <td className="py-3 px-3 text-right font-semibold text-brand-700">{staff.totalDuration} Min</td>
                     {showCommission && (
                       <td className="py-3 px-3 text-right font-bold text-amber-700">
-                        {staff.commissionEarned != null ? staff.commissionEarned.toFixed(2) : '—'}
+                        {staff.commissionEarned != null ? `$${staff.commissionEarned.toFixed(2)}` : '—'}
                       </td>
                     )}
                   </tr>
@@ -359,6 +359,7 @@ function StaffSummaryReport({
                   <td className="py-3 px-3 text-right text-brand-800">{staffSummaryTotals.totalMinutes} Min</td>
                   {showCommission && (
                     <td className="py-3 px-3 text-right text-amber-800">
+                      $
                       {rankedStaffSummary
                         .reduce((sum, s) => sum + (s.commissionEarned || 0), 0)
                         .toFixed(2)}
@@ -892,7 +893,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-xs uppercase font-semibold text-slate-400">Total Commission</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.totalCommission.toFixed(2)}</h3>
+                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5">${stats.totalCommission.toFixed(2)}</h3>
                 </div>
               </div>
             </div>
