@@ -20,13 +20,14 @@ export async function GET(request) {
       prisma.log.count({ where: whereClause }),
       prisma.log.findMany({
         where: whereClause,
-        select: { quantity: true },
+        select: { quantity: true, department: true },
       }),
     ]);
 
-    // Commission is tiered per-order: each order's own quantity picks its rate.
+    // Commission is tiered per-order (flat rate per order, not per piece);
+    // rate depends on the order's quantity tier and its department.
     const totalCommission = commissionLogs.reduce(
-      (sum, log) => sum + calculateOrderCommission(log.quantity),
+      (sum, log) => sum + calculateOrderCommission(log.quantity, log.department),
       0
     );
 

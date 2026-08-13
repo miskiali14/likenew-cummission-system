@@ -62,8 +62,10 @@ export async function GET(request) {
       row.totalQuantity += log.quantity || 0;
       row.totalDuration += log.durationMinutes || 0;
       row.totalOrdersHandled += 1;
-      // Commission is tiered per-order: each order's own quantity picks its rate.
-      row.commissionEarned += calculateOrderCommission(log.quantity);
+      // Commission is tiered per-order (flat rate per order, not per piece);
+      // each order's own quantity picks its tier, and the tier rate depends
+      // on the department (Ironing vs Washing).
+      row.commissionEarned += calculateOrderCommission(log.quantity, log.department);
     }
 
     const formattedSummary = Array.from(mergedByKey.values())
