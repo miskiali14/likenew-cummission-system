@@ -6,7 +6,8 @@ import { todayStr } from '@/lib/date';
 import { calculateOrderCommission } from '@/lib/commission';
 
 // Staff Summary Controller — Admin, Sales, QC, Viewer. Sales/QC/Viewer can
-// only ever see today's report; Admin can pick any date.
+// only ever see today's report; Admin can pick a single date or a date range
+// (e.g. the 1st through the 20th of a month).
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'QUALITY_CONTROL', 'VIEWER']);
   if (auth.response) return auth.response;
@@ -20,11 +21,19 @@ export async function GET(request) {
     const department =
       user.role === 'VIEWER' && user.department ? user.department : searchParams.get('department');
     const date = user.role === 'ADMIN' ? searchParams.get('date') : todayStr();
+    const dateFrom = user.role === 'ADMIN' ? searchParams.get('dateFrom') : null;
+    const dateTo = user.role === 'ADMIN' ? searchParams.get('dateTo') : null;
 
     const whereClause = {};
     if (branch) whereClause.branch = branch;
     if (department && department !== 'All') whereClause.department = department;
-    if (date) whereClause.date = date;
+    if (dateFrom || dateTo) {
+      whereClause.date = {};
+      if (dateFrom) whereClause.date.gte = dateFrom;
+      if (dateTo) whereClause.date.lte = dateTo;
+    } else if (date) {
+      whereClause.date = date;
+    }
 
     const logs = await prisma.log.findMany({
       where: whereClause,

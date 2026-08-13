@@ -29,7 +29,9 @@ import {
   Loader2,
   UserCheck,
   Trash2,
-  Download
+  Download,
+  Calendar,
+  X
 } from 'lucide-react';
 
 const BRANCHES = [
@@ -95,9 +97,15 @@ function StaffSummaryReport({
   title,
   subtitle,
   showBranchColumn = true,
-  selectedDate,
-  onDateChange,
+  dateFrom,
+  dateTo,
+  onDateFromChange,
+  onDateToChange,
 }) {
+  const hasDateRangePicker = onDateFromChange && onDateToChange;
+  const dateRangeLabel = dateFrom && dateTo && dateFrom !== dateTo
+    ? `${dateFrom}_to_${dateTo}`
+    : (dateFrom || dateTo || 'all');
   const showCommission = staffSummary.some((s) => s.commissionEarned !== undefined);
 
   const staffSummaryTotals = useMemo(() => {
@@ -133,21 +141,44 @@ function StaffSummaryReport({
             <p className="text-xs text-slate-500">{subtitle}</p>
           </div>
         </div>
-        {onDateChange && (
+        {hasDateRangePicker && (
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => onDateChange(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
-            />
+            <Calendar size={15} className="text-brand-500 shrink-0" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => onDateFromChange(e.target.value)}
+                className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+              />
+            </div>
+            <span className="w-3 h-px bg-slate-300" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">To</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => onDateToChange(e.target.value)}
+                className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+              />
+            </div>
+            {(dateFrom || dateTo) && (
+              <button
+                onClick={() => { onDateFromChange(''); onDateToChange(''); }}
+                title="Clear date range — show all dates"
+                className="text-slate-400 hover:text-red-500 transition ml-1"
+              >
+                <X size={15} />
+              </button>
+            )}
           </div>
         )}
         {staffSummary.length > 0 && (
           <button
             onClick={() =>
               exportToCSV(
-                `staff-report-${selectedDate || 'all'}.csv`,
+                `staff-report-${dateRangeLabel}.csv`,
                 rankedStaffSummary.map((s) => ({
                   Rank: rankedStaffSummary.indexOf(s) + 1,
                   StaffName: s.staffName,
@@ -345,7 +376,10 @@ export default function DashboardPage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState('All');
   const [selectedDept, setSelectedDept] = useState('All');
-  const [selectedDate, setSelectedDate] = useState('');
+  // Date range filter for the Branch/Staff Report — Admin can pick a single
+  // day (from === to) or a range (e.g. the 1st through the 20th of a month).
+  const [staffReportDateFrom, setStaffReportDateFrom] = useState('');
+  const [staffReportDateTo, setStaffReportDateTo] = useState('');
   // Independent date filter for "All Registered Logs" — defaults to showing
   // every date; Admin can narrow it down to one specific day.
   const [allLogsDate, setAllLogsDate] = useState('');
@@ -393,7 +427,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     setFormData((prev) => ({ ...prev, date: today }));
-    setSelectedDate(today);
+    setStaffReportDateFrom(today);
+    setStaffReportDateTo(today);
   }, []);
 
   // 1. Initial User Load & Authentication Check
@@ -486,12 +521,11 @@ export default function DashboardPage() {
     try {
       const branchParam = selectedBranch === 'All' ? '' : selectedBranch;
       const deptParam = selectedDept === 'All' ? '' : selectedDept;
-      const dateParam = selectedDate || '';
 
       const results = await Promise.allSettled([
         API.get(`/logs/stats?branch=${branchParam}`),
         API.get(`/logs/all?branch=${branchParam}&department=${deptParam}&date=${allLogsDate}`),
-        API.get(`/logs/staff-summary?branch=${branchParam}&department=${deptParam}&date=${dateParam}`)
+        API.get(`/logs/staff-summary?branch=${branchParam}&department=${deptParam}&dateFrom=${staffReportDateFrom || ''}&dateTo=${staffReportDateTo || ''}`)
       ]);
 
       if (results[0].status === 'fulfilled') {
@@ -516,7 +550,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedBranch, selectedDept, selectedDate, allLogsDate]);
+  }, [selectedBranch, selectedDept, staffReportDateFrom, staffReportDateTo, allLogsDate]);
 
   // Safe Staff Data Fetching. A Viewer with no assigned department sees both
   // combined (read-only); a department-scoped Viewer (or Sales/QC) sees only
@@ -575,7 +609,7 @@ export default function DashboardPage() {
     try {
       const deptParam = user?.role === 'VIEWER' ? (user?.department || 'All') : currentDept;
       const res = await API.get(
-        `/logs/staff-summary?branch=${currentBranch}&department=${deptParam}&date=${selectedDate || ''}`
+        `/logs/staff-summary?branch=${currentBranch}&department=${deptParam}`
       );
       setStaffSummary(res.data || []);
     } catch (err) {
@@ -583,7 +617,7 @@ export default function DashboardPage() {
       console.error(debugInfo);
       alert('STAFF SUMMARY DEBUG:\n\n' + debugInfo);
     }
-  }, [currentBranch, currentDept, selectedDate, user?.role]);
+  }, [currentBranch, currentDept, user?.role]);
 
   // Main Effect for fetching Dashboard Data
   useEffect(() => {
@@ -599,7 +633,7 @@ export default function DashboardPage() {
         fetchMyBranchStaffSummary();
       }
     }
-  }, [user, selectedBranch, selectedDept, selectedDate, formData.registrarId, fetchAdminDashboardData, fetchRoleLogs, fetchMyLogs, fetchMyBranchStaffSummary]);
+  }, [user, selectedBranch, selectedDept, formData.registrarId, fetchAdminDashboardData, fetchRoleLogs, fetchMyLogs, fetchMyBranchStaffSummary]);
 
   // Calculated Totals for Reports
   const logsTotals = useMemo(() => {
@@ -883,8 +917,10 @@ export default function DashboardPage() {
               title="Staff Work Summary Report"
               subtitle="Total items, orders, and duration processed by each staff member"
               showBranchColumn={true}
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
+              dateFrom={staffReportDateFrom}
+              dateTo={staffReportDateTo}
+              onDateFromChange={setStaffReportDateFrom}
+              onDateToChange={setStaffReportDateTo}
             />
 
             {/* ALL LOGS TABLE FOR ADMIN */}
