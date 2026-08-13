@@ -97,6 +97,7 @@ function StaffSummaryReport({
   title,
   subtitle,
   showBranchColumn = true,
+  showChart = true,
   dateFrom,
   dateTo,
   onDateFromChange,
@@ -269,17 +270,19 @@ function StaffSummaryReport({
           </div>
 
           {/* Ranking Graph */}
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={rankedStaffSummary} layout="vertical" margin={{ left: 12 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" allowDecimals={false} />
-                <YAxis type="category" dataKey="staffName" width={110} tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="totalQuantity" name="Pieces Handled" fill="#7c3aed" radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {showChart && (
+            <div className="w-full h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={rankedStaffSummary} layout="vertical" margin={{ left: 12 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} />
+                  <YAxis type="category" dataKey="staffName" width={110} tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Bar dataKey="totalQuantity" name="Pieces Handled" fill="#7c3aed" radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
 
           {/* Full ranked table */}
           <div className="overflow-x-auto rounded-xl border border-slate-100">
@@ -1364,6 +1367,7 @@ export default function DashboardPage() {
               title={`${currentBranch} Branch Report — Today`}
               subtitle={`How everyone in your branch is performing today${user?.department ? '' : ' (Washing & Ironing)'}`}
               showBranchColumn={false}
+              showChart={false}
             />
 
             {/* TODAY'S LOGS — no actions */}
