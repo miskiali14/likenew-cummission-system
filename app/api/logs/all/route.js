@@ -13,11 +13,21 @@ export async function GET(request) {
     const branch = resolveBranch(auth.user, searchParams);
     const department = searchParams.get('department');
     const date = searchParams.get('date');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const employeeId = searchParams.get('employeeId');
 
     const whereClause = {};
     if (branch) whereClause.branch = branch;
     if (department && department !== 'All') whereClause.department = department;
-    if (date) whereClause.date = date;
+    if (employeeId) whereClause.employeeId = employeeId;
+    if (dateFrom || dateTo) {
+      whereClause.date = {};
+      if (dateFrom) whereClause.date.gte = dateFrom;
+      if (dateTo) whereClause.date.lte = dateTo;
+    } else if (date) {
+      whereClause.date = date;
+    }
 
     const logs = await prisma.log.findMany({
       where: whereClause,
