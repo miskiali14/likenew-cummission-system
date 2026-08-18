@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, Package, AlertCircle, X } from 'lucide-react';
+import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Package, AlertCircle, X } from 'lucide-react';
 
 const emptyForm = { customerId: '', customerName: '', description: '', date: '', branch: 'HQ' };
 
@@ -112,6 +112,17 @@ export default function CustomerItemsPage() {
     try {
       await API.patch(`/customer-items/${id}`, { status: 'CLAIMED' });
       showToast('success', 'Item marked as claimed');
+      fetchItems();
+    } catch (err) {
+      showToast('error', 'Failed to update item');
+    }
+  };
+
+  const handleMarkHeld = async (id) => {
+    if (!confirm('Move this item back to Held?')) return;
+    try {
+      await API.patch(`/customer-items/${id}`, { status: 'HELD' });
+      showToast('success', 'Item moved back to Held');
       fetchItems();
     } catch (err) {
       showToast('error', 'Failed to update item');
@@ -253,13 +264,21 @@ export default function CustomerItemsPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        {item.status === 'HELD' && (
+                        {item.status === 'HELD' ? (
                           <button
                             onClick={() => handleMarkClaimed(item.id)}
                             className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
                             title="Mark as Claimed"
                           >
                             <CheckCircle2 size={18} />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleMarkHeld(item.id)}
+                            className="text-amber-600 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50 transition"
+                            title="Move back to Held"
+                          >
+                            <RotateCcw size={18} />
                           </button>
                         )}
                         <button
