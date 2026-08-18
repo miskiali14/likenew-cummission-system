@@ -38,6 +38,9 @@ export default function Sidebar({ user }) {
               <Link href="/dashboard/financial-report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/financial-report')}`}>
                 💰 Financial Report
               </Link>
+              <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
+                🧳 Customer Items
+              </Link>
               <div className="my-3 border-t border-gray-800" />
             </>
           )}
@@ -48,6 +51,9 @@ export default function Sidebar({ user }) {
               <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Sales Section</div>
               <Link href="/dashboard" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard')}`}>
                 🧺 Washing Logs & Report
+              </Link>
+              <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
+                🧳 Customer Items
               </Link>
             </>
           )}

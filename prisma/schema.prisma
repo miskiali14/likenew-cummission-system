@@ -29,6 +29,11 @@ enum UserStatus {
   INACTIVE
 }
 
+enum ItemStatus {
+  HELD
+  CLAIMED
+}
+
 model User {
   id         String      @id @default(uuid())
   fullName   String
@@ -91,4 +96,20 @@ model Log {
   @@index([orderId, department, branch])
   @@index([employeeId])
   @@index([registrarId])
+}
+
+// Customer belongings left behind and held at a branch until claimed —
+// Admin sees everything; Sales sees and registers items for their own branch.
+model CustomerItem {
+  id           String     @id @default(uuid())
+  branch       String     // HQ or KM5
+  customerId   String     // ticket/reference number from the paper log
+  customerName String
+  description  String     // item(s) left behind
+  date         String     // YYYY-MM-DD, when it was logged
+  status       ItemStatus @default(HELD)
+  claimedAt    DateTime?
+  createdAt    DateTime   @default(now())
+
+  @@index([branch, status])
 }
