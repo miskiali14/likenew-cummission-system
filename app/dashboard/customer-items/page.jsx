@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, CheckCircle2, Trash2, Package, AlertCircle, X } from 'lucide-react';
+import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, Package, AlertCircle, X } from 'lucide-react';
 
 const emptyForm = { customerId: '', customerName: '', description: '', date: '', branch: 'HQ' };
 
@@ -16,6 +16,7 @@ export default function CustomerItemsPage() {
   const [branchFilter, setBranchFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
   const [notification, setNotification] = useState(null);
 
@@ -69,13 +70,37 @@ export default function CustomerItemsPage() {
     );
   }, [items, search]);
 
+  const openAddModal = () => {
+    setEditingId(null);
+    const today = new Date().toISOString().split('T')[0];
+    setFormData({ ...emptyForm, date: today, branch: user?.branch || 'HQ' });
+    setShowModal(true);
+  };
+
+  const openEditModal = (item) => {
+    setEditingId(item.id);
+    setFormData({
+      customerId: item.customerId,
+      customerName: item.customerName,
+      description: item.description,
+      date: item.date,
+      branch: item.branch,
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await API.post('/customer-items', formData);
+      if (editingId) {
+        await API.patch(`/customer-items/${editingId}`, formData);
+        showToast('success', 'Item updated successfully!');
+      } else {
+        await API.post('/customer-items', formData);
+        showToast('success', 'Item saved successfully!');
+      }
       setShowModal(false);
-      setFormData((prev) => ({ ...emptyForm, date: prev.date, branch: prev.branch }));
-      showToast('success', 'Item saved successfully!');
+      setEditingId(null);
       fetchItems();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to save item');
@@ -132,7 +157,7 @@ export default function CustomerItemsPage() {
           <p className="text-sm text-gray-500">Belongings customers left behind — registered, tracked, and marked once claimed</p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={openAddModal}
           className="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition shadow-sm"
         >
           <PlusCircle size={18} /> Add Item
@@ -237,15 +262,20 @@ export default function CustomerItemsPage() {
                             <CheckCircle2 size={18} />
                           </button>
                         )}
-                        {user?.role === 'ADMIN' && (
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
-                            title="Delete"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => openEditModal(item)}
+                          className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
+                          title="Edit"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                          title="Delete"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -256,11 +286,11 @@ export default function CustomerItemsPage() {
         )}
       </div>
 
-      {/* Modal — Add Item */}
+      {/* Modal — Add / Edit Item */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">Add Customer Item</h2>
+            <h2 className="text-xl font-bold text-gray-800">{editingId ? 'Edit Customer Item' : 'Add Customer Item'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Customer ID</label>
@@ -322,7 +352,7 @@ export default function CustomerItemsPage() {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => { setShowModal(false); setEditingId(null); }}
                   className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
                 >
                   Cancel

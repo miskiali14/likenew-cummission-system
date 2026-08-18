@@ -20,7 +20,11 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const { status, customerId, customerName, description, date } = body;
+    const { status, customerId, customerName, description, date, branch } = body;
+
+    // Only Admin may move an item between branches; Sales edits stay within
+    // their own branch regardless of what's sent.
+    const nextBranch = user.role === 'ADMIN' && branch !== undefined ? branch : undefined;
 
     const item = await prisma.customerItem.update({
       where: { id },
@@ -33,6 +37,7 @@ export async function PATCH(request, { params }) {
         ...(customerName !== undefined && { customerName }),
         ...(description !== undefined && { description }),
         ...(date !== undefined && { date }),
+        ...(nextBranch !== undefined && { branch: nextBranch }),
       },
     });
 
@@ -42,13 +47,22 @@ export async function PATCH(request, { params }) {
   }
 }
 
-// Delete a Customer Item — Admin only
+// Delete a Customer Item — Admin any branch, Sales their own branch only.
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES']);
   if (auth.response) return auth.response;
+  const user = auth.user;
 
   try {
     const { id } = await params;
+    const existing = await prisma.customerItem.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ message: 'Item not found' }, { status: 404 });
+    }
+    if (user.role !== 'ADMIN' && existing.branch !== user.branch) {
+      return NextResponse.json({ message: 'This item does not belong to your branch' }, { status: 403 });
+    }
+
     await prisma.customerItem.delete({ where: { id } });
     return NextResponse.json({ message: 'Item deleted successfully' });
   } catch (error) {
