@@ -105,6 +105,7 @@ model CustomerItem {
   branch       String     // HQ or KM5
   customerId   String     // ticket/reference number from the paper log
   customerName String
+  phone        String?    // customer's phone number, if collected
   description  String     // item(s) left behind
   date         String     // YYYY-MM-DD, when it was logged
   status       ItemStatus @default(HELD)

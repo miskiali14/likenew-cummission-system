@@ -20,7 +20,7 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const { status, customerId, customerName, description, date, branch } = body;
+    const { status, customerId, customerName, phone, description, date, branch } = body;
 
     // Only Admin may move an item between branches; Sales edits stay within
     // their own branch regardless of what's sent.
@@ -35,6 +35,7 @@ export async function PATCH(request, { params }) {
         }),
         ...(customerId !== undefined && { customerId: String(customerId) }),
         ...(customerName !== undefined && { customerName }),
+        ...(phone !== undefined && { phone: phone || null }),
         ...(description !== undefined && { description }),
         ...(date !== undefined && { date }),
         ...(nextBranch !== undefined && { branch: nextBranch }),

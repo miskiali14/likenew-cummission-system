@@ -41,7 +41,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { customerId, customerName, description, date } = body;
+    const { customerId, customerName, phone, description, date } = body;
 
     if (!customerId || !customerName || !description) {
       return NextResponse.json(
@@ -57,6 +57,7 @@ export async function POST(request) {
         branch,
         customerId: String(customerId),
         customerName,
+        phone: phone || null,
         description,
         date: date || todayStr(),
       },

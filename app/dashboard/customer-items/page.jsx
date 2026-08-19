@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
 import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Package, AlertCircle, X } from 'lucide-react';
 
-const emptyForm = { customerId: '', customerName: '', description: '', date: '', branch: 'HQ' };
+const emptyForm = { customerId: '', customerName: '', phone: '', description: '', date: '', branch: 'HQ' };
 
 export default function CustomerItemsPage() {
   const router = useRouter();
@@ -66,6 +66,7 @@ export default function CustomerItemsPage() {
       (it) =>
         it.customerId.toLowerCase().includes(q) ||
         it.customerName.toLowerCase().includes(q) ||
+        (it.phone || '').toLowerCase().includes(q) ||
         it.description.toLowerCase().includes(q)
     );
   }, [items, search]);
@@ -82,6 +83,7 @@ export default function CustomerItemsPage() {
     setFormData({
       customerId: item.customerId,
       customerName: item.customerName,
+      phone: item.phone || '',
       description: item.description,
       date: item.date,
       branch: item.branch,
@@ -207,7 +209,7 @@ export default function CustomerItemsPage() {
           <Search size={15} className="text-slate-400 shrink-0" />
           <input
             type="text"
-            placeholder="Search by customer ID, name, or item..."
+            placeholder="Search by customer ID, name, phone, or item..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none w-full"
@@ -237,6 +239,7 @@ export default function CustomerItemsPage() {
                   {user?.role === 'ADMIN' && <th className="p-4">Branch</th>}
                   <th className="p-4">Customer ID</th>
                   <th className="p-4">Customer Name</th>
+                  <th className="p-4">Phone</th>
                   <th className="p-4">Item Description</th>
                   <th className="p-4">Date</th>
                   <th className="p-4">Status</th>
@@ -249,6 +252,7 @@ export default function CustomerItemsPage() {
                     {user?.role === 'ADMIN' && <td className="p-4 text-gray-600">{item.branch}</td>}
                     <td className="p-4 font-extrabold text-slate-900">{item.customerId}</td>
                     <td className="p-4 font-medium text-gray-900">{item.customerName}</td>
+                    <td className="p-4 text-gray-600">{item.phone || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4 text-gray-600">{item.description}</td>
                     <td className="p-4 text-gray-500">{item.date}</td>
                     <td className="p-4">
@@ -328,6 +332,16 @@ export default function CustomerItemsPage() {
                   required
                   value={formData.customerName}
                   onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="E.g. 0615xxxxxx"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
