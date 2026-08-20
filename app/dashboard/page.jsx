@@ -89,6 +89,19 @@ const groupLogsByStaff = (logsArr) => {
   return Array.from(map.values());
 };
 
+// Returns the set of "orderId|department|branch" keys that appear more than
+// once in the given logs — the same order legitimately passes through both
+// Washing and Ironing, so a duplicate only counts within the same department
+// & branch (i.e. someone registered the same order twice by mistake).
+const findDuplicateOrderKeys = (logsArr) => {
+  const counts = new Map();
+  logsArr.forEach((log) => {
+    const key = `${log.orderId}|${log.department}|${log.branch}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  return new Set([...counts.entries()].filter(([, count]) => count > 1).map(([key]) => key));
+};
+
 // Reusable Staff Work Summary / Leaderboard Report.
 // Used by ADMIN (all staff, filterable) and by SALES / QUALITY_CONTROL users
 // (scoped to their own branch & department) so everyone can see the report.
@@ -650,6 +663,10 @@ export default function DashboardPage() {
     );
   }, [logs]);
 
+  // Orders sharing the same orderId + department + branch — flags accidental
+  // double-registration in the log tables below.
+  const duplicateOrderKeys = useMemo(() => findDuplicateOrderKeys(logs), [logs]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -1013,7 +1030,14 @@ export default function DashboardPage() {
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td className="py-3 px-3 font-extrabold text-slate-900 text-base">#{item.orderId}</td>
+                            <td className="py-3 px-3 font-extrabold text-slate-900 text-base">
+                              #{item.orderId}
+                              {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
+                                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
+                                  Duplicate
+                                </span>
+                              )}
+                            </td>
                             <td className="py-3 px-3">
                               <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                                 {item.branch || 'HQ'}
@@ -1282,7 +1306,14 @@ export default function DashboardPage() {
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">#{item.orderId}</td>
+                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">
+                              #{item.orderId}
+                              {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
+                                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
+                                  Duplicate
+                                </span>
+                              )}
+                            </td>
                             {idx === 0 && (
                               <td className="py-3 px-2 align-top" rowSpan={group.orders.length}>
                                 {group.staffName}
@@ -1399,7 +1430,14 @@ export default function DashboardPage() {
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">#{item.orderId}</td>
+                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">
+                              #{item.orderId}
+                              {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
+                                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
+                                  Duplicate
+                                </span>
+                              )}
+                            </td>
                             {!user?.department && (
                               <td className="py-3 px-2">
                                 <span
