@@ -57,6 +57,10 @@ export default function FinancialReportPage() {
   const [personalDateTo, setPersonalDateTo] = useState('');
   const [personalLogs, setPersonalLogs] = useState([]);
   const [personalLoading, setPersonalLoading] = useState(false);
+  // Every order in this employee's branch & department (all staff, not just
+  // this one) over the same date range — used to catch duplicates that exist
+  // BETWEEN staff members, e.g. two different people both registering #123.
+  const [personalContextLogs, setPersonalContextLogs] = useState([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -101,6 +105,7 @@ export default function FinancialReportPage() {
   useEffect(() => {
     if (!personalEmployeeId) {
       setPersonalLogs([]);
+      setPersonalContextLogs([]);
       return;
     }
     setPersonalLoading(true);
@@ -113,6 +118,21 @@ export default function FinancialReportPage() {
   }, [personalEmployeeId, personalDateFrom, personalDateTo]);
 
   const selectedEmployee = employees.find((e) => e.id === personalEmployeeId);
+
+  // Fetch every order in the same branch & department (all staff) so
+  // duplicates can be detected even when the other side was registered by a
+  // different staff member.
+  useEffect(() => {
+    if (!selectedEmployee) {
+      setPersonalContextLogs([]);
+      return;
+    }
+    API.get(
+      `/logs/all?branch=${selectedEmployee.branch}&department=${selectedEmployee.department}&dateFrom=${personalDateFrom || ''}&dateTo=${personalDateTo || ''}`
+    )
+      .then((res) => setPersonalContextLogs(res.data || []))
+      .catch((err) => console.error('Failed to load duplicate context:', err));
+  }, [selectedEmployee, personalDateFrom, personalDateTo]);
 
   const personalTotals = useMemo(() => {
     return personalLogs.reduce(
@@ -129,9 +149,24 @@ export default function FinancialReportPage() {
     ? `${personalDateFrom}_to_${personalDateTo}`
     : (personalDateFrom || personalDateTo || 'all');
 
-  // Orders this staff member has registered more than once (same orderId,
-  // department & branch) — flags accidental double-registration.
-  const personalDuplicateKeys = useMemo(() => findDuplicateOrderKeys(personalLogs), [personalLogs]);
+  // Orders with the same orderId/department/branch as another order in the
+  // branch — whether registered twice by this same staffer, or by a
+  // different one entirely (e.g. Hassan Nur and Qasim both logging #123).
+  const personalDuplicateKeys = useMemo(() => findDuplicateOrderKeys(personalContextLogs), [personalContextLogs]);
+
+  // For each duplicate key, the other staff name(s) sharing that order —
+  // shown so it's clear this isn't just a self-duplicate.
+  const otherStaffByDuplicateKey = useMemo(() => {
+    const map = new Map();
+    for (const log of personalContextLogs) {
+      const key = `${log.orderId}|${log.department}|${log.branch}`;
+      if (!personalDuplicateKeys.has(key)) continue;
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key).add(log.staffName);
+    }
+    return map;
+  }, [personalContextLogs, personalDuplicateKeys]);
+
   const personalDuplicateOrderCount = useMemo(
     () => personalLogs.filter((log) => personalDuplicateKeys.has(`${log.orderId}|${log.department}|${log.branch}`)).length,
     [personalLogs, personalDuplicateKeys]
@@ -464,7 +499,14 @@ export default function FinancialReportPage() {
                     Quantity: log.quantity,
                     DurationMinutes: log.durationMinutes ?? '',
                     Commission: calculateOrderCommission(log.quantity, log.department).toFixed(2),
-                    Duplicate: personalDuplicateKeys.has(`${log.orderId}|${log.department}|${log.branch}`) ? 'Yes' : '',
+                    Duplicate: (() => {
+                      const key = `${log.orderId}|${log.department}|${log.branch}`;
+                      if (!personalDuplicateKeys.has(key)) return '';
+                      const otherStaff = [...(otherStaffByDuplicateKey.get(key) || [])].filter(
+                        (name) => name !== log.staffName
+                      );
+                      return otherStaff.length ? `Yes (also: ${otherStaff.join(', ')})` : 'Yes';
+                    })(),
                   }))
                 )
               }
@@ -525,11 +567,21 @@ export default function FinancialReportPage() {
                     <tr key={log.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition">
                       <td className="py-3 px-3 font-extrabold text-slate-900">
                         #{log.orderId}
-                        {personalDuplicateKeys.has(`${log.orderId}|${log.department}|${log.branch}`) && (
-                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
-                            Duplicate
-                          </span>
-                        )}
+                        {(() => {
+                          const key = `${log.orderId}|${log.department}|${log.branch}`;
+                          if (!personalDuplicateKeys.has(key)) return null;
+                          const otherStaff = [...(otherStaffByDuplicateKey.get(key) || [])].filter(
+                            (name) => name !== log.staffName
+                          );
+                          return (
+                            <span
+                              className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle"
+                              title={otherStaff.length ? `Also registered by: ${otherStaff.join(', ')}` : 'Registered more than once'}
+                            >
+                              Duplicate{otherStaff.length ? ` — also ${otherStaff.join(', ')}` : ''}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="py-3 px-3 text-slate-600">{log.date}</td>
                       <td className="py-3 px-3">
