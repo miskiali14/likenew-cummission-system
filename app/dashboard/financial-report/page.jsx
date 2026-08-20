@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { DollarSign, Calendar, Download, TrendingUp, Package, X, User } from 'lucide-react';
 import { calculateOrderCommission } from '@/lib/commission';
+import { findDuplicateOrderKeys } from '@/lib/duplicates';
 
 const BRANCH_COLORS = { HQ: '#7c3aed', KM5: '#f59e0b' };
 const DEPT_COLORS = { WASHING: '#3b82f6', IRONING: '#f59e0b' };
@@ -127,6 +128,14 @@ export default function FinancialReportPage() {
   const personalDateRangeLabel = personalDateFrom && personalDateTo && personalDateFrom !== personalDateTo
     ? `${personalDateFrom}_to_${personalDateTo}`
     : (personalDateFrom || personalDateTo || 'all');
+
+  // Orders this staff member has registered more than once (same orderId,
+  // department & branch) — flags accidental double-registration.
+  const personalDuplicateKeys = useMemo(() => findDuplicateOrderKeys(personalLogs), [personalLogs]);
+  const personalDuplicateOrderCount = useMemo(
+    () => personalLogs.filter((log) => personalDuplicateKeys.has(`${log.orderId}|${log.department}|${log.branch}`)).length,
+    [personalLogs, personalDuplicateKeys]
+  );
 
   const overall = useMemo(() => {
     return rows.reduce(
@@ -455,6 +464,7 @@ export default function FinancialReportPage() {
                     Quantity: log.quantity,
                     DurationMinutes: log.durationMinutes ?? '',
                     Commission: calculateOrderCommission(log.quantity, log.department).toFixed(2),
+                    Duplicate: personalDuplicateKeys.has(`${log.orderId}|${log.department}|${log.branch}`) ? 'Yes' : '',
                   }))
                 )
               }
@@ -477,7 +487,7 @@ export default function FinancialReportPage() {
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
                 <p className="text-xs uppercase font-semibold text-slate-400">Total Orders</p>
                 <h3 className="text-xl font-bold text-slate-800 mt-0.5">{personalTotals.orders}</h3>
@@ -489,6 +499,12 @@ export default function FinancialReportPage() {
               <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
                 <p className="text-xs uppercase font-semibold text-slate-400">Total Commission</p>
                 <h3 className="text-xl font-bold text-amber-700 mt-0.5">${personalTotals.commission.toFixed(2)}</h3>
+              </div>
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <p className="text-xs uppercase font-semibold text-slate-400">Duplicate Orders</p>
+                <h3 className={`text-xl font-bold mt-0.5 ${personalDuplicateOrderCount > 0 ? 'text-red-600' : 'text-slate-800'}`}>
+                  {personalDuplicateOrderCount}
+                </h3>
               </div>
             </div>
 
@@ -507,7 +523,14 @@ export default function FinancialReportPage() {
                 <tbody>
                   {personalLogs.map((log) => (
                     <tr key={log.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                      <td className="py-3 px-3 font-extrabold text-slate-900">#{log.orderId}</td>
+                      <td className="py-3 px-3 font-extrabold text-slate-900">
+                        #{log.orderId}
+                        {personalDuplicateKeys.has(`${log.orderId}|${log.department}|${log.branch}`) && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
+                            Duplicate
+                          </span>
+                        )}
+                      </td>
                       <td className="py-3 px-3 text-slate-600">{log.date}</td>
                       <td className="py-3 px-3">
                         <span
