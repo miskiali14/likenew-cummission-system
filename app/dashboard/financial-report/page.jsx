@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import { DollarSign, Calendar, Download, TrendingUp, Package, X, User } from 'lucide-react';
 import { calculateOrderCommission } from '@/lib/commission';
-import { findDuplicateOrderKeys } from '@/lib/duplicates';
+import { findDuplicateOrderKeys, getCommissionCountedIds } from '@/lib/duplicates';
 
 const BRANCH_COLORS = { HQ: '#7c3aed', KM5: '#f59e0b' };
 const DEPT_COLORS = { WASHING: '#3b82f6', IRONING: '#f59e0b' };
@@ -134,16 +134,22 @@ export default function FinancialReportPage() {
       .catch((err) => console.error('Failed to load duplicate context:', err));
   }, [selectedEmployee, personalDateFrom, personalDateTo]);
 
+  // Duplicate orders (same orderId/department/branch, whoever registered
+  // them) only earn commission once, on whichever entry came first — decided
+  // against the full branch/department context, not just this one staffer's
+  // own list, since the other duplicate might belong to someone else.
+  const commissionCountedIds = useMemo(() => getCommissionCountedIds(personalContextLogs), [personalContextLogs]);
+
   const personalTotals = useMemo(() => {
     return personalLogs.reduce(
       (acc, log) => ({
         orders: acc.orders + 1,
         items: acc.items + Number(log.quantity || 0),
-        commission: acc.commission + calculateOrderCommission(log.quantity, log.department),
+        commission: acc.commission + (commissionCountedIds.has(log.id) ? calculateOrderCommission(log.quantity, log.department) : 0),
       }),
       { orders: 0, items: 0, commission: 0 }
     );
-  }, [personalLogs]);
+  }, [personalLogs, commissionCountedIds]);
 
   const personalDateRangeLabel = personalDateFrom && personalDateTo && personalDateFrom !== personalDateTo
     ? `${personalDateFrom}_to_${personalDateTo}`
@@ -498,7 +504,7 @@ export default function FinancialReportPage() {
                     Department: log.department,
                     Quantity: log.quantity,
                     DurationMinutes: log.durationMinutes ?? '',
-                    Commission: calculateOrderCommission(log.quantity, log.department).toFixed(2),
+                    Commission: (commissionCountedIds.has(log.id) ? calculateOrderCommission(log.quantity, log.department) : 0).toFixed(2),
                     Duplicate: (() => {
                       const key = `${log.orderId}|${log.department}|${log.branch}`;
                       if (!personalDuplicateKeys.has(key)) return '';
@@ -599,8 +605,16 @@ export default function FinancialReportPage() {
                       <td className="py-3 px-3 text-right text-slate-600">
                         {log.durationMinutes != null ? `${log.durationMinutes} Min` : '—'}
                       </td>
-                      <td className="py-3 px-3 text-right font-bold text-amber-700">
-                        ${calculateOrderCommission(log.quantity, log.department).toFixed(2)}
+                      <td className="py-3 px-3 text-right">
+                        {commissionCountedIds.has(log.id) ? (
+                          <span className="font-bold text-amber-700">
+                            ${calculateOrderCommission(log.quantity, log.department).toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="font-bold text-slate-400" title="Duplicate order — commission not counted">
+                            $0.00
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))}

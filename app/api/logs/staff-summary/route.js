@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { todayStr } from '@/lib/date';
 import { calculateOrderCommission } from '@/lib/commission';
+import { getCommissionCountedIds } from '@/lib/duplicates';
 
 // Staff Summary Controller — Admin, Sales, QC, Viewer. Sales/QC/Viewer can
 // only ever see today's report; Admin can pick a single date or a date range
@@ -38,13 +39,22 @@ export async function GET(request) {
     const logs = await prisma.log.findMany({
       where: whereClause,
       select: {
+        id: true,
+        orderId: true,
         staffName: true,
         department: true,
         branch: true,
         quantity: true,
         durationMinutes: true,
+        createdAt: true,
       },
     });
+
+    // Duplicate orders (same orderId/department/branch, logged more than
+    // once) only earn commission once — on whichever entry was registered
+    // first. The later duplicate(s) still count toward items/orders totals,
+    // just not commission.
+    const commissionCountedIds = getCommissionCountedIds(logs);
 
     // Merge rows whose staff name matches case-insensitively (handles accidental
     // duplicate Employee records for the same real person, e.g. "hassan nur" vs
@@ -73,8 +83,11 @@ export async function GET(request) {
       row.totalOrdersHandled += 1;
       // Commission is tiered per-order (flat rate per order, not per piece);
       // each order's own quantity picks its tier, and the tier rate depends
-      // on the department (Ironing vs Washing).
-      row.commissionEarned += calculateOrderCommission(log.quantity, log.department);
+      // on the department (Ironing vs Washing). Duplicate orders only pay
+      // commission once (see commissionCountedIds above).
+      if (commissionCountedIds.has(log.id)) {
+        row.commissionEarned += calculateOrderCommission(log.quantity, log.department);
+      }
     }
 
     const formattedSummary = Array.from(mergedByKey.values())

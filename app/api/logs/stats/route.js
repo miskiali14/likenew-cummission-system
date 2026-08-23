@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { calculateOrderCommission } from '@/lib/commission';
+import { getCommissionCountedIds } from '@/lib/duplicates';
 
 // Admin Stats Controller (/api/logs/stats) — ADMIN only
 export async function GET(request) {
@@ -20,14 +21,17 @@ export async function GET(request) {
       prisma.log.count({ where: whereClause }),
       prisma.log.findMany({
         where: whereClause,
-        select: { quantity: true, department: true },
+        select: { id: true, orderId: true, quantity: true, department: true, branch: true, createdAt: true },
       }),
     ]);
 
     // Commission is tiered per-order (flat rate per order, not per piece);
-    // rate depends on the order's quantity tier and its department.
+    // rate depends on the order's quantity tier and its department. Duplicate
+    // orders (same orderId/department/branch) only pay commission once, on
+    // whichever entry was registered first.
+    const commissionCountedIds = getCommissionCountedIds(commissionLogs);
     const totalCommission = commissionLogs.reduce(
-      (sum, log) => sum + calculateOrderCommission(log.quantity, log.department),
+      (sum, log) => sum + (commissionCountedIds.has(log.id) ? calculateOrderCommission(log.quantity, log.department) : 0),
       0
     );
 
