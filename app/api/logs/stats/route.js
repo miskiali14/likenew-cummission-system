@@ -13,7 +13,16 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const branch = resolveBranch(auth.user, searchParams);
-    const whereClause = branch ? { branch } : {};
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+
+    const whereClause = {};
+    if (branch) whereClause.branch = branch;
+    if (dateFrom || dateTo) {
+      whereClause.date = {};
+      if (dateFrom) whereClause.date.gte = dateFrom;
+      if (dateTo) whereClause.date.lte = dateTo;
+    }
 
     const [washing, ironing, totalOrders, commissionLogs] = await Promise.all([
       prisma.log.count({ where: { ...whereClause, department: 'WASHING' } }),

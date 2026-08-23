@@ -388,6 +388,10 @@ export default function DashboardPage() {
   // Independent date filter for "All Registered Logs" — defaults to showing
   // every date; Admin can narrow it down to one specific day.
   const [allLogsDate, setAllLogsDate] = useState('');
+  // Date range filter for the top stat cards + Registration Analytics chart —
+  // defaults to showing every date.
+  const [analyticsDateFrom, setAnalyticsDateFrom] = useState('');
+  const [analyticsDateTo, setAnalyticsDateTo] = useState('');
   const [stats, setStats] = useState({ washing: 0, ironing: 0, totalOrders: 0, totalCommission: 0 });
   const [logs, setLogs] = useState([]);
   const [staffSummary, setStaffSummary] = useState([]);
@@ -528,7 +532,7 @@ export default function DashboardPage() {
       const deptParam = selectedDept === 'All' ? '' : selectedDept;
 
       const results = await Promise.allSettled([
-        API.get(`/logs/stats?branch=${branchParam}`),
+        API.get(`/logs/stats?branch=${branchParam}&dateFrom=${analyticsDateFrom || ''}&dateTo=${analyticsDateTo || ''}`),
         API.get(`/logs/all?branch=${branchParam}&department=${deptParam}&date=${allLogsDate}`),
         API.get(`/logs/staff-summary?branch=${branchParam}&department=${deptParam}&dateFrom=${staffReportDateFrom || ''}&dateTo=${staffReportDateTo || ''}`)
       ]);
@@ -555,7 +559,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedBranch, selectedDept, staffReportDateFrom, staffReportDateTo, allLogsDate]);
+  }, [selectedBranch, selectedDept, staffReportDateFrom, staffReportDateTo, allLogsDate, analyticsDateFrom, analyticsDateTo]);
 
   // Safe Staff Data Fetching. A Viewer with no assigned department sees both
   // combined (read-only); a department-scoped Viewer (or Sales/QC) sees only
@@ -905,7 +909,40 @@ export default function DashboardPage() {
 
             {/* Chart Graph */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Registration Analytics ({selectedBranch})</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <h2 className="text-lg font-bold text-slate-800">Registration Analytics ({selectedBranch})</h2>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
+                  <Calendar size={15} className="text-brand-500 shrink-0" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
+                    <input
+                      type="date"
+                      value={analyticsDateFrom}
+                      onChange={(e) => setAnalyticsDateFrom(e.target.value)}
+                      className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                    />
+                  </div>
+                  <span className="w-3 h-px bg-slate-300" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">To</span>
+                    <input
+                      type="date"
+                      value={analyticsDateTo}
+                      onChange={(e) => setAnalyticsDateTo(e.target.value)}
+                      className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                    />
+                  </div>
+                  {(analyticsDateFrom || analyticsDateTo) && (
+                    <button
+                      onClick={() => { setAnalyticsDateFrom(''); setAnalyticsDateTo(''); }}
+                      title="Clear date range — show all dates"
+                      className="text-slate-400 hover:text-red-500 transition ml-1"
+                    >
+                      <X size={15} />
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="w-full h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData}>
