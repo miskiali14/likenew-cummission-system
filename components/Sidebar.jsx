@@ -41,6 +41,9 @@ export default function Sidebar({ user }) {
               <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
                 🧳 Customer Items
               </Link>
+              <Link href="/dashboard/reports" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/reports')}`}>
+                🖨️ Reports
+              </Link>
               <div className="my-3 border-t border-gray-800" />
             </>
           )}
