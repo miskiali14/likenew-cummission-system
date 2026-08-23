@@ -222,13 +222,6 @@ export default function ReportsPage() {
 
     // Auto-generated management notes
     const notes = [];
-    if (staffRows.length >= 2) {
-      const top = staffRows[0];
-      const bottom = staffRows[staffRows.length - 1];
-      notes.push(
-        `Order size is assigned, not chosen. Commission rewards large orders, but supervisors decide who receives them. ${top.staffName} earned ${fmtMoney(top.commission)} and ${bottom.staffName} ${fmtMoney(bottom.commission)} — before treating that as a performance gap, check with the supervisors how bulk orders are allocated.`
-      );
-    }
     const disadvantaged = staffRows.filter((s) => s.tier3 === 0 && s.orders > 0);
     disadvantaged.forEach((s) => {
       const avgPieces = s.pieces / s.orders;
@@ -242,10 +235,6 @@ export default function ReportsPage() {
         `${formatDateShort(d.date)} is thin. ${d.orders} orders against a range average near ${Math.round(totalOrders / dailyRows.length)}. If that is a real half-day it is fine; if entries are missing, commission for that day is understated.`
       );
     });
-    const missingMinutes = logs.filter((l) => l.durationMinutes == null).length;
-    if (missingMinutes > 0) {
-      notes.push(`Duration (Minutes) is missing on ${missingMinutes} of ${totalOrders} order lines this period — minutes-based figures for those lines cannot be reported.`);
-    }
 
     return {
       staffRows,
