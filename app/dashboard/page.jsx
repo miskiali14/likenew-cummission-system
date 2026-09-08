@@ -459,6 +459,14 @@ export default function DashboardPage() {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+
+        // Customer Care has no washing/ironing logs to register or view here —
+        // their entire job lives on the Complaints page.
+        if (parsedUser.role === 'CUSTOMER_CARE') {
+          router.push('/dashboard/complaints');
+          return;
+        }
+
         setUser(parsedUser);
 
         if (parsedUser.role !== 'ADMIN') {

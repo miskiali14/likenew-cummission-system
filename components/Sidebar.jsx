@@ -58,6 +58,9 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <Link href="/dashboard/reports" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/reports')}`}>
                 🖨️ Reports
               </Link>
+              <Link href="/dashboard/complaints" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints')}`}>
+                📢 Complaints
+              </Link>
               <div className="my-3 border-t border-gray-800" />
             </>
           )}
@@ -71,6 +74,19 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               </Link>
               <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
                 🧳 Customer Items
+              </Link>
+              <Link href="/dashboard/complaints" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints')}`}>
+                📢 Complaints
+              </Link>
+            </>
+          )}
+
+          {/* ================= CUSTOMER CARE ================= */}
+          {userRole === 'CUSTOMER_CARE' && (
+            <>
+              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Customer Care</div>
+              <Link href="/dashboard/complaints" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints')}`}>
+                📢 Complaints
               </Link>
             </>
           )}

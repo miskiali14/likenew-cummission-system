@@ -12,6 +12,7 @@ enum Role {
   SALES
   QUALITY_CONTROL
   VIEWER
+  CUSTOMER_CARE
 }
 
 enum Department {
@@ -32,6 +33,21 @@ enum UserStatus {
 enum ItemStatus {
   HELD
   CLAIMED
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum ComplaintCategory {
+  DAMAGED
+  DELAYED
+  LOST
+  QUALITY
+  STAFF
+  OTHER
 }
 
 model User {
@@ -111,6 +127,25 @@ model CustomerItem {
   status       ItemStatus @default(HELD)
   claimedAt    DateTime?
   createdAt    DateTime   @default(now())
+
+  @@index([branch, status])
+}
+
+// Customer complaints — logged by Admin, Sales, or the dedicated Customer
+// Care role, and tracked through to resolution.
+model Complaint {
+  id             String            @id @default(uuid())
+  branch         String            // HQ or KM5
+  customerName   String
+  phone          String?
+  orderId        String?           // free-text reference to the related order, if any
+  category       ComplaintCategory @default(OTHER)
+  description    String
+  status         ComplaintStatus   @default(OPEN)
+  resolutionNotes String?
+  date           String            // YYYY-MM-DD, when it was logged
+  createdAt      DateTime          @default(now())
+  resolvedAt     DateTime?
 
   @@index([branch, status])
 }
