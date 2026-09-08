@@ -3,17 +3,31 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function Sidebar({ user }) {
+export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
   const pathname = usePathname();
   const userRole = user?.role; // 'ADMIN' | 'SALES' | 'QUALITY_CONTROL'
 
-  const isActive = (path) => pathname === path 
+  const isActive = (path) => pathname === path
     ? 'bg-brand-600 text-white font-medium'
     : 'text-gray-300 hover:bg-gray-800';
 
   return (
-    <aside className="w-64 bg-gray-900 text-white min-h-screen p-4 flex flex-col justify-between">
-      <div>
+    <>
+      {/* Backdrop — mobile only, closes the drawer on tap */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+      <aside
+        className={`w-64 bg-gray-900 text-white min-h-screen p-4 flex flex-col justify-between
+          fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-in-out
+          md:static md:translate-x-0
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+      <div onClick={onClose}>
         <div className="mb-8 font-bold text-xl tracking-wide text-center border-b border-gray-800 pb-4">
           Likenew Laundry
         </div>
@@ -88,6 +102,7 @@ export default function Sidebar({ user }) {
         <div className="text-sm font-semibold">{user?.fullName || 'User'}</div>
         <div className="text-xs text-brand-300 capitalize">{user?.role} — {user?.branch || 'HQ'}</div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
