@@ -4,8 +4,9 @@ import { requireAuth } from '@/lib/auth';
 import { resolveBranch } from '@/lib/branch';
 import { todayStr } from '@/lib/date';
 
-// Ironing Logs — QC, Viewer & Admin. QC/Viewer only ever see today's orders;
-// Admin sees full history (they have "All Registered Logs" for that).
+// Ironing Logs — QC, Viewer & Admin. QC only ever sees today's orders.
+// Viewer can pick a date range (defaults to today); Admin sees full history
+// here too (they also have "All Registered Logs" for that).
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'QUALITY_CONTROL', 'VIEWER']);
   if (auth.response) return auth.response;
@@ -22,7 +23,20 @@ export async function GET(request) {
     const branch = resolveBranch(auth.user, searchParams);
     const whereClause = { department: 'IRONING' };
     if (branch) whereClause.branch = branch;
-    if (auth.user.role !== 'ADMIN') whereClause.date = todayStr();
+
+    if (auth.user.role === 'QUALITY_CONTROL') {
+      whereClause.date = todayStr();
+    } else if (auth.user.role === 'VIEWER' || auth.user.role === 'ADMIN') {
+      const dateFrom = searchParams.get('dateFrom');
+      const dateTo = searchParams.get('dateTo');
+      if (dateFrom || dateTo) {
+        whereClause.date = {};
+        if (dateFrom) whereClause.date.gte = dateFrom;
+        if (dateTo) whereClause.date.lte = dateTo;
+      } else if (auth.user.role === 'VIEWER') {
+        whereClause.date = todayStr();
+      }
+    }
 
     const logs = await prisma.log.findMany({
       where: whereClause,

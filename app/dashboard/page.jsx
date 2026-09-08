@@ -392,6 +392,10 @@ export default function DashboardPage() {
   // defaults to showing every date.
   const [analyticsDateFrom, setAnalyticsDateFrom] = useState('');
   const [analyticsDateTo, setAnalyticsDateTo] = useState('');
+  // Date range filter for the Viewer role — defaults to today, but unlike
+  // Sales/QC a Viewer can widen it to see past dates.
+  const [viewerDateFrom, setViewerDateFrom] = useState('');
+  const [viewerDateTo, setViewerDateTo] = useState('');
   const [stats, setStats] = useState({ washing: 0, ironing: 0, totalOrders: 0, totalCommission: 0 });
   const [logs, setLogs] = useState([]);
   const [staffSummary, setStaffSummary] = useState([]);
@@ -438,6 +442,8 @@ export default function DashboardPage() {
     setFormData((prev) => ({ ...prev, date: today }));
     setStaffReportDateFrom(today);
     setStaffReportDateTo(today);
+    setViewerDateFrom(today);
+    setViewerDateTo(today);
   }, []);
 
   // 1. Initial User Load & Authentication Check
@@ -568,10 +574,13 @@ export default function DashboardPage() {
     if (!user) return;
     setLoading(true);
     try {
+      const dateParams = user.role === 'VIEWER'
+        ? `&dateFrom=${viewerDateFrom || ''}&dateTo=${viewerDateTo || ''}`
+        : '';
       if (user.role === 'VIEWER' && !user.department) {
         const [washingRes, ironingRes] = await Promise.all([
-          API.get(`/logs/washing?branch=${currentBranch}`),
-          API.get(`/logs/ironing?branch=${currentBranch}`),
+          API.get(`/logs/washing?branch=${currentBranch}${dateParams}`),
+          API.get(`/logs/ironing?branch=${currentBranch}${dateParams}`),
         ]);
         const combined = [...(washingRes.data || []), ...(ironingRes.data || [])].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -580,7 +589,7 @@ export default function DashboardPage() {
       } else {
         const dept = user.role === 'VIEWER' ? user.department : user.role;
         const endpoint = dept === 'IRONING' || dept === 'QUALITY_CONTROL' ? '/logs/ironing' : '/logs/washing';
-        const res = await API.get(`${endpoint}?branch=${currentBranch}`);
+        const res = await API.get(`${endpoint}?branch=${currentBranch}${dateParams}`);
         setLogs(res.data || []);
       }
     } catch (err) {
@@ -588,7 +597,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, currentBranch]);
+  }, [user, currentBranch, viewerDateFrom, viewerDateTo]);
 
   // Fetching Personal Logs for whichever Registrar is currently selected
   // in the "Assigned By" dropdown (/logs/my-logs?registrarId=...)
@@ -617,8 +626,11 @@ export default function DashboardPage() {
   const fetchMyBranchStaffSummary = useCallback(async () => {
     try {
       const deptParam = user?.role === 'VIEWER' ? (user?.department || 'All') : currentDept;
+      const dateParams = user?.role === 'VIEWER'
+        ? `&dateFrom=${viewerDateFrom || ''}&dateTo=${viewerDateTo || ''}`
+        : '';
       const res = await API.get(
-        `/logs/staff-summary?branch=${currentBranch}&department=${deptParam}`
+        `/logs/staff-summary?branch=${currentBranch}&department=${deptParam}${dateParams}`
       );
       setStaffSummary(res.data || []);
     } catch (err) {
@@ -626,7 +638,7 @@ export default function DashboardPage() {
       console.error(debugInfo);
       alert('STAFF SUMMARY DEBUG:\n\n' + debugInfo);
     }
-  }, [currentBranch, currentDept, user?.role]);
+  }, [currentBranch, currentDept, user?.role, viewerDateFrom, viewerDateTo]);
 
   // Main Effect for fetching Dashboard Data
   useEffect(() => {
@@ -1402,35 +1414,69 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* VIEWER DASHBOARD — read-only, today only. Combined (both depts) if
-            no department is assigned, otherwise scoped to just one. */}
+        {/* VIEWER DASHBOARD — read-only, own date range (defaults to today).
+            Combined (both depts) if no department is assigned, otherwise
+            scoped to just one. */}
         {user?.role === 'VIEWER' && (
           <div className="space-y-8">
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex items-center gap-3">
-              <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
-                <Users size={22} />
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+                  <Users size={22} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">{currentBranch} Branch — Read-Only View</h2>
+                  <p className="text-xs text-slate-500">
+                    You can view {user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing and Ironing'} activity for {currentBranch}. Viewing only — no changes can be made.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">{currentBranch} Branch — Read-Only View</h2>
-                <p className="text-xs text-slate-500">
-                  You can view today's {user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing and Ironing'} activity for {currentBranch}. Viewing only — no changes can be made.
-                </p>
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
+                <Calendar size={15} className="text-brand-500 shrink-0" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
+                  <input
+                    type="date"
+                    value={viewerDateFrom}
+                    onChange={(e) => setViewerDateFrom(e.target.value)}
+                    className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                  />
+                </div>
+                <span className="w-3 h-px bg-slate-300" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">To</span>
+                  <input
+                    type="date"
+                    value={viewerDateTo}
+                    onChange={(e) => setViewerDateTo(e.target.value)}
+                    className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                  />
+                </div>
+                {(viewerDateFrom || viewerDateTo) && (
+                  <button
+                    onClick={() => { setViewerDateFrom(''); setViewerDateTo(''); }}
+                    title="Clear date range — show all dates"
+                    className="text-slate-400 hover:text-red-500 transition ml-1"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* STAFF SUMMARY — today only, scoped to assigned department (or both) */}
+            {/* STAFF SUMMARY — scoped to assigned department (or both), with its own date range */}
             <StaffSummaryReport
               staffSummary={staffSummary}
-              title={`${currentBranch} Branch Report — Today`}
-              subtitle={`How everyone in your branch is performing today${user?.department ? '' : ' (Washing & Ironing)'}`}
+              title={`${currentBranch} Branch Report`}
+              subtitle={`How everyone in your branch is performing${user?.department ? '' : ' (Washing & Ironing)'}`}
               showBranchColumn={false}
               showChart={false}
             />
 
-            {/* TODAY'S LOGS — no actions */}
+            {/* LOGS — no actions */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
               <h3 className="text-md font-bold text-slate-800 mb-4">
-                Today's Logs — {currentBranch} Branch ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
+                Logs — {currentBranch} Branch ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
               </h3>
 
               <div className="overflow-x-auto">
@@ -1448,7 +1494,7 @@ export default function DashboardPage() {
                     {logs.length === 0 ? (
                       <tr>
                         <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400">
-                          No logs registered today for {currentBranch} branch yet.
+                          No logs found for {currentBranch} branch in this date range.
                         </td>
                       </tr>
                     ) : (
