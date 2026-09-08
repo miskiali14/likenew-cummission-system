@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, X } from 'lucide-react';
 
 const CATEGORIES = [
   { value: 'DAMAGED', label: 'Damaged Item' },
@@ -38,6 +38,8 @@ export default function ComplaintsPage() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
   const [notification, setNotification] = useState(null);
+  const [resolveTarget, setResolveTarget] = useState(null);
+  const [resolveNotes, setResolveNotes] = useState('');
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -128,6 +130,28 @@ export default function ComplaintsPage() {
       fetchComplaints();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to save complaint');
+    }
+  };
+
+  const openResolveModal = (c) => {
+    setResolveTarget(c);
+    setResolveNotes(c.resolutionNotes || '');
+  };
+
+  const handleResolveSubmit = async (e) => {
+    e.preventDefault();
+    if (!resolveTarget) return;
+    try {
+      await API.patch(`/complaints/${resolveTarget.id}`, {
+        status: 'RESOLVED',
+        resolutionNotes: resolveNotes,
+      });
+      showToast('success', 'Complaint marked as resolved!');
+      setResolveTarget(null);
+      setResolveNotes('');
+      fetchComplaints();
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to resolve complaint');
     }
   };
 
@@ -270,6 +294,15 @@ export default function ComplaintsPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        {c.status !== 'RESOLVED' && (
+                          <button
+                            onClick={() => openResolveModal(c)}
+                            className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
+                            title="Resolve Complaint"
+                          >
+                            <CheckCheck size={18} />
+                          </button>
+                        )}
                         <button
                           onClick={() => openEditModal(c)}
                           className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
@@ -423,6 +456,55 @@ export default function ComplaintsPage() {
                   className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700"
                 >
                   Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal — Resolve Complaint (quick, focused action) */}
+      {resolveTarget && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Resolve Complaint</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {resolveTarget.customerName}
+                {resolveTarget.orderId ? ` — Order ${resolveTarget.orderId}` : ''}
+              </p>
+              <p className="text-sm text-gray-600 mt-2 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                {resolveTarget.description}
+              </p>
+            </div>
+            <form onSubmit={handleResolveSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  How was this resolved?
+                </label>
+                <textarea
+                  required
+                  autoFocus
+                  rows={3}
+                  placeholder="E.g. Replaced the damaged item and offered a discount on the next order"
+                  value={resolveNotes}
+                  onChange={(e) => setResolveNotes(e.target.value)}
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setResolveTarget(null); setResolveNotes(''); }}
+                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 flex items-center gap-1.5"
+                >
+                  <CheckCheck size={16} /> Mark as Resolved
                 </button>
               </div>
             </form>
