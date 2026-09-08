@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
-// Update a complaint (status, resolution notes, details) — Admin any branch,
-// Sales/Customer Care their own branch only.
+// Update a complaint (status, resolution notes, details) — Admin and
+// Customer Care only, any branch. Sales can log complaints but does not
+// manage or see how they were resolved.
 export async function PATCH(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
   if (auth.response) return auth.response;
-  const user = auth.user;
 
   try {
     const { id } = await params;
@@ -15,15 +15,12 @@ export async function PATCH(request, { params }) {
     if (!existing) {
       return NextResponse.json({ message: 'Complaint not found' }, { status: 404 });
     }
-    if (user.role !== 'ADMIN' && existing.branch !== user.branch) {
-      return NextResponse.json({ message: 'This complaint does not belong to your branch' }, { status: 403 });
-    }
 
     const body = await request.json();
     const { status, customerName, phone, orderId, category, description, date, resolutionNotes, branch } = body;
 
-    // Only Admin may move a complaint between branches.
-    const nextBranch = user.role === 'ADMIN' && branch !== undefined ? branch : undefined;
+    // Admin and Customer Care may move a complaint between branches.
+    const nextBranch = branch !== undefined ? branch : undefined;
 
     const complaint = await prisma.complaint.update({
       where: { id },
@@ -49,20 +46,16 @@ export async function PATCH(request, { params }) {
   }
 }
 
-// Delete a complaint — Admin any branch, Sales/Customer Care their own branch only.
+// Delete a complaint — Admin and Customer Care only, any branch.
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
   if (auth.response) return auth.response;
-  const user = auth.user;
 
   try {
     const { id } = await params;
     const existing = await prisma.complaint.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ message: 'Complaint not found' }, { status: 404 });
-    }
-    if (user.role !== 'ADMIN' && existing.branch !== user.branch) {
-      return NextResponse.json({ message: 'This complaint does not belong to your branch' }, { status: 403 });
     }
 
     await prisma.complaint.delete({ where: { id } });

@@ -3,8 +3,8 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
-// Customer complaints — Admin sees every branch; Sales and Customer Care
-// see and register complaints for their own branch.
+// Customer complaints — Admin and Customer Care see every branch; Sales
+// see and register complaints for their own branch only.
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE']);
   if (auth.response) return auth.response;
@@ -15,7 +15,7 @@ export async function GET(request) {
     const branchParam = searchParams.get('branch');
     const status = searchParams.get('status');
 
-    const branch = user.role === 'ADMIN'
+    const branch = ['ADMIN', 'CUSTOMER_CARE'].includes(user.role)
       ? (branchParam && branchParam !== 'All' ? branchParam : null)
       : user.branch;
 
@@ -50,7 +50,9 @@ export async function POST(request) {
       );
     }
 
-    const branch = user.role === 'ADMIN' ? (body.branch || 'HQ') : user.branch;
+    const branch = ['ADMIN', 'CUSTOMER_CARE'].includes(user.role)
+      ? (body.branch || user.branch || 'HQ')
+      : user.branch;
 
     const complaint = await prisma.complaint.create({
       data: {

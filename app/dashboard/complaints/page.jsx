@@ -41,6 +41,11 @@ export default function ComplaintsPage() {
   const [resolveTarget, setResolveTarget] = useState(null);
   const [resolveNotes, setResolveNotes] = useState('');
 
+  // Admin and Customer Care oversee complaints across both branches and can
+  // manage/resolve them; Sales can only log a complaint for their own branch.
+  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE'].includes(user?.role);
+  const canManage = ['ADMIN', 'CUSTOMER_CARE'].includes(user?.role);
+
   const showToast = (type, message) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 4000);
@@ -66,7 +71,7 @@ export default function ComplaintsPage() {
     if (!user) return;
     setLoading(true);
     try {
-      const branchParam = user.role === 'ADMIN' && branchFilter !== 'All' ? branchFilter : '';
+      const branchParam = canSeeAllBranches && branchFilter !== 'All' ? branchFilter : '';
       const res = await API.get(`/complaints?branch=${branchParam}&status=${statusTab}`);
       setComplaints(res.data || []);
     } catch (err) {
@@ -219,7 +224,7 @@ export default function ComplaintsPage() {
           ))}
         </div>
 
-        {user?.role === 'ADMIN' && (
+        {canSeeAllBranches && (
           <select
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
@@ -262,7 +267,7 @@ export default function ComplaintsPage() {
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
-                  {user?.role === 'ADMIN' && <th className="p-4">Branch</th>}
+                  {canSeeAllBranches && <th className="p-4">Branch</th>}
                   <th className="p-4">Customer</th>
                   <th className="p-4">Phone</th>
                   <th className="p-4">Order ID</th>
@@ -270,13 +275,13 @@ export default function ComplaintsPage() {
                   <th className="p-4">Details</th>
                   <th className="p-4">Date</th>
                   <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  {canManage && <th className="p-4 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
                 {filteredComplaints.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50/50 transition">
-                    {user?.role === 'ADMIN' && <td className="p-4 text-gray-600">{c.branch}</td>}
+                    {canSeeAllBranches && <td className="p-4 text-gray-600">{c.branch}</td>}
                     <td className="p-4 font-medium text-gray-900">{c.customerName}</td>
                     <td className="p-4 text-gray-600">{c.phone || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4 text-gray-600">{c.orderId || <span className="text-slate-300">—</span>}</td>
@@ -292,33 +297,35 @@ export default function ComplaintsPage() {
                         {STATUS_LABEL[c.status]}
                       </span>
                     </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {c.status !== 'RESOLVED' && (
+                    {canManage && (
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {c.status !== 'RESOLVED' && (
+                            <button
+                              onClick={() => openResolveModal(c)}
+                              className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
+                              title="Resolve Complaint"
+                            >
+                              <CheckCheck size={18} />
+                            </button>
+                          )}
                           <button
-                            onClick={() => openResolveModal(c)}
-                            className="text-emerald-500 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
-                            title="Resolve Complaint"
+                            onClick={() => openEditModal(c)}
+                            className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
+                            title="Edit / Update Status"
                           >
-                            <CheckCheck size={18} />
+                            <Edit2 size={18} />
                           </button>
-                        )}
-                        <button
-                          onClick={() => openEditModal(c)}
-                          className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
-                          title="Edit / Update Status"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(c.id)}
-                          className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
-                          title="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
+                          <button
+                            onClick={() => handleDelete(c.id)}
+                            className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                            title="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -399,7 +406,7 @@ export default function ComplaintsPage() {
                     className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
-                {user?.role === 'ADMIN' && (
+                {canSeeAllBranches && (
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">Branch</label>
                     <select
