@@ -4,9 +4,10 @@ import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
 // Customer Items (belongings left behind, held until claimed) — Admin sees
-// every branch; Sales sees and registers items for their own branch only.
+// every branch; Sales and Call Center see and register items for their own
+// branch only (Call Center can view/add but not edit or delete — see [id]).
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -35,7 +36,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 

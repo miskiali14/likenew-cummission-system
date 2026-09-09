@@ -20,6 +20,10 @@ export default function CustomerItemsPage() {
   const [formData, setFormData] = useState(emptyForm);
   const [notification, setNotification] = useState(null);
 
+  // Call Center can log and view items but not mark them claimed, edit, or
+  // delete them — that stays with Admin/Sales who handle the item in person.
+  const canManage = user?.role !== 'CALL_CENTER';
+
   const showToast = (type, message) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 4000);
@@ -32,7 +36,7 @@ export default function CustomerItemsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (parsedUser.role !== 'ADMIN' && parsedUser.role !== 'SALES') {
+    if (!['ADMIN', 'SALES', 'CALL_CENTER'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
@@ -243,7 +247,7 @@ export default function CustomerItemsPage() {
                   <th className="p-4">Item Description</th>
                   <th className="p-4">Date</th>
                   <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  {canManage && <th className="p-4 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
@@ -266,41 +270,43 @@ export default function CustomerItemsPage() {
                         {item.status === 'CLAIMED' ? 'Claimed' : 'Held'}
                       </span>
                     </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {item.status === 'HELD' ? (
+                    {canManage && (
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {item.status === 'HELD' ? (
+                            <button
+                              onClick={() => handleMarkClaimed(item.id)}
+                              className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
+                              title="Mark as Claimed"
+                            >
+                              <CheckCircle2 size={18} />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleMarkHeld(item.id)}
+                              className="text-amber-600 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50 transition"
+                              title="Move back to Held"
+                            >
+                              <RotateCcw size={18} />
+                            </button>
+                          )}
                           <button
-                            onClick={() => handleMarkClaimed(item.id)}
-                            className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
-                            title="Mark as Claimed"
+                            onClick={() => openEditModal(item)}
+                            className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
+                            title="Edit"
                           >
-                            <CheckCircle2 size={18} />
+                            <Edit2 size={18} />
                           </button>
-                        ) : (
                           <button
-                            onClick={() => handleMarkHeld(item.id)}
-                            className="text-amber-600 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50 transition"
-                            title="Move back to Held"
+                            onClick={() => handleDelete(item.id)}
+                            className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                            title="Delete"
                           >
-                            <RotateCcw size={18} />
+                            <Trash2 size={18} />
                           </button>
-                        )}
-                        <button
-                          onClick={() => openEditModal(item)}
-                          className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
-                          title="Edit"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
-                          title="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

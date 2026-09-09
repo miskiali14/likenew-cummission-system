@@ -4,9 +4,10 @@ import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
 // Customer complaints — Admin and Customer Care see every branch; Sales
-// see and register complaints for their own branch only.
+// and Call Center see and register complaints for their own branch only
+// (Call Center can view/add but not edit, resolve, or delete — see [id]).
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -35,7 +36,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 

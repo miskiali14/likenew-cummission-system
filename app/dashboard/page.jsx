@@ -467,6 +467,13 @@ export default function DashboardPage() {
           return;
         }
 
+        // Call Center's job is logging Customer Items and Complaints —
+        // the washing/ironing log form here doesn't apply to them either.
+        if (parsedUser.role === 'CALL_CENTER') {
+          router.push('/dashboard/customer-items');
+          return;
+        }
+
         setUser(parsedUser);
 
         if (parsedUser.role !== 'ADMIN') {

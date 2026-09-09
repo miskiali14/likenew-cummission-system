@@ -91,6 +91,19 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
             </>
           )}
 
+          {/* ================= CALL CENTER ================= */}
+          {userRole === 'CALL_CENTER' && (
+            <>
+              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Call Center</div>
+              <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
+                🧳 Customer Items
+              </Link>
+              <Link href="/dashboard/complaints" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints')}`}>
+                📢 Complaints
+              </Link>
+            </>
+          )}
+
           {/* ================= QUALITY CONTROL ================= */}
           {userRole === 'QUALITY_CONTROL' && (
             <>

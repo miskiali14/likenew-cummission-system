@@ -13,6 +13,7 @@ enum Role {
   QUALITY_CONTROL
   VIEWER
   CUSTOMER_CARE
+  CALL_CENTER
 }
 
 enum Department {

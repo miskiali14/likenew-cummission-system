@@ -58,7 +58,7 @@ export default function ComplaintsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'SALES', 'CUSTOMER_CARE'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
