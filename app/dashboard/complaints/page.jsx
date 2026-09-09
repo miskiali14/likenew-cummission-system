@@ -41,9 +41,10 @@ export default function ComplaintsPage() {
   const [resolveTarget, setResolveTarget] = useState(null);
   const [resolveNotes, setResolveNotes] = useState('');
 
-  // Admin and Customer Care oversee complaints across both branches and can
-  // manage/resolve them; Sales can only log a complaint for their own branch.
-  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE'].includes(user?.role);
+  // Admin, Customer Care, and Call Center oversee complaints across both
+  // branches; only Admin and Customer Care can manage/resolve them — Sales
+  // and Call Center can only log a complaint.
+  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user?.role);
   const canManage = ['ADMIN', 'CUSTOMER_CARE'].includes(user?.role);
 
   const showToast = (type, message) => {

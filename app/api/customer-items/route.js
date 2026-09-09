@@ -3,9 +3,10 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
-// Customer Items (belongings left behind, held until claimed) — Admin sees
-// every branch; Sales and Call Center see and register items for their own
-// branch only (Call Center can view/add but not edit or delete — see [id]).
+// Customer Items (belongings left behind, held until claimed) — Admin and
+// Call Center see and can pick any branch; Sales sees and registers items
+// for their own branch only (Call Center can view/add but not edit or
+// delete — see [id]).
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'CALL_CENTER']);
   if (auth.response) return auth.response;
@@ -16,7 +17,7 @@ export async function GET(request) {
     const branchParam = searchParams.get('branch');
     const status = searchParams.get('status');
 
-    const branch = user.role === 'ADMIN'
+    const branch = ['ADMIN', 'CALL_CENTER'].includes(user.role)
       ? (branchParam && branchParam !== 'All' ? branchParam : null)
       : user.branch;
 
@@ -51,7 +52,9 @@ export async function POST(request) {
       );
     }
 
-    const branch = user.role === 'ADMIN' ? (body.branch || 'HQ') : user.branch;
+    const branch = ['ADMIN', 'CALL_CENTER'].includes(user.role)
+      ? (body.branch || user.branch || 'HQ')
+      : user.branch;
 
     const item = await prisma.customerItem.create({
       data: {

@@ -23,6 +23,9 @@ export default function CustomerItemsPage() {
   // Call Center can log and view items but not mark them claimed, edit, or
   // delete them — that stays with Admin/Sales who handle the item in person.
   const canManage = user?.role !== 'CALL_CENTER';
+  // Admin and Call Center oversee items across both branches; Sales stays
+  // scoped to its own branch.
+  const canSeeAllBranches = ['ADMIN', 'CALL_CENTER'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -49,7 +52,7 @@ export default function CustomerItemsPage() {
     if (!user) return;
     setLoading(true);
     try {
-      const branchParam = user.role === 'ADMIN' && branchFilter !== 'All' ? branchFilter : '';
+      const branchParam = canSeeAllBranches && branchFilter !== 'All' ? branchFilter : '';
       const res = await API.get(`/customer-items?branch=${branchParam}&status=${statusTab}`);
       setItems(res.data || []);
     } catch (err) {
@@ -197,7 +200,7 @@ export default function CustomerItemsPage() {
           ))}
         </div>
 
-        {user?.role === 'ADMIN' && (
+        {canSeeAllBranches && (
           <select
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
@@ -240,7 +243,7 @@ export default function CustomerItemsPage() {
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
-                  {user?.role === 'ADMIN' && <th className="p-4">Branch</th>}
+                  {canSeeAllBranches && <th className="p-4">Branch</th>}
                   <th className="p-4">Customer ID</th>
                   <th className="p-4">Customer Name</th>
                   <th className="p-4">Phone</th>
@@ -253,7 +256,7 @@ export default function CustomerItemsPage() {
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
                 {filteredItems.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50/50 transition">
-                    {user?.role === 'ADMIN' && <td className="p-4 text-gray-600">{item.branch}</td>}
+                    {canSeeAllBranches && <td className="p-4 text-gray-600">{item.branch}</td>}
                     <td className="p-4 font-extrabold text-slate-900">{item.customerId}</td>
                     <td className="p-4 font-medium text-gray-900">{item.customerName}</td>
                     <td className="p-4 text-gray-600">{item.phone || <span className="text-slate-300">—</span>}</td>
@@ -373,7 +376,7 @@ export default function CustomerItemsPage() {
                     className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
-                {user?.role === 'ADMIN' && (
+                {canSeeAllBranches && (
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-1">Branch</label>
                     <select

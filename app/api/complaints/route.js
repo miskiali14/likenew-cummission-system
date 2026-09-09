@@ -3,8 +3,8 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
-// Customer complaints — Admin and Customer Care see every branch; Sales
-// and Call Center see and register complaints for their own branch only
+// Customer complaints — Admin, Customer Care, and Call Center see every
+// branch; Sales sees and registers complaints for their own branch only
 // (Call Center can view/add but not edit, resolve, or delete — see [id]).
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER']);
@@ -16,7 +16,7 @@ export async function GET(request) {
     const branchParam = searchParams.get('branch');
     const status = searchParams.get('status');
 
-    const branch = ['ADMIN', 'CUSTOMER_CARE'].includes(user.role)
+    const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user.role)
       ? (branchParam && branchParam !== 'All' ? branchParam : null)
       : user.branch;
 
@@ -51,7 +51,7 @@ export async function POST(request) {
       );
     }
 
-    const branch = ['ADMIN', 'CUSTOMER_CARE'].includes(user.role)
+    const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user.role)
       ? (body.branch || user.branch || 'HQ')
       : user.branch;
 
