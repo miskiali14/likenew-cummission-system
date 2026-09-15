@@ -15,6 +15,8 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const branchParam = searchParams.get('branch');
     const status = searchParams.get('status');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
 
     const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user.role)
       ? (branchParam && branchParam !== 'All' ? branchParam : null)
@@ -23,6 +25,11 @@ export async function GET(request) {
     const whereClause = {};
     if (branch) whereClause.branch = branch;
     if (status && status !== 'All') whereClause.status = status;
+    if (dateFrom || dateTo) {
+      whereClause.date = {};
+      if (dateFrom) whereClause.date.gte = dateFrom;
+      if (dateTo) whereClause.date.lte = dateTo;
+    }
 
     const complaints = await prisma.complaint.findMany({
       where: whereClause,
