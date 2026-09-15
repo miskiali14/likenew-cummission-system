@@ -4,10 +4,10 @@ import { requireAuth } from '@/lib/auth';
 import { CUSTOMER_ITEM_CLAIM_COMMISSION } from '@/lib/commission';
 
 // Customer Item claim commission — a separate report from washing/ironing
-// commission. Non-admin only ever sees their own total; Admin sees a
+// commission. Call Center only ever sees their own total; Admin sees a
 // per-person breakdown plus the grand total.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 

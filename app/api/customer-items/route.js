@@ -3,15 +3,15 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
-// Customer Items (belongings left behind, held until claimed) — Admin sees
-// everything and can filter by branch. Every other user (Sales, Call
-// Center, ...) only ever sees the items they personally logged — not a
-// colleague's, even at the same branch — so two people sharing this desk
-// each get their own private list. Legacy items logged before this
-// tracking existed (createdById is null) stay visible to everyone so
-// nothing old disappears.
+// Customer Items (belongings left behind, held until claimed) — this desk
+// belongs to Admin and Call Center only; Sales has no access here at all.
+// Admin sees everything and can filter by branch. Call Center only ever
+// sees the items they personally logged — not a colleague's, even at the
+// same branch — so two people sharing this desk each get their own
+// private list. Legacy items logged before this tracking existed
+// (createdById is null) stay visible to everyone so nothing old disappears.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -40,7 +40,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 

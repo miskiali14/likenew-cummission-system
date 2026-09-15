@@ -31,11 +31,10 @@ export default function CustomerItemsPage() {
   const [claimMethod, setClaimMethod] = useState('');
   const [claimNotes, setClaimNotes] = useState('');
 
-  // Call Center can log and view items but not mark them claimed, edit, or
-  // delete them — that stays with Admin/Sales who handle the item in person.
-  const canManage = user?.role !== 'CALL_CENTER';
-  // Admin and Call Center oversee items across both branches; Sales stays
-  // scoped to its own branch.
+  // Customer Items is Admin + Call Center only — Sales has no access at all.
+  // Both remaining roles can claim, revert, edit, and delete, and both can
+  // see/log against either branch.
+  const canManage = ['ADMIN', 'CALL_CENTER'].includes(user?.role);
   const canSeeAllBranches = ['ADMIN', 'CALL_CENTER'].includes(user?.role);
 
   const showToast = (type, message) => {
@@ -50,7 +49,7 @@ export default function CustomerItemsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'SALES', 'CALL_CENTER'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'CALL_CENTER'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }

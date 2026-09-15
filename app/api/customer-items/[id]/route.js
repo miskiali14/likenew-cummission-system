@@ -5,11 +5,12 @@ import { requireAuth } from '@/lib/auth';
 const VALID_COLLECTION_METHODS = ['IN_PERSON', 'DELIVERY', 'INCLUDED_IN_ORDER'];
 
 // Update a Customer Item (mark claimed, edit details) — Admin any item;
-// Sales only an item they personally logged (or a legacy one with no
-// owner). Marking something CLAIMED requires saying how it was collected —
-// that person earns the per-item commission tracked on the item itself.
+// Call Center only an item they personally logged (or a legacy one with
+// no owner). Sales has no access to Customer Items at all. Marking
+// something CLAIMED requires saying how it was collected — that person
+// earns the per-item commission tracked on the item itself.
 export async function PATCH(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -33,8 +34,7 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    // Only Admin may move an item between branches; Sales edits stay within
-    // their own branch regardless of what's sent.
+    // Only Admin may move an item between branches.
     const nextBranch = user.role === 'ADMIN' && branch !== undefined ? branch : undefined;
 
     const item = await prisma.customerItem.update({
@@ -63,10 +63,10 @@ export async function PATCH(request, { params }) {
   }
 }
 
-// Delete a Customer Item — Admin any item, Sales only one they logged
-// (or a legacy one with no owner).
+// Delete a Customer Item — Admin any item, Call Center only one they
+// logged (or a legacy one with no owner). Sales has no access at all.
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
