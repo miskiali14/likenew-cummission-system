@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
-// Update a Customer Item (mark claimed, edit details) — Admin any branch,
-// Sales their own branch only.
+const VALID_COLLECTION_METHODS = ['IN_PERSON', 'DELIVERY', 'INCLUDED_IN_ORDER'];
+
+// Update a Customer Item (mark claimed, edit details) — Admin any item;
+// Sales only an item they personally logged (or a legacy one with no
+// owner). Marking something CLAIMED requires saying how it was collected —
+// that person earns the per-item commission tracked on the item itself.
 export async function PATCH(request, { params }) {
   const auth = requireAuth(request, ['ADMIN', 'SALES']);
   if (auth.response) return auth.response;
@@ -15,12 +19,19 @@ export async function PATCH(request, { params }) {
     if (!existing) {
       return NextResponse.json({ message: 'Item not found' }, { status: 404 });
     }
-    if (user.role !== 'ADMIN' && existing.branch !== user.branch) {
-      return NextResponse.json({ message: 'This item does not belong to your branch' }, { status: 403 });
+    if (user.role !== 'ADMIN' && existing.createdById && existing.createdById !== user.id) {
+      return NextResponse.json({ message: 'This item was not logged by you' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { status, customerId, customerName, phone, description, date, branch } = body;
+    const { status, customerId, customerName, phone, description, date, branch, collectionMethod, collectionNotes } = body;
+
+    if (status === 'CLAIMED' && !VALID_COLLECTION_METHODS.includes(collectionMethod)) {
+      return NextResponse.json(
+        { message: 'Please select how the item was collected' },
+        { status: 400 }
+      );
+    }
 
     // Only Admin may move an item between branches; Sales edits stay within
     // their own branch regardless of what's sent.
@@ -32,6 +43,10 @@ export async function PATCH(request, { params }) {
         ...(status !== undefined && {
           status,
           claimedAt: status === 'CLAIMED' ? new Date() : null,
+          claimedById: status === 'CLAIMED' ? user.id : null,
+          claimedByName: status === 'CLAIMED' ? user.fullName : null,
+          collectionMethod: status === 'CLAIMED' ? collectionMethod : null,
+          collectionNotes: status === 'CLAIMED' ? (collectionNotes || null) : null,
         }),
         ...(customerId !== undefined && { customerId: String(customerId) }),
         ...(customerName !== undefined && { customerName }),
@@ -48,7 +63,8 @@ export async function PATCH(request, { params }) {
   }
 }
 
-// Delete a Customer Item — Admin any branch, Sales their own branch only.
+// Delete a Customer Item — Admin any item, Sales only one they logged
+// (or a legacy one with no owner).
 export async function DELETE(request, { params }) {
   const auth = requireAuth(request, ['ADMIN', 'SALES']);
   if (auth.response) return auth.response;
@@ -60,8 +76,8 @@ export async function DELETE(request, { params }) {
     if (!existing) {
       return NextResponse.json({ message: 'Item not found' }, { status: 404 });
     }
-    if (user.role !== 'ADMIN' && existing.branch !== user.branch) {
-      return NextResponse.json({ message: 'This item does not belong to your branch' }, { status: 403 });
+    if (user.role !== 'ADMIN' && existing.createdById && existing.createdById !== user.id) {
+      return NextResponse.json({ message: 'This item was not logged by you' }, { status: 403 });
     }
 
     await prisma.customerItem.delete({ where: { id } });

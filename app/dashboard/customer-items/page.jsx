@@ -3,9 +3,16 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Package, AlertCircle, X } from 'lucide-react';
+import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Package, AlertCircle, X, Wallet } from 'lucide-react';
 
 const emptyForm = { customerId: '', customerName: '', phone: '', description: '', date: '', branch: 'HQ' };
+
+const COLLECTION_METHODS = [
+  { value: 'IN_PERSON', label: 'Customer picked it up in person' },
+  { value: 'DELIVERY', label: 'A delivery person came for it' },
+  { value: 'INCLUDED_IN_ORDER', label: 'Included with their order' },
+];
+const collectionMethodLabel = (val) => COLLECTION_METHODS.find((m) => m.value === val)?.label || val;
 
 export default function CustomerItemsPage() {
   const router = useRouter();
@@ -19,6 +26,10 @@ export default function CustomerItemsPage() {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
   const [notification, setNotification] = useState(null);
+  const [commission, setCommission] = useState(null);
+  const [claimTarget, setClaimTarget] = useState(null);
+  const [claimMethod, setClaimMethod] = useState('');
+  const [claimNotes, setClaimNotes] = useState('');
 
   // Call Center can log and view items but not mark them claimed, edit, or
   // delete them — that stays with Admin/Sales who handle the item in person.
@@ -65,6 +76,20 @@ export default function CustomerItemsPage() {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const fetchCommission = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await API.get('/customer-items/commission');
+      setCommission(res.data);
+    } catch (err) {
+      console.error('Failed to load commission summary:', err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchCommission();
+  }, [fetchCommission]);
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -116,23 +141,37 @@ export default function CustomerItemsPage() {
     }
   };
 
-  const handleMarkClaimed = async (id) => {
-    if (!confirm('Mark this item as claimed? It will move out of the Held list.')) return;
+  const openClaimModal = (item) => {
+    setClaimTarget(item);
+    setClaimMethod('');
+    setClaimNotes('');
+  };
+
+  const handleClaimSubmit = async (e) => {
+    e.preventDefault();
+    if (!claimTarget) return;
     try {
-      await API.patch(`/customer-items/${id}`, { status: 'CLAIMED' });
+      await API.patch(`/customer-items/${claimTarget.id}`, {
+        status: 'CLAIMED',
+        collectionMethod: claimMethod,
+        collectionNotes: claimNotes,
+      });
       showToast('success', 'Item marked as claimed');
+      setClaimTarget(null);
       fetchItems();
+      fetchCommission();
     } catch (err) {
-      showToast('error', 'Failed to update item');
+      showToast('error', err.response?.data?.message || 'Failed to update item');
     }
   };
 
   const handleMarkHeld = async (id) => {
-    if (!confirm('Move this item back to Held?')) return;
+    if (!confirm('Move this item back to Held? This removes the collection commission for it.')) return;
     try {
       await API.patch(`/customer-items/${id}`, { status: 'HELD' });
       showToast('success', 'Item moved back to Held');
       fetchItems();
+      fetchCommission();
     } catch (err) {
       showToast('error', 'Failed to update item');
     }
@@ -183,6 +222,39 @@ export default function CustomerItemsPage() {
           <PlusCircle size={18} /> Add Item
         </button>
       </div>
+
+      {/* Customer Item Collection Commission — separate from washing/ironing commission */}
+      {commission && (
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+            <Wallet size={16} className="text-brand-600" />
+            Customer Item Collection Commission
+          </div>
+          {user?.role === 'ADMIN' ? (
+            commission.byUser?.length ? (
+              <div className="space-y-2">
+                {commission.byUser.map((u) => (
+                  <div key={u.userId} className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600">{u.name}</span>
+                    <span className="font-medium text-slate-800">{u.count} items — ${u.commission.toFixed(2)}</span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-100 font-semibold text-slate-900">
+                  <span>Total</span>
+                  <span>{commission.totalClaimedCount} items — ${commission.totalCommission.toFixed(2)}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400">No items claimed yet.</p>
+            )
+          ) : (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-600">Your total ({commission.myClaimedCount} items claimed)</span>
+              <span className="font-semibold text-slate-900 text-base">${commission.myCommission.toFixed(2)}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
@@ -250,6 +322,8 @@ export default function CustomerItemsPage() {
                   <th className="p-4">Item Description</th>
                   <th className="p-4">Date</th>
                   <th className="p-4">Status</th>
+                  {user?.role === 'ADMIN' && <th className="p-4">Logged By</th>}
+                  {user?.role === 'ADMIN' && <th className="p-4">Handled By</th>}
                   {canManage && <th className="p-4 text-right">Actions</th>}
                 </tr>
               </thead>
@@ -273,12 +347,26 @@ export default function CustomerItemsPage() {
                         {item.status === 'CLAIMED' ? 'Claimed' : 'Held'}
                       </span>
                     </td>
+                    {user?.role === 'ADMIN' && (
+                      <td className="p-4 text-gray-500">{item.createdByName || <span className="text-slate-300">—</span>}</td>
+                    )}
+                    {user?.role === 'ADMIN' && (
+                      <td className="p-4 text-gray-500">
+                        {item.status === 'CLAIMED' ? (
+                          <span title={item.collectionMethod ? collectionMethodLabel(item.collectionMethod) : ''}>
+                            {item.claimedByName || '—'}
+                          </span>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
+                      </td>
+                    )}
                     {canManage && (
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {item.status === 'HELD' ? (
                             <button
-                              onClick={() => handleMarkClaimed(item.id)}
+                              onClick={() => openClaimModal(item)}
                               className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
                               title="Mark as Claimed"
                             >
@@ -404,6 +492,65 @@ export default function CustomerItemsPage() {
                   className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700"
                 >
                   Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal — Mark as Claimed */}
+      {claimTarget && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Mark as Claimed</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {claimTarget.customerName} — {claimTarget.description}
+              </p>
+            </div>
+            <form onSubmit={handleClaimSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  How did the customer get it back?
+                </label>
+                <select
+                  required
+                  value={claimMethod}
+                  onChange={(e) => setClaimMethod(e.target.value)}
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="" disabled>Select one...</option>
+                  {COLLECTION_METHODS.map((m) => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Notes (optional)
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="E.g. where/how it was collected"
+                  value={claimNotes}
+                  onChange={(e) => setClaimNotes(e.target.value)}
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setClaimTarget(null)}
+                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 flex items-center gap-1.5"
+                >
+                  <CheckCircle2 size={16} /> Confirm Claimed
                 </button>
               </div>
             </form>

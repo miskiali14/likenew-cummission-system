@@ -51,6 +51,13 @@ enum ComplaintCategory {
   OTHER
 }
 
+// How the customer actually got their held item back, recorded at claim time.
+enum CollectionMethod {
+  IN_PERSON          // Customer came and picked it up themselves
+  DELIVERY           // A delivery person came to collect it on the customer's behalf
+  INCLUDED_IN_ORDER  // It was tucked into the customer's next laundry order
+}
+
 model User {
   id         String      @id @default(uuid())
   fullName   String
@@ -116,20 +123,32 @@ model Log {
 }
 
 // Customer belongings left behind and held at a branch until claimed —
-// Admin sees everything; Sales sees and registers items for their own branch.
+// Admin sees everything; every other user only sees the items they
+// personally logged, not a colleague's (createdById). Claiming one out
+// pays the person who handled the handover a flat commission, tracked
+// separately from the washing/ironing commission report.
 model CustomerItem {
-  id           String     @id @default(uuid())
-  branch       String     // HQ or KM5
-  customerId   String     // ticket/reference number from the paper log
-  customerName String
-  phone        String?    // customer's phone number, if collected
-  description  String     // item(s) left behind
-  date         String     // YYYY-MM-DD, when it was logged
-  status       ItemStatus @default(HELD)
-  claimedAt    DateTime?
-  createdAt    DateTime   @default(now())
+  id               String            @id @default(uuid())
+  branch           String            // HQ or KM5
+  customerId       String            // ticket/reference number from the paper log
+  customerName     String
+  phone            String?           // customer's phone number, if collected
+  description      String            // item(s) left behind
+  date             String            // YYYY-MM-DD, when it was logged
+  status           ItemStatus        @default(HELD)
+  claimedAt        DateTime?
+  createdAt        DateTime          @default(now())
+
+  createdById      String?           // User.id who logged this item
+  createdByName    String?           // denormalized for display
+
+  claimedById      String?           // User.id who handed the item back
+  claimedByName    String?           // denormalized for display
+  collectionMethod CollectionMethod?
+  collectionNotes  String?           // free-text note on how/where it was collected
 
   @@index([branch, status])
+  @@index([createdById])
 }
 
 // Customer complaints — logged by Admin, Sales, or the dedicated Customer
