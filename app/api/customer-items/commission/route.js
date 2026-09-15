@@ -4,29 +4,56 @@ import { requireAuth } from '@/lib/auth';
 import { CUSTOMER_ITEM_CLAIM_COMMISSION } from '@/lib/commission';
 
 // Customer Item claim commission — a separate report from washing/ironing
-// commission. Call Center only ever sees their own total; Admin sees a
-// per-person breakdown plus the grand total.
+// commission, never mixed into it. Call Center only ever sees their own
+// total and history; Admin sees a per-person breakdown, the grand total,
+// and every claimed item. Optional dateFrom/dateTo (YYYY-MM-DD) filter by
+// when the item was actually claimed.
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
   try {
+    const { searchParams } = new URL(request.url);
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+
     const whereClause = { status: 'CLAIMED', claimedById: { not: null } };
     if (user.role !== 'ADMIN') {
       whereClause.claimedById = user.id;
     }
+    if (dateFrom || dateTo) {
+      whereClause.claimedAt = {};
+      if (dateFrom) whereClause.claimedAt.gte = new Date(`${dateFrom}T00:00:00.000Z`);
+      if (dateTo) whereClause.claimedAt.lte = new Date(`${dateTo}T23:59:59.999Z`);
+    }
 
     const claimed = await prisma.customerItem.findMany({
       where: whereClause,
-      select: { claimedById: true, claimedByName: true },
+      orderBy: { claimedAt: 'desc' },
+      select: {
+        id: true,
+        branch: true,
+        customerId: true,
+        customerName: true,
+        description: true,
+        date: true,
+        claimedAt: true,
+        claimedById: true,
+        claimedByName: true,
+        collectionMethod: true,
+        collectionNotes: true,
+      },
     });
+
+    const items = claimed.map((c) => ({ ...c, commission: CUSTOMER_ITEM_CLAIM_COMMISSION }));
 
     if (user.role !== 'ADMIN') {
       const count = claimed.length;
       return NextResponse.json({
         myClaimedCount: count,
         myCommission: Number((count * CUSTOMER_ITEM_CLAIM_COMMISSION).toFixed(2)),
+        items,
       });
     }
 
@@ -46,6 +73,7 @@ export async function GET(request) {
       totalClaimedCount: totalCount,
       totalCommission: Number((totalCount * CUSTOMER_ITEM_CLAIM_COMMISSION).toFixed(2)),
       byUser: breakdown,
+      items,
     });
   } catch (error) {
     return NextResponse.json({ message: 'A server error occurred', error: error.message }, { status: 500 });

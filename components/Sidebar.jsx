@@ -55,6 +55,9 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
                 🧳 Customer Items
               </Link>
+              <Link href="/dashboard/customer-items/commission-report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items/commission-report')}`}>
+                💵 Item Commission Report
+              </Link>
               <Link href="/dashboard/reports" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/reports')}`}>
                 🖨️ Reports
               </Link>
@@ -94,6 +97,9 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Call Center</div>
               <Link href="/dashboard/customer-items" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items')}`}>
                 🧳 Customer Items
+              </Link>
+              <Link href="/dashboard/customer-items/commission-report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/customer-items/commission-report')}`}>
+                💵 My Commission Report
               </Link>
               <Link href="/dashboard/complaints" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints')}`}>
                 📢 Complaints
