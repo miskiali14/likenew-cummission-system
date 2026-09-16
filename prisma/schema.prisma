@@ -63,12 +63,13 @@ enum DeadStockStatus {
   GIVEN_OUT
 }
 
-// How a dead-stock order was originally packaged/handled at the branch.
-enum DeadStockCategory {
-  LALAAB       // Folded
-  HANGER       // On a hanger
-  BUSTE_ROOG   // Bagged
-  KABO
+// User-managed list of Dead Stock categories (how an order was packaged/
+// handled) — starts with Lalaab/Hanger/Buste+Roog/Kabo, but Admin/Customer
+// Care can add more from the UI, so this isn't a fixed enum.
+model DeadStockCategoryOption {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
 }
 
 model User {
@@ -172,7 +173,7 @@ model DeadStock {
   id               String            @id @default(uuid())
   branch           String            // HQ or KM5
   orderId          String            // raw order reference, e.g. "45327-1/1"
-  category         DeadStockCategory
+  category         String            // free text, picked from DeadStockCategoryOption
   quantity         Int               @default(1)
   date             String            // YYYY-MM-DD, when it was logged
   status           DeadStockStatus   @default(IN_STOCK)

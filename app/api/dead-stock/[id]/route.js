@@ -3,7 +3,6 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
 const VALID_COLLECTION_METHODS = ['IN_PERSON', 'DELIVERY', 'INCLUDED_IN_ORDER'];
-const VALID_CATEGORIES = ['LALAAB', 'HANGER', 'BUSTE_ROOG', 'KABO'];
 
 // Update a Dead Stock entry (edit, or mark given out) — Admin/Customer Care.
 // Marking GIVEN_OUT requires saying how it left, same as a Customer Item
@@ -29,7 +28,7 @@ export async function PATCH(request, { params }) {
         { status: 400 }
       );
     }
-    if (category !== undefined && !VALID_CATEGORIES.includes(category)) {
+    if (category !== undefined && !String(category).trim()) {
       return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
     }
 

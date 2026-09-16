@@ -6,12 +6,6 @@ import API from '@/lib/api';
 import { Boxes, CheckCircle2, Clock, Calendar, Download, X, DollarSign, Wallet } from 'lucide-react';
 import { DEAD_STOCK_GIVEN_OUT_COMMISSION } from '@/lib/commission';
 
-const CATEGORY_LABEL = {
-  LALAAB: 'Lalaab (Folded)',
-  HANGER: 'Hanger',
-  BUSTE_ROOG: 'Buste+Roog (Bagged)',
-  KABO: 'Kabo',
-};
 const METHOD_LABEL = {
   IN_PERSON: 'Picked up in person',
   DELIVERY: 'Delivery personnel',
@@ -195,7 +189,7 @@ export default function DeadStockReportPage() {
                   Date: it.date,
                   Branch: it.branch,
                   OrderRef: it.orderId,
-                  Category: CATEGORY_LABEL[it.category] || it.category,
+                  Category: it.category,
                   Quantity: it.quantity,
                   Status: it.status === 'GIVEN_OUT' ? 'Given Out' : 'In Stock',
                   LoggedBy: it.createdByName || '',
@@ -322,7 +316,7 @@ export default function DeadStockReportPage() {
               <div className="space-y-2">
                 {byCategory.map((c) => (
                   <div key={c.category} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">{CATEGORY_LABEL[c.category] || c.category}</span>
+                    <span className="text-slate-600">{c.category}</span>
                     <span className="font-semibold text-slate-800">{c.count} entries — {c.quantity} pcs</span>
                   </div>
                 ))}
@@ -366,7 +360,7 @@ export default function DeadStockReportPage() {
                       <td className="py-3 px-3 font-extrabold text-slate-900">{it.orderId}</td>
                       <td className="py-3 px-3">
                         <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
-                          {CATEGORY_LABEL[it.category] || it.category}
+                          {it.category}
                         </span>
                       </td>
                       <td className="py-3 px-3 text-right font-semibold text-slate-700">{it.quantity}</td>

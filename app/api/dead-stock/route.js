@@ -3,8 +3,6 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
-const VALID_CATEGORIES = ['LALAAB', 'HANGER', 'BUSTE_ROOG', 'KABO'];
-
 // Dead Stock — old, uncollected orders sitting at a branch. Admin and
 // Customer Care only; both see every branch.
 export async function GET(request) {
@@ -40,7 +38,7 @@ export async function POST(request) {
     const body = await request.json();
     const { orderId, category, quantity, date, branch } = body;
 
-    if (!orderId || !VALID_CATEGORIES.includes(category)) {
+    if (!orderId || !category || !String(category).trim()) {
       return NextResponse.json(
         { message: 'Please fill in the order reference and select a category' },
         { status: 400 }
