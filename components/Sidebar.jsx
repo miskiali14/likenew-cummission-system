@@ -67,6 +67,12 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <Link href="/dashboard/complaints/report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints/report')}`}>
                 📊 Complaints Report
               </Link>
+              <Link href="/dashboard/dead-stock" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/dead-stock')}`}>
+                📦 Dead Stock
+              </Link>
+              <Link href="/dashboard/dead-stock/report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/dead-stock/report')}`}>
+                📊 Dead Stock Report
+              </Link>
               <div className="my-3 border-t border-gray-800" />
             </>
           )}
@@ -93,6 +99,12 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               </Link>
               <Link href="/dashboard/complaints/report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/complaints/report')}`}>
                 📊 Complaints Report
+              </Link>
+              <Link href="/dashboard/dead-stock" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/dead-stock')}`}>
+                📦 Dead Stock
+              </Link>
+              <Link href="/dashboard/dead-stock/report" className={`block px-4 py-2.5 rounded-lg transition ${isActive('/dashboard/dead-stock/report')}`}>
+                📊 Dead Stock Report
               </Link>
             </>
           )}

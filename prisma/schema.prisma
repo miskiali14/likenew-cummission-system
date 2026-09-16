@@ -58,6 +58,19 @@ enum CollectionMethod {
   INCLUDED_IN_ORDER  // It was tucked into the customer's next laundry order
 }
 
+enum DeadStockStatus {
+  IN_STOCK
+  GIVEN_OUT
+}
+
+// How a dead-stock order was originally packaged/handled at the branch.
+enum DeadStockCategory {
+  LALAAB       // Folded
+  HANGER       // On a hanger
+  BUSTE_ROOG   // Bagged
+  KABO
+}
+
 model User {
   id         String      @id @default(uuid())
   fullName   String
@@ -149,6 +162,32 @@ model CustomerItem {
 
   @@index([branch, status])
   @@index([createdById])
+}
+
+// Old, uncollected orders sitting at a branch (a "dead stock" list) — logged
+// and given back out by Admin or Customer Care only. Given-out orders record
+// how they left, same as CustomerItem's collection method, but carry no
+// commission — this is a tracking/report feature, not a paid one.
+model DeadStock {
+  id               String            @id @default(uuid())
+  branch           String            // HQ or KM5
+  orderId          String            // raw order reference, e.g. "45327-1/1"
+  category         DeadStockCategory
+  quantity         Int               @default(1)
+  date             String            // YYYY-MM-DD, when it was logged
+  status           DeadStockStatus   @default(IN_STOCK)
+  createdAt        DateTime          @default(now())
+
+  createdById      String?
+  createdByName    String?
+
+  givenOutAt       DateTime?
+  givenOutById     String?
+  givenOutByName   String?
+  givenOutMethod   CollectionMethod?
+  givenOutNotes    String?
+
+  @@index([branch, status])
 }
 
 // Customer complaints — logged by Admin, Sales, or the dedicated Customer
