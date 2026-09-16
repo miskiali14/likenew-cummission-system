@@ -46,6 +46,8 @@ export async function GET(request) {
         id: true,
         orderId: true,
         staffName: true,
+        employeeId: true,
+        employee: { select: { name: true } },
         department: true,
         branch: true,
         quantity: true,
@@ -60,18 +62,22 @@ export async function GET(request) {
     // just not commission.
     const commissionCountedIds = getCommissionCountedIds(logs);
 
-    // Merge rows whose staff name matches case-insensitively (handles accidental
-    // duplicate Employee records for the same real person, e.g. "hassan nur" vs
-    // "Hasan Nur") so each person's totals appear on one combined row instead of
-    // being split across near-duplicate entries.
+    // Group by the linked Employee (the source of truth for their name),
+    // not the free-text staffName snapshot on each log — that snapshot can
+    // drift over time (typos, spelling variants like "Sakariye Cabdiqaadir"
+    // vs "Sakarie Abdikadir" for the same person), which used to split one
+    // real employee across multiple rows. Logs from before Employee-linking
+    // existed (no employeeId) still fall back to a normalized staffName key.
     const mergedByKey = new Map();
     for (const log of logs) {
-      const normalizedName = log.staffName.trim().toLowerCase();
-      const key = `${normalizedName}|${log.department}|${log.branch}`;
+      const canonicalName = log.employee?.name || log.staffName.trim();
+      const key = log.employeeId
+        ? `emp:${log.employeeId}`
+        : `name:${log.staffName.trim().toLowerCase()}|${log.department}|${log.branch}`;
 
       if (!mergedByKey.has(key)) {
         mergedByKey.set(key, {
-          staffName: log.staffName.trim(),
+          staffName: canonicalName,
           department: log.department,
           branch: log.branch,
           totalQuantity: 0,

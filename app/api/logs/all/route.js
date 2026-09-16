@@ -31,6 +31,7 @@ export async function GET(request) {
 
     const logs = await prisma.log.findMany({
       where: whereClause,
+      include: { employee: { select: { name: true } } },
       orderBy: { createdAt: 'desc' },
     });
 

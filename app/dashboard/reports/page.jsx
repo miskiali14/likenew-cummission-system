@@ -125,10 +125,17 @@ export default function ReportsPage() {
 
     const byStaff = new Map();
     for (const log of logs) {
-      const key = `${log.staffName.trim().toLowerCase()}|${log.department}|${log.branch}`;
+      // Group by the linked Employee (canonical name), not the free-text
+      // staffName snapshot — that can drift over time (spelling variants
+      // for the same person), which used to split one employee across
+      // multiple rows. Pre-Employee-link logs fall back to staffName.
+      const canonicalName = log.employee?.name || log.staffName.trim();
+      const key = log.employeeId
+        ? `emp:${log.employeeId}`
+        : `name:${log.staffName.trim().toLowerCase()}|${log.department}|${log.branch}`;
       if (!byStaff.has(key)) {
         byStaff.set(key, {
-          staffName: log.staffName.trim(),
+          staffName: canonicalName,
           department: log.department,
           branch: log.branch,
           tier1: 0,
@@ -164,16 +171,18 @@ export default function ReportsPage() {
     const sectionMap = new Map();
     const branchMap = new Map();
     for (const log of logs) {
+      const staffKey = log.employeeId ? `emp:${log.employeeId}` : `name:${log.staffName.trim().toLowerCase()}`;
+
       if (!sectionMap.has(log.department)) sectionMap.set(log.department, { staff: new Set(), orders: 0, pieces: 0, commission: 0 });
       const sec = sectionMap.get(log.department);
-      sec.staff.add(log.staffName.trim().toLowerCase());
+      sec.staff.add(staffKey);
       sec.orders += 1;
       sec.pieces += log.quantity;
       sec.commission += commissionFor(log);
 
       if (!branchMap.has(log.branch)) branchMap.set(log.branch, { staff: new Set(), orders: 0, pieces: 0, commission: 0 });
       const br = branchMap.get(log.branch);
-      br.staff.add(log.staffName.trim().toLowerCase());
+      br.staff.add(staffKey);
       br.orders += 1;
       br.pieces += log.quantity;
       br.commission += commissionFor(log);
