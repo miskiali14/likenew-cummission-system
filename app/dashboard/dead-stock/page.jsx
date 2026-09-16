@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Boxes, AlertCircle, X } from 'lucide-react';
+import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Boxes, AlertCircle, X, Wallet } from 'lucide-react';
+import { DEAD_STOCK_GIVEN_OUT_COMMISSION } from '@/lib/commission';
 
 const emptyForm = { orderId: '', category: 'LALAAB', quantity: 1, date: '', branch: 'HQ' };
 
@@ -36,6 +37,7 @@ export default function DeadStockPage() {
   const [giveOutTarget, setGiveOutTarget] = useState(null);
   const [giveOutMethod, setGiveOutMethod] = useState('');
   const [giveOutNotes, setGiveOutNotes] = useState('');
+  const [commission, setCommission] = useState(null);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -75,6 +77,24 @@ export default function DeadStockPage() {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const fetchCommission = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await API.get('/dead-stock/report');
+      const givenOutCount = (res.data || []).filter((it) => it.status === 'GIVEN_OUT').length;
+      setCommission({
+        count: givenOutCount,
+        total: Number((givenOutCount * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2)),
+      });
+    } catch (err) {
+      console.error('Failed to load commission summary:', err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchCommission();
+  }, [fetchCommission]);
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -137,17 +157,19 @@ export default function DeadStockPage() {
       showToast('success', 'Marked as given out');
       setGiveOutTarget(null);
       fetchItems();
+      fetchCommission();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to update entry');
     }
   };
 
   const handleMarkInStock = async (id) => {
-    if (!confirm('Move this back to In Stock?')) return;
+    if (!confirm('Move this back to In Stock? This removes the commission for it.')) return;
     try {
       await API.patch(`/dead-stock/${id}`, { status: 'IN_STOCK' });
       showToast('success', 'Moved back to In Stock');
       fetchItems();
+      fetchCommission();
     } catch (err) {
       showToast('error', 'Failed to update entry');
     }
@@ -198,6 +220,19 @@ export default function DeadStockPage() {
           <PlusCircle size={18} /> Add Entry
         </button>
       </div>
+
+      {/* Given-Out Commission — separate from every other commission */}
+      {commission && (
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <Wallet size={16} className="text-brand-600" />
+            Given-Out Commission
+          </div>
+          <span className="text-sm text-slate-600">
+            {commission.count} given out — <span className="font-bold text-slate-900">${commission.total.toFixed(2)}</span>
+          </span>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">

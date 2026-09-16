@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Boxes, CheckCircle2, Clock, Calendar, Download, X } from 'lucide-react';
+import { Boxes, CheckCircle2, Clock, Calendar, Download, X, DollarSign, Wallet } from 'lucide-react';
+import { DEAD_STOCK_GIVEN_OUT_COMMISSION } from '@/lib/commission';
 
 const CATEGORY_LABEL = {
   LALAAB: 'Lalaab (Folded)',
@@ -86,7 +87,21 @@ export default function DeadStockReportPage() {
     const inStockQty = inStock.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutQty = givenOut.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutRate = totalEntries > 0 ? (givenOut.length / totalEntries) * 100 : 0;
-    return { totalEntries, totalQuantity, inStockCount: inStock.length, inStockQty, givenOutCount: givenOut.length, givenOutQty, givenOutRate };
+    const totalCommission = Number((givenOut.length * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2));
+    return { totalEntries, totalQuantity, inStockCount: inStock.length, inStockQty, givenOutCount: givenOut.length, givenOutQty, givenOutRate, totalCommission };
+  }, [items]);
+
+  const byUser = useMemo(() => {
+    const map = new Map();
+    for (const it of items) {
+      if (it.status !== 'GIVEN_OUT' || !it.givenOutById) continue;
+      const entry = map.get(it.givenOutById) || { userId: it.givenOutById, name: it.givenOutByName || 'Unknown', count: 0 };
+      entry.count += 1;
+      map.set(it.givenOutById, entry);
+    }
+    return [...map.values()]
+      .map((e) => ({ ...e, commission: Number((e.count * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2)) }))
+      .sort((a, b) => b.commission - a.commission);
   }, [items]);
 
   const byCategory = useMemo(() => {
@@ -187,6 +202,7 @@ export default function DeadStockReportPage() {
                   GivenOutBy: it.givenOutByName || '',
                   GivenOutMethod: METHOD_LABEL[it.givenOutMethod] || it.givenOutMethod || '',
                   GivenOutNotes: it.givenOutNotes || '',
+                  Commission: it.status === 'GIVEN_OUT' ? DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2) : '0.00',
                 }))
               )
             }
@@ -206,7 +222,7 @@ export default function DeadStockReportPage() {
       ) : (
         <>
           {/* Summary cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
               <div className="p-3 bg-slate-50 text-slate-600 rounded-xl border border-slate-100">
                 <Boxes size={24} />
@@ -249,6 +265,54 @@ export default function DeadStockReportPage() {
                 <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.givenOutRate.toFixed(0)}%</h3>
               </div>
             </div>
+            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+                <DollarSign size={24} />
+              </div>
+              <div>
+                <p className="text-xs uppercase font-semibold text-slate-400">Given-Out Commission</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">${stats.totalCommission.toFixed(2)}</h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Commission breakdown by person — separate from every other commission */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
+              <Wallet size={16} className="text-brand-600" />
+              Commission by Person (${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)} per order given out)
+            </div>
+            {byUser.length === 0 ? (
+              <p className="text-sm text-slate-400">No orders given out in this date range.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-slate-100">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase bg-slate-50/70">
+                      <th className="py-3 px-3">Name</th>
+                      <th className="py-3 px-3 text-right">Orders Given Out</th>
+                      <th className="py-3 px-3 text-right">Commission</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {byUser.map((u) => (
+                      <tr key={u.userId} className="border-b border-slate-100 hover:bg-slate-50/80 transition">
+                        <td className="py-3 px-3 font-semibold text-slate-800">{u.name}</td>
+                        <td className="py-3 px-3 text-right text-slate-600">{u.count}</td>
+                        <td className="py-3 px-3 text-right font-bold text-amber-700">${u.commission.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
+                    <tr>
+                      <td className="py-3 px-3 text-slate-800">Total</td>
+                      <td className="py-3 px-3 text-right text-slate-900">{stats.givenOutCount}</td>
+                      <td className="py-3 px-3 text-right text-amber-800">${stats.totalCommission.toFixed(2)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
           </div>
 
           {/* Breakdown by category / branch */}
@@ -291,6 +355,7 @@ export default function DeadStockReportPage() {
                     <th className="py-3 px-3 text-right">Qty</th>
                     <th className="py-3 px-3">Status</th>
                     <th className="py-3 px-3">Given Out By</th>
+                    <th className="py-3 px-3 text-right">Commission</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -317,6 +382,9 @@ export default function DeadStockReportPage() {
                         </span>
                       </td>
                       <td className="py-3 px-3 text-slate-600">{it.givenOutByName || <span className="text-slate-300">—</span>}</td>
+                      <td className="py-3 px-3 text-right font-bold text-amber-700">
+                        {it.status === 'GIVEN_OUT' ? `$${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)}` : <span className="text-slate-300">—</span>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
