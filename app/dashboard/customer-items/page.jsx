@@ -3,9 +3,17 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Package, AlertCircle, X, Wallet } from 'lucide-react';
+import { Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, Package, AlertCircle, X, Wallet, AlertTriangle } from 'lucide-react';
 
 const emptyForm = { customerId: '', customerName: '', phone: '', description: '', date: '', branch: 'HQ' };
+
+// An item sitting HELD this long is easy to forget about — flag it.
+const AGING_THRESHOLD_DAYS = 30;
+const getAgeDays = (dateStr) => {
+  if (!dateStr) return 0;
+  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+  return days < 0 ? 0 : days;
+};
 
 const COLLECTION_METHODS = [
   { value: 'IN_PERSON', label: 'Customer picked it up in person' },
@@ -101,6 +109,11 @@ export default function CustomerItemsPage() {
         it.description.toLowerCase().includes(q)
     );
   }, [items, search]);
+
+  const agingCount = useMemo(
+    () => items.filter((it) => it.status === 'HELD' && getAgeDays(it.date) > AGING_THRESHOLD_DAYS).length,
+    [items]
+  );
 
   const openAddModal = () => {
     setEditingId(null);
@@ -222,6 +235,14 @@ export default function CustomerItemsPage() {
         </button>
       </div>
 
+      {/* Aging alert — items sitting HELD past the threshold are easy to forget */}
+      {agingCount > 0 && (
+        <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm font-medium">
+          <AlertTriangle size={18} className="shrink-0" />
+          {agingCount} item{agingCount > 1 ? 's have' : ' has'} been held for over {AGING_THRESHOLD_DAYS} days — worth following up.
+        </div>
+      )}
+
       {/* Customer Item Collection Commission — separate from washing/ironing commission */}
       {commission && (
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
@@ -320,6 +341,7 @@ export default function CustomerItemsPage() {
                   <th className="p-4">Phone</th>
                   <th className="p-4">Item Description</th>
                   <th className="p-4">Date</th>
+                  <th className="p-4">Age</th>
                   <th className="p-4">Status</th>
                   {user?.role === 'ADMIN' && <th className="p-4">Logged By</th>}
                   {user?.role === 'ADMIN' && <th className="p-4">Handled By</th>}
@@ -335,6 +357,22 @@ export default function CustomerItemsPage() {
                     <td className="p-4 text-gray-600">{item.phone || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4 text-gray-600">{item.description}</td>
                     <td className="p-4 text-gray-500">{item.date}</td>
+                    <td className="p-4">
+                      {item.status === 'HELD' ? (
+                        <span
+                          className={`text-xs font-semibold ${
+                            getAgeDays(item.date) > AGING_THRESHOLD_DAYS ? 'text-red-600' : 'text-slate-500'
+                          }`}
+                        >
+                          {getAgeDays(item.date)}d
+                          {getAgeDays(item.date) > AGING_THRESHOLD_DAYS && (
+                            <AlertTriangle size={12} className="inline ml-1 -mt-0.5" />
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
+                    </td>
                     <td className="p-4">
                       <span
                         className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
