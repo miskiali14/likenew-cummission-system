@@ -3,11 +3,13 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { CUSTOMER_ITEM_CLAIM_COMMISSION } from '@/lib/commission';
 
-// Customer Item claim commission — a separate report from washing/ironing
-// commission, never mixed into it. Call Center only ever sees their own
-// total and history; Admin sees a per-person breakdown, the grand total,
-// and every claimed item. Optional dateFrom/dateTo (YYYY-MM-DD) filter by
-// when the item was actually claimed.
+// Customer Item resolution commission — a separate report from washing/
+// ironing commission, never mixed into it. Every resolved outcome (Claimed,
+// Donated, Discarded) earns the same flat commission — the person still did
+// the work of closing it out either way. Call Center only ever sees their
+// own total and history; Admin sees a per-person breakdown, the grand
+// total, and every resolved item. Optional dateFrom/dateTo (YYYY-MM-DD)
+// filter by when the item was actually resolved.
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
   if (auth.response) return auth.response;
@@ -18,7 +20,7 @@ export async function GET(request) {
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
 
-    const whereClause = { status: 'CLAIMED', claimedById: { not: null } };
+    const whereClause = { status: { in: ['CLAIMED', 'DONATED', 'DISCARDED'] }, claimedById: { not: null } };
     if (user.role !== 'ADMIN') {
       whereClause.claimedById = user.id;
     }
@@ -38,6 +40,7 @@ export async function GET(request) {
         customerName: true,
         description: true,
         date: true,
+        status: true,
         claimedAt: true,
         claimedById: true,
         claimedByName: true,

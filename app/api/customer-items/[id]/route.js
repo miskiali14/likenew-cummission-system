@@ -3,10 +3,10 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
 const VALID_COLLECTION_METHODS = ['IN_PERSON', 'DELIVERY', 'INCLUDED_IN_ORDER'];
-// Terminal outcomes for an item — CLAIMED earns the collector a commission
-// and requires a collection method; DONATED/DISCARDED cover a customer who
-// says not to bother bringing it back (give it away / throw it out) and
-// carry no commission or collection method, just an optional note.
+// Terminal outcomes for an item — all three earn the person who resolved it
+// a commission. CLAIMED requires picking a collection method; DONATED/
+// DISCARDED (customer said give it away / throw it out) have no collection
+// method to pick, so they require a written reason/method instead.
 const RESOLVED_STATUSES = ['CLAIMED', 'DONATED', 'DISCARDED'];
 
 // Update a Customer Item (mark claimed/donated/discarded, edit details) —
@@ -33,6 +33,12 @@ export async function PATCH(request, { params }) {
     if (status === 'CLAIMED' && !VALID_COLLECTION_METHODS.includes(collectionMethod)) {
       return NextResponse.json(
         { message: 'Please select how the item was collected' },
+        { status: 400 }
+      );
+    }
+    if ((status === 'DONATED' || status === 'DISCARDED') && !(collectionNotes && collectionNotes.trim())) {
+      return NextResponse.json(
+        { message: 'Please describe how/why the item was donated or discarded' },
         { status: 400 }
       );
     }

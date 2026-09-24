@@ -264,7 +264,7 @@ export default function CustomerItemsPage() {
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
             <Wallet size={16} className="text-brand-600" />
-            Customer Item Collection Commission
+            Customer Item Resolution Commission
           </div>
           {user?.role === 'ADMIN' ? (
             commission.byUser?.length ? (
@@ -281,11 +281,11 @@ export default function CustomerItemsPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-400">No items claimed yet.</p>
+              <p className="text-sm text-slate-400">No items resolved yet.</p>
             )
           ) : (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">Your total ({commission.myClaimedCount} items claimed)</span>
+              <span className="text-slate-600">Your total ({commission.myClaimedCount} items resolved)</span>
               <span className="font-semibold text-slate-900 text-base">${commission.myCommission.toFixed(2)}</span>
             </div>
           )}
@@ -590,11 +590,12 @@ export default function CustomerItemsPage() {
               )}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  Notes (optional)
+                  {resolveOutcome === 'CLAIMED' ? 'Notes (optional)' : 'How/why was it donated or discarded?'}
                 </label>
                 <textarea
+                  required={resolveOutcome !== 'CLAIMED'}
                   rows={2}
-                  placeholder="E.g. where/how it was collected, or why it was donated/discarded"
+                  placeholder={resolveOutcome === 'CLAIMED' ? 'E.g. where/how it was collected' : 'E.g. donated to the mosque, or thrown out — damaged beyond use'}
                   value={resolveNotes}
                   onChange={(e) => setResolveNotes(e.target.value)}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"

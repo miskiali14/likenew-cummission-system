@@ -130,10 +130,10 @@ export default function DeadStockPage() {
     if (!user) return;
     try {
       const res = await API.get('/dead-stock/report');
-      const givenOutCount = (res.data || []).filter((it) => it.status === 'GIVEN_OUT').length;
+      const resolvedCount = (res.data || []).filter((it) => RESOLVED_STATUSES.includes(it.status)).length;
       setCommission({
-        count: givenOutCount,
-        total: Number((givenOutCount * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2)),
+        count: resolvedCount,
+        total: Number((resolvedCount * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2)),
       });
     } catch (err) {
       console.error('Failed to load commission summary:', err);
@@ -283,15 +283,15 @@ export default function DeadStockPage() {
         </div>
       )}
 
-      {/* Given-Out Commission — separate from every other commission */}
+      {/* Resolution Commission (Given Out / Donated / Discarded) — separate from every other commission */}
       {commission && (
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Wallet size={16} className="text-brand-600" />
-            Given-Out Commission
+            Resolution Commission
           </div>
           <span className="text-sm text-slate-600">
-            {commission.count} given out — <span className="font-bold text-slate-900">${commission.total.toFixed(2)}</span>
+            {commission.count} resolved — <span className="font-bold text-slate-900">${commission.total.toFixed(2)}</span>
           </span>
         </div>
       )}
@@ -584,10 +584,13 @@ export default function DeadStockPage() {
                 </div>
               )}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Notes (optional)</label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  {resolveOutcome === 'GIVEN_OUT' ? 'Notes (optional)' : 'How/why was it donated or discarded?'}
+                </label>
                 <textarea
+                  required={resolveOutcome !== 'GIVEN_OUT'}
                   rows={2}
-                  placeholder="E.g. where/how it was collected, or why it was donated/discarded"
+                  placeholder={resolveOutcome === 'GIVEN_OUT' ? 'E.g. where/how it was collected' : 'E.g. donated to the mosque, or thrown out — damaged beyond use'}
                   value={giveOutNotes}
                   onChange={(e) => setGiveOutNotes(e.target.value)}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"

@@ -18,6 +18,9 @@ const STATUS_STYLE = {
   DONATED: 'bg-violet-50 text-violet-700 border-violet-200',
   DISCARDED: 'bg-slate-100 text-slate-600 border-slate-300',
 };
+// All three terminal outcomes earn the same commission — the person still
+// did the work of closing the entry out either way.
+const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
 
 const exportToCSV = (filename, rows) => {
   if (!rows || rows.length === 0) return;
@@ -90,20 +93,21 @@ export default function DeadStockReportPage() {
     const inStockQty = inStock.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutQty = givenOut.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutRate = totalEntries > 0 ? (givenOut.length / totalEntries) * 100 : 0;
-    const totalCommission = Number((givenOut.length * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2));
+    const resolvedCount = items.filter((it) => RESOLVED_STATUSES.includes(it.status)).length;
+    const totalCommission = Number((resolvedCount * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2));
     return {
       totalEntries, totalQuantity,
       inStockCount: inStock.length, inStockQty,
       givenOutCount: givenOut.length, givenOutQty,
       donatedCount: donated.length, discardedCount: discarded.length,
-      givenOutRate, totalCommission,
+      resolvedCount, givenOutRate, totalCommission,
     };
   }, [items]);
 
   const byUser = useMemo(() => {
     const map = new Map();
     for (const it of items) {
-      if (it.status !== 'GIVEN_OUT' || !it.givenOutById) continue;
+      if (!RESOLVED_STATUSES.includes(it.status) || !it.givenOutById) continue;
       const entry = map.get(it.givenOutById) || { userId: it.givenOutById, name: it.givenOutByName || 'Unknown', count: 0 };
       entry.count += 1;
       map.set(it.givenOutById, entry);
@@ -211,7 +215,7 @@ export default function DeadStockReportPage() {
                   GivenOutBy: it.givenOutByName || '',
                   GivenOutMethod: METHOD_LABEL[it.givenOutMethod] || it.givenOutMethod || '',
                   GivenOutNotes: it.givenOutNotes || '',
-                  Commission: it.status === 'GIVEN_OUT' ? DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2) : '0.00',
+                  Commission: RESOLVED_STATUSES.includes(it.status) ? DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2) : '0.00',
                 }))
               )
             }
@@ -297,7 +301,7 @@ export default function DeadStockReportPage() {
                 <DollarSign size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Given-Out Commission</p>
+                <p className="text-xs uppercase font-semibold text-slate-400">Resolution Commission</p>
                 <h3 className="text-2xl font-bold text-slate-800 mt-0.5">${stats.totalCommission.toFixed(2)}</h3>
               </div>
             </div>
@@ -307,17 +311,17 @@ export default function DeadStockReportPage() {
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-3">
             <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
               <Wallet size={16} className="text-brand-600" />
-              Commission by Person (${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)} per order given out)
+              Commission by Person (${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)} per order resolved — given out, donated, or discarded)
             </div>
             {byUser.length === 0 ? (
-              <p className="text-sm text-slate-400">No orders given out in this date range.</p>
+              <p className="text-sm text-slate-400">No orders resolved in this date range.</p>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-slate-100">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase bg-slate-50/70">
                       <th className="py-3 px-3">Name</th>
-                      <th className="py-3 px-3 text-right">Orders Given Out</th>
+                      <th className="py-3 px-3 text-right">Orders Resolved</th>
                       <th className="py-3 px-3 text-right">Commission</th>
                     </tr>
                   </thead>
@@ -333,7 +337,7 @@ export default function DeadStockReportPage() {
                   <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
                     <tr>
                       <td className="py-3 px-3 text-slate-800">Total</td>
-                      <td className="py-3 px-3 text-right text-slate-900">{stats.givenOutCount}</td>
+                      <td className="py-3 px-3 text-right text-slate-900">{stats.resolvedCount}</td>
                       <td className="py-3 px-3 text-right text-amber-800">${stats.totalCommission.toFixed(2)}</td>
                     </tr>
                   </tfoot>
@@ -404,7 +408,7 @@ export default function DeadStockReportPage() {
                       </td>
                       <td className="py-3 px-3 text-slate-600">{it.givenOutByName || <span className="text-slate-300">—</span>}</td>
                       <td className="py-3 px-3 text-right font-bold text-amber-700">
-                        {it.status === 'GIVEN_OUT' ? `$${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)}` : <span className="text-slate-300">—</span>}
+                        {RESOLVED_STATUSES.includes(it.status) ? `$${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)}` : <span className="text-slate-300">—</span>}
                       </td>
                     </tr>
                   ))}

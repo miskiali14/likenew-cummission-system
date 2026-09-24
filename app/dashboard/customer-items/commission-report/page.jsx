@@ -10,6 +10,12 @@ const COLLECTION_METHOD_LABEL = {
   DELIVERY: 'Delivery personnel',
   INCLUDED_IN_ORDER: 'Included with order',
 };
+const OUTCOME_LABEL = { CLAIMED: 'Claimed', DONATED: 'Donated', DISCARDED: 'Discarded' };
+const OUTCOME_STYLE = {
+  CLAIMED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DONATED: 'bg-violet-50 text-violet-700 border-violet-200',
+  DISCARDED: 'bg-slate-100 text-slate-600 border-slate-300',
+};
 
 const exportToCSV = (filename, rows) => {
   if (!rows || rows.length === 0) return;
@@ -99,6 +105,7 @@ export default function CustomerItemCommissionReportPage() {
         Item: it.description,
         Branch: it.branch,
         ...(isAdmin ? { CollectedBy: it.claimedByName } : {}),
+        Outcome: OUTCOME_LABEL[it.status] || it.status,
         CollectionMethod: COLLECTION_METHOD_LABEL[it.collectionMethod] || it.collectionMethod || '',
         Notes: it.collectionNotes || '',
         Commission: it.commission.toFixed(2),
@@ -112,7 +119,7 @@ export default function CustomerItemCommissionReportPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Customer Item Commission Report</h1>
           <p className="text-sm text-gray-500">
-            $0.50 per item collected — tracked entirely separately from washing/ironing commission
+            $0.50 per item resolved (claimed, donated, or discarded) — tracked entirely separately from washing/ironing commission
           </p>
         </div>
       </div>
@@ -205,7 +212,7 @@ export default function CustomerItemCommissionReportPage() {
               </div>
               <div>
                 <p className="text-xs uppercase font-semibold text-slate-400">
-                  {isAdmin ? 'Items Claimed' : 'Your Items Claimed'}
+                  {isAdmin ? 'Items Resolved' : 'Your Items Resolved'}
                 </p>
                 <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
                   {isAdmin ? viewCount : data.myClaimedCount}
@@ -222,14 +229,14 @@ export default function CustomerItemCommissionReportPage() {
                 Breakdown by Person
               </div>
               {data.byUser.length === 0 ? (
-                <p className="text-sm text-slate-400">No items claimed in this date range.</p>
+                <p className="text-sm text-slate-400">No items resolved in this date range.</p>
               ) : (
                 <div className="overflow-x-auto rounded-xl border border-slate-100">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase bg-slate-50/70">
                         <th className="py-3 px-3">Name</th>
-                        <th className="py-3 px-3 text-right">Items Claimed</th>
+                        <th className="py-3 px-3 text-right">Items Resolved</th>
                         <th className="py-3 px-3 text-right">Commission</th>
                       </tr>
                     </thead>
@@ -260,12 +267,12 @@ export default function CustomerItemCommissionReportPage() {
             <h3 className="text-sm font-bold text-slate-700">
               {isAdmin
                 ? selectedPersonId === 'All'
-                  ? 'All Claimed Items'
-                  : `Claimed Items — ${data.byUser.find((u) => u.userId === selectedPersonId)?.name || ''}`
-                : 'Your Claimed Items'}
+                  ? 'All Resolved Items'
+                  : `Resolved Items — ${data.byUser.find((u) => u.userId === selectedPersonId)?.name || ''}`
+                : 'Your Resolved Items'}
             </h3>
             {items.length === 0 ? (
-              <p className="text-center py-8 text-slate-400 text-sm">No items claimed in this date range.</p>
+              <p className="text-center py-8 text-slate-400 text-sm">No items resolved in this date range.</p>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-slate-100">
                 <table className="w-full text-left border-collapse text-sm">
@@ -275,7 +282,8 @@ export default function CustomerItemCommissionReportPage() {
                       <th className="py-3 px-3">Customer</th>
                       <th className="py-3 px-3">Item</th>
                       <th className="py-3 px-3">Branch</th>
-                      {isAdmin && <th className="py-3 px-3">Collected By</th>}
+                      {isAdmin && <th className="py-3 px-3">Resolved By</th>}
+                      <th className="py-3 px-3">Outcome</th>
                       <th className="py-3 px-3">Method</th>
                       <th className="py-3 px-3">Notes</th>
                       <th className="py-3 px-3 text-right">Commission</th>
@@ -291,8 +299,13 @@ export default function CustomerItemCommissionReportPage() {
                         <td className="py-3 px-3 text-slate-600">{it.description}</td>
                         <td className="py-3 px-3 text-slate-600">{it.branch}</td>
                         {isAdmin && <td className="py-3 px-3 text-slate-600">{it.claimedByName}</td>}
+                        <td className="py-3 px-3">
+                          <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${OUTCOME_STYLE[it.status]}`}>
+                            {OUTCOME_LABEL[it.status] || it.status}
+                          </span>
+                        </td>
                         <td className="py-3 px-3 text-slate-600">
-                          {COLLECTION_METHOD_LABEL[it.collectionMethod] || it.collectionMethod}
+                          {it.collectionMethod ? (COLLECTION_METHOD_LABEL[it.collectionMethod] || it.collectionMethod) : <span className="text-slate-300">—</span>}
                         </td>
                         <td className="py-3 px-3 text-slate-500 max-w-xs truncate" title={it.collectionNotes || ''}>
                           {it.collectionNotes || <span className="text-slate-300">—</span>}
@@ -303,7 +316,7 @@ export default function CustomerItemCommissionReportPage() {
                   </tbody>
                   <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
                     <tr>
-                      <td colSpan={isAdmin ? 7 : 6} className="py-3 px-3 text-slate-800">Total:</td>
+                      <td colSpan={isAdmin ? 8 : 7} className="py-3 px-3 text-slate-800">Total:</td>
                       <td className="py-3 px-3 text-right text-amber-800">
                         ${(isAdmin ? viewCommission : data.myCommission).toFixed(2)}
                       </td>
