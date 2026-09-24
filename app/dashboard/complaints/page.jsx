@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, X } from 'lucide-react';
+import { Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, Clock, X } from 'lucide-react';
 
 const CATEGORIES = [
   { value: 'DAMAGED', label: 'Damaged Item' },
@@ -161,6 +161,16 @@ export default function ComplaintsPage() {
     }
   };
 
+  const handleMarkInProgress = async (id) => {
+    try {
+      await API.patch(`/complaints/${id}`, { status: 'IN_PROGRESS' });
+      showToast('success', 'Complaint marked as in progress');
+      fetchComplaints();
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to update complaint');
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!confirm('Delete this complaint permanently?')) return;
     try {
@@ -307,6 +317,15 @@ export default function ComplaintsPage() {
                     {canManage && (
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-1">
+                          {c.status === 'OPEN' && (
+                            <button
+                              onClick={() => handleMarkInProgress(c.id)}
+                              className="text-amber-500 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50 transition"
+                              title="Mark as In Progress"
+                            >
+                              <Clock size={18} />
+                            </button>
+                          )}
                           {c.status !== 'RESOLVED' && (
                             <button
                               onClick={() => openResolveModal(c)}
