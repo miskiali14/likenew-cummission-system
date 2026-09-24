@@ -276,6 +276,7 @@ export default function ComplaintsPage() {
                   <th className="p-4">Details</th>
                   <th className="p-4">Date</th>
                   <th className="p-4">Status</th>
+                  {canManage && <th className="p-4">Resolution</th>}
                   {canManage && <th className="p-4 text-right">Actions</th>}
                 </tr>
               </thead>
@@ -298,6 +299,11 @@ export default function ComplaintsPage() {
                         {STATUS_LABEL[c.status]}
                       </span>
                     </td>
+                    {canManage && (
+                      <td className="p-4 text-gray-600 max-w-xs truncate" title={c.resolutionNotes || ''}>
+                        {c.resolutionNotes || <span className="text-slate-300">—</span>}
+                      </td>
+                    )}
                     {canManage && (
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-1">
