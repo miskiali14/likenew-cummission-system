@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { DollarSign, Package, Calendar, Download, X, Wallet } from 'lucide-react';
+import { DollarSign, Package, Calendar, Download, X, Wallet, User } from 'lucide-react';
 
 const COLLECTION_METHOD_LABEL = {
   IN_PERSON: 'Picked up in person',
@@ -38,6 +38,7 @@ export default function CustomerItemCommissionReportPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [data, setData] = useState(null);
+  const [selectedPersonId, setSelectedPersonId] = useState('All');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -71,7 +72,19 @@ export default function CustomerItemCommissionReportPage() {
   }, [fetchReport]);
 
   const isAdmin = user?.role === 'ADMIN';
-  const items = data?.items || [];
+  const allItems = data?.items || [];
+
+  // Admin can narrow the whole report down to one person (e.g. Abdifitah or
+  // Samira) — handy for printing/sharing just their own commission history.
+  const items = useMemo(
+    () => (isAdmin && selectedPersonId !== 'All' ? allItems.filter((it) => it.claimedById === selectedPersonId) : allItems),
+    [allItems, isAdmin, selectedPersonId]
+  );
+  const viewCommission = useMemo(
+    () => Number(items.reduce((sum, it) => sum + it.commission, 0).toFixed(2)),
+    [items]
+  );
+  const viewCount = items.length;
 
   const dateRangeLabel = dateFrom && dateTo && dateFrom !== dateTo
     ? `${dateFrom}_to_${dateTo}`
@@ -106,6 +119,21 @@ export default function CustomerItemCommissionReportPage() {
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+        {isAdmin && data?.byUser?.length > 0 && (
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
+            <User size={15} className="text-brand-500 shrink-0" />
+            <select
+              value={selectedPersonId}
+              onChange={(e) => setSelectedPersonId(e.target.value)}
+              className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none cursor-pointer"
+            >
+              <option value="All">Everyone</option>
+              {data.byUser.map((u) => (
+                <option key={u.userId} value={u.userId}>{u.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
           <Calendar size={15} className="text-brand-500 shrink-0" />
           <div className="flex items-center gap-1.5">
@@ -139,7 +167,12 @@ export default function CustomerItemCommissionReportPage() {
         </div>
         {csvRows.length > 0 && (
           <button
-            onClick={() => exportToCSV(`customer-item-commission-${dateRangeLabel}.csv`, csvRows)}
+            onClick={() => {
+              const personSlug = isAdmin && selectedPersonId !== 'All'
+                ? `-${(data.byUser.find((u) => u.userId === selectedPersonId)?.name || '').replace(/\s+/g, '_')}`
+                : '';
+              exportToCSV(`customer-item-commission-${dateRangeLabel}${personSlug}.csv`, csvRows);
+            }}
             className="flex items-center gap-2 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 transition ml-auto"
           >
             <Download size={16} /> Export CSV
@@ -159,10 +192,10 @@ export default function CustomerItemCommissionReportPage() {
               </div>
               <div>
                 <p className="text-xs uppercase font-semibold text-slate-400">
-                  {isAdmin ? 'Total Commission' : 'Your Commission'}
+                  {isAdmin ? (selectedPersonId === 'All' ? 'Total Commission' : `${data.byUser.find((u) => u.userId === selectedPersonId)?.name || ''}'s Commission`) : 'Your Commission'}
                 </p>
                 <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
-                  ${(isAdmin ? data.totalCommission : data.myCommission).toFixed(2)}
+                  ${(isAdmin ? viewCommission : data.myCommission).toFixed(2)}
                 </h3>
               </div>
             </div>
@@ -172,10 +205,10 @@ export default function CustomerItemCommissionReportPage() {
               </div>
               <div>
                 <p className="text-xs uppercase font-semibold text-slate-400">
-                  {isAdmin ? 'Total Items Claimed' : 'Your Items Claimed'}
+                  {isAdmin ? 'Items Claimed' : 'Your Items Claimed'}
                 </p>
                 <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
-                  {isAdmin ? data.totalClaimedCount : data.myClaimedCount}
+                  {isAdmin ? viewCount : data.myClaimedCount}
                 </h3>
               </div>
             </div>
@@ -225,7 +258,11 @@ export default function CustomerItemCommissionReportPage() {
           {/* Full claimed items history */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-700">
-              {isAdmin ? 'All Claimed Items' : 'Your Claimed Items'}
+              {isAdmin
+                ? selectedPersonId === 'All'
+                  ? 'All Claimed Items'
+                  : `Claimed Items — ${data.byUser.find((u) => u.userId === selectedPersonId)?.name || ''}`
+                : 'Your Claimed Items'}
             </h3>
             {items.length === 0 ? (
               <p className="text-center py-8 text-slate-400 text-sm">No items claimed in this date range.</p>
@@ -268,7 +305,7 @@ export default function CustomerItemCommissionReportPage() {
                     <tr>
                       <td colSpan={isAdmin ? 7 : 6} className="py-3 px-3 text-slate-800">Total:</td>
                       <td className="py-3 px-3 text-right text-amber-800">
-                        ${(isAdmin ? data.totalCommission : data.myCommission).toFixed(2)}
+                        ${(isAdmin ? viewCommission : data.myCommission).toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>

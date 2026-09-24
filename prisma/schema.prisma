@@ -34,6 +34,8 @@ enum UserStatus {
 enum ItemStatus {
   HELD
   CLAIMED
+  DONATED    // Customer said to give it away rather than come collect it
+  DISCARDED  // Customer said to throw it away rather than come collect it
 }
 
 enum ComplaintStatus {
@@ -61,6 +63,8 @@ enum CollectionMethod {
 enum DeadStockStatus {
   IN_STOCK
   GIVEN_OUT
+  DONATED    // Customer said to give it away rather than come collect it
+  DISCARDED  // Customer said to throw it away rather than come collect it
 }
 
 // User-managed list of Dead Stock categories (how an order was packaged/

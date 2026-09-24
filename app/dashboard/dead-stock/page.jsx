@@ -22,6 +22,20 @@ const COLLECTION_METHODS = [
   { value: 'INCLUDED_IN_ORDER', label: 'Included with their order' },
 ];
 
+const OUTCOMES = [
+  { value: 'GIVEN_OUT', label: 'Given out to customer' },
+  { value: 'DONATED', label: 'Donated (customer said give it away)' },
+  { value: 'DISCARDED', label: 'Discarded (customer said throw it away)' },
+];
+const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
+const STATUS_STYLE = {
+  IN_STOCK: 'bg-amber-50 text-amber-700 border-amber-200',
+  GIVEN_OUT: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DONATED: 'bg-violet-50 text-violet-700 border-violet-200',
+  DISCARDED: 'bg-slate-100 text-slate-600 border-slate-300',
+};
+const STATUS_LABEL = { IN_STOCK: 'In Stock', GIVEN_OUT: 'Given Out', DONATED: 'Donated', DISCARDED: 'Discarded' };
+
 export default function DeadStockPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -35,6 +49,7 @@ export default function DeadStockPage() {
   const [formData, setFormData] = useState(emptyForm);
   const [notification, setNotification] = useState(null);
   const [giveOutTarget, setGiveOutTarget] = useState(null);
+  const [resolveOutcome, setResolveOutcome] = useState('GIVEN_OUT');
   const [giveOutMethod, setGiveOutMethod] = useState('');
   const [giveOutNotes, setGiveOutNotes] = useState('');
   const [commission, setCommission] = useState(null);
@@ -179,6 +194,7 @@ export default function DeadStockPage() {
 
   const openGiveOutModal = (item) => {
     setGiveOutTarget(item);
+    setResolveOutcome('GIVEN_OUT');
     setGiveOutMethod('');
     setGiveOutNotes('');
   };
@@ -188,11 +204,11 @@ export default function DeadStockPage() {
     if (!giveOutTarget) return;
     try {
       await API.patch(`/dead-stock/${giveOutTarget.id}`, {
-        status: 'GIVEN_OUT',
-        givenOutMethod: giveOutMethod,
+        status: resolveOutcome,
+        givenOutMethod: resolveOutcome === 'GIVEN_OUT' ? giveOutMethod : undefined,
         givenOutNotes: giveOutNotes,
       });
-      showToast('success', 'Marked as given out');
+      showToast('success', `Marked as ${STATUS_LABEL[resolveOutcome].toLowerCase()}`);
       setGiveOutTarget(null);
       fetchItems();
       fetchCommission();
@@ -282,8 +298,8 @@ export default function DeadStockPage() {
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 rounded-xl p-1">
-          {['IN_STOCK', 'GIVEN_OUT', 'All'].map((tab) => (
+        <div className="flex items-center bg-slate-100 rounded-xl p-1 flex-wrap">
+          {['IN_STOCK', 'GIVEN_OUT', 'DONATED', 'DISCARDED', 'All'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusTab(tab)}
@@ -291,7 +307,7 @@ export default function DeadStockPage() {
                 statusTab === tab ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              {tab === 'IN_STOCK' ? 'In Stock' : tab === 'GIVEN_OUT' ? 'Given Out' : 'All'}
+              {tab === 'All' ? 'All' : STATUS_LABEL[tab]}
             </button>
           ))}
         </div>
@@ -378,14 +394,8 @@ export default function DeadStockPage() {
                       )}
                     </td>
                     <td className="p-4">
-                      <span
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
-                          item.status === 'GIVEN_OUT'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}
-                      >
-                        {item.status === 'GIVEN_OUT' ? 'Given Out' : 'In Stock'}
+                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[item.status]}`}>
+                        {STATUS_LABEL[item.status]}
                       </span>
                     </td>
                     <td className="p-4 text-gray-500">{item.createdByName || <span className="text-slate-300">—</span>}</td>
@@ -396,7 +406,7 @@ export default function DeadStockPage() {
                           <button
                             onClick={() => openGiveOutModal(item)}
                             className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
-                            title="Mark as Given Out"
+                            title="Resolve (Given Out / Donated / Discarded)"
                           >
                             <CheckCircle2 size={18} />
                           </button>
@@ -531,38 +541,53 @@ export default function DeadStockPage() {
         </div>
       )}
 
-      {/* Modal — Mark as Given Out */}
+      {/* Modal — Resolve Entry (Given Out / Donated / Discarded) */}
       {giveOutTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-800">Mark as Given Out</h2>
+              <h2 className="text-xl font-bold text-gray-800">Resolve Entry</h2>
               <p className="text-sm text-gray-500 mt-1">
                 {giveOutTarget.orderId} — {giveOutTarget.category} ({giveOutTarget.quantity})
               </p>
             </div>
             <form onSubmit={handleGiveOutSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  How did the customer get it back?
-                </label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Outcome</label>
                 <select
                   required
-                  value={giveOutMethod}
-                  onChange={(e) => setGiveOutMethod(e.target.value)}
+                  value={resolveOutcome}
+                  onChange={(e) => setResolveOutcome(e.target.value)}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="" disabled>Select one...</option>
-                  {COLLECTION_METHODS.map((m) => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
+                  {OUTCOMES.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
                   ))}
                 </select>
               </div>
+              {resolveOutcome === 'GIVEN_OUT' && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    How did the customer get it back?
+                  </label>
+                  <select
+                    required
+                    value={giveOutMethod}
+                    onChange={(e) => setGiveOutMethod(e.target.value)}
+                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="" disabled>Select one...</option>
+                    {COLLECTION_METHODS.map((m) => (
+                      <option key={m.value} value={m.value}>{m.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Notes (optional)</label>
                 <textarea
                   rows={2}
-                  placeholder="E.g. where/how it was collected"
+                  placeholder="E.g. where/how it was collected, or why it was donated/discarded"
                   value={giveOutNotes}
                   onChange={(e) => setGiveOutNotes(e.target.value)}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
@@ -580,7 +605,7 @@ export default function DeadStockPage() {
                   type="submit"
                   className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 flex items-center gap-1.5"
                 >
-                  <CheckCircle2 size={16} /> Confirm Given Out
+                  <CheckCircle2 size={16} /> Confirm
                 </button>
               </div>
             </form>

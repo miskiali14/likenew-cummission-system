@@ -22,6 +22,20 @@ const COLLECTION_METHODS = [
 ];
 const collectionMethodLabel = (val) => COLLECTION_METHODS.find((m) => m.value === val)?.label || val;
 
+const OUTCOMES = [
+  { value: 'CLAIMED', label: 'Claimed by customer' },
+  { value: 'DONATED', label: 'Donated (customer said give it away)' },
+  { value: 'DISCARDED', label: 'Discarded (customer said throw it away)' },
+];
+const RESOLVED_STATUSES = ['CLAIMED', 'DONATED', 'DISCARDED'];
+const STATUS_STYLE = {
+  HELD: 'bg-amber-50 text-amber-700 border-amber-200',
+  CLAIMED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DONATED: 'bg-violet-50 text-violet-700 border-violet-200',
+  DISCARDED: 'bg-slate-100 text-slate-600 border-slate-300',
+};
+const STATUS_LABEL = { HELD: 'Held', CLAIMED: 'Claimed', DONATED: 'Donated', DISCARDED: 'Discarded' };
+
 export default function CustomerItemsPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -35,9 +49,10 @@ export default function CustomerItemsPage() {
   const [formData, setFormData] = useState(emptyForm);
   const [notification, setNotification] = useState(null);
   const [commission, setCommission] = useState(null);
-  const [claimTarget, setClaimTarget] = useState(null);
-  const [claimMethod, setClaimMethod] = useState('');
-  const [claimNotes, setClaimNotes] = useState('');
+  const [resolveTarget, setResolveTarget] = useState(null);
+  const [resolveOutcome, setResolveOutcome] = useState('CLAIMED');
+  const [resolveMethod, setResolveMethod] = useState('');
+  const [resolveNotes, setResolveNotes] = useState('');
 
   // Customer Items is Admin + Call Center only — Sales has no access at all.
   // Both remaining roles can claim, revert, edit, and delete, and both can
@@ -153,23 +168,24 @@ export default function CustomerItemsPage() {
     }
   };
 
-  const openClaimModal = (item) => {
-    setClaimTarget(item);
-    setClaimMethod('');
-    setClaimNotes('');
+  const openResolveModal = (item) => {
+    setResolveTarget(item);
+    setResolveOutcome('CLAIMED');
+    setResolveMethod('');
+    setResolveNotes('');
   };
 
-  const handleClaimSubmit = async (e) => {
+  const handleResolveSubmit = async (e) => {
     e.preventDefault();
-    if (!claimTarget) return;
+    if (!resolveTarget) return;
     try {
-      await API.patch(`/customer-items/${claimTarget.id}`, {
-        status: 'CLAIMED',
-        collectionMethod: claimMethod,
-        collectionNotes: claimNotes,
+      await API.patch(`/customer-items/${resolveTarget.id}`, {
+        status: resolveOutcome,
+        collectionMethod: resolveOutcome === 'CLAIMED' ? resolveMethod : undefined,
+        collectionNotes: resolveNotes,
       });
-      showToast('success', 'Item marked as claimed');
-      setClaimTarget(null);
+      showToast('success', `Item marked as ${STATUS_LABEL[resolveOutcome].toLowerCase()}`);
+      setResolveTarget(null);
       fetchItems();
       fetchCommission();
     } catch (err) {
@@ -278,8 +294,8 @@ export default function CustomerItemsPage() {
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 rounded-xl p-1">
-          {['HELD', 'CLAIMED', 'All'].map((tab) => (
+        <div className="flex items-center bg-slate-100 rounded-xl p-1 flex-wrap">
+          {['HELD', 'CLAIMED', 'DONATED', 'DISCARDED', 'All'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusTab(tab)}
@@ -287,7 +303,7 @@ export default function CustomerItemsPage() {
                 statusTab === tab ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              {tab === 'HELD' ? 'Held' : tab === 'CLAIMED' ? 'Claimed' : 'All'}
+              {tab === 'All' ? 'All' : STATUS_LABEL[tab]}
             </button>
           ))}
         </div>
@@ -374,14 +390,8 @@ export default function CustomerItemsPage() {
                       )}
                     </td>
                     <td className="p-4">
-                      <span
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
-                          item.status === 'CLAIMED'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}
-                      >
-                        {item.status === 'CLAIMED' ? 'Claimed' : 'Held'}
+                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[item.status]}`}>
+                        {STATUS_LABEL[item.status]}
                       </span>
                     </td>
                     {user?.role === 'ADMIN' && (
@@ -389,7 +399,7 @@ export default function CustomerItemsPage() {
                     )}
                     {user?.role === 'ADMIN' && (
                       <td className="p-4 text-gray-500">
-                        {item.status === 'CLAIMED' ? (
+                        {RESOLVED_STATUSES.includes(item.status) ? (
                           <span title={item.collectionMethod ? collectionMethodLabel(item.collectionMethod) : ''}>
                             {item.claimedByName || '—'}
                           </span>
@@ -403,9 +413,9 @@ export default function CustomerItemsPage() {
                         <div className="flex items-center justify-end gap-1">
                           {item.status === 'HELD' ? (
                             <button
-                              onClick={() => openClaimModal(item)}
+                              onClick={() => openResolveModal(item)}
                               className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
-                              title="Mark as Claimed"
+                              title="Resolve (Claimed / Donated / Discarded)"
                             >
                               <CheckCircle2 size={18} />
                             </button>
@@ -536,49 +546,64 @@ export default function CustomerItemsPage() {
         </div>
       )}
 
-      {/* Modal — Mark as Claimed */}
-      {claimTarget && (
+      {/* Modal — Resolve Item (Claimed / Donated / Discarded) */}
+      {resolveTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-800">Mark as Claimed</h2>
+              <h2 className="text-xl font-bold text-gray-800">Resolve Item</h2>
               <p className="text-sm text-gray-500 mt-1">
-                {claimTarget.customerName} — {claimTarget.description}
+                {resolveTarget.customerName} — {resolveTarget.description}
               </p>
             </div>
-            <form onSubmit={handleClaimSubmit} className="space-y-4">
+            <form onSubmit={handleResolveSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  How did the customer get it back?
-                </label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Outcome</label>
                 <select
                   required
-                  value={claimMethod}
-                  onChange={(e) => setClaimMethod(e.target.value)}
+                  value={resolveOutcome}
+                  onChange={(e) => setResolveOutcome(e.target.value)}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="" disabled>Select one...</option>
-                  {COLLECTION_METHODS.map((m) => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
+                  {OUTCOMES.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
                   ))}
                 </select>
               </div>
+              {resolveOutcome === 'CLAIMED' && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    How did the customer get it back?
+                  </label>
+                  <select
+                    required
+                    value={resolveMethod}
+                    onChange={(e) => setResolveMethod(e.target.value)}
+                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="" disabled>Select one...</option>
+                    {COLLECTION_METHODS.map((m) => (
+                      <option key={m.value} value={m.value}>{m.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
                   Notes (optional)
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="E.g. where/how it was collected"
-                  value={claimNotes}
-                  onChange={(e) => setClaimNotes(e.target.value)}
+                  placeholder="E.g. where/how it was collected, or why it was donated/discarded"
+                  value={resolveNotes}
+                  onChange={(e) => setResolveNotes(e.target.value)}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setClaimTarget(null)}
+                  onClick={() => setResolveTarget(null)}
                   className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
                 >
                   Cancel
@@ -587,7 +612,7 @@ export default function CustomerItemsPage() {
                   type="submit"
                   className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 flex items-center gap-1.5"
                 >
-                  <CheckCircle2 size={16} /> Confirm Claimed
+                  <CheckCircle2 size={16} /> Confirm
                 </button>
               </div>
             </form>

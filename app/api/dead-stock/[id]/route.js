@@ -3,10 +3,14 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
 const VALID_COLLECTION_METHODS = ['IN_PERSON', 'DELIVERY', 'INCLUDED_IN_ORDER'];
+// Terminal outcomes for a dead stock order — GIVEN_OUT earns the person a
+// commission and requires a collection method; DONATED/DISCARDED cover a
+// customer who says not to bother bringing it back and carry no commission
+// or collection method, just an optional note.
+const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
 
-// Update a Dead Stock entry (edit, or mark given out) — Admin/Customer Care.
-// Marking GIVEN_OUT requires saying how it left, same as a Customer Item
-// claim — no commission here though, this is a tracking report only.
+// Update a Dead Stock entry (edit, or mark given out/donated/discarded) —
+// Admin/Customer Care.
 export async function PATCH(request, { params }) {
   const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
   if (auth.response) return auth.response;
@@ -37,11 +41,11 @@ export async function PATCH(request, { params }) {
       data: {
         ...(status !== undefined && {
           status,
-          givenOutAt: status === 'GIVEN_OUT' ? new Date() : null,
-          givenOutById: status === 'GIVEN_OUT' ? user.id : null,
-          givenOutByName: status === 'GIVEN_OUT' ? user.fullName : null,
+          givenOutAt: RESOLVED_STATUSES.includes(status) ? new Date() : null,
+          givenOutById: RESOLVED_STATUSES.includes(status) ? user.id : null,
+          givenOutByName: RESOLVED_STATUSES.includes(status) ? user.fullName : null,
           givenOutMethod: status === 'GIVEN_OUT' ? givenOutMethod : null,
-          givenOutNotes: status === 'GIVEN_OUT' ? (givenOutNotes || null) : null,
+          givenOutNotes: RESOLVED_STATUSES.includes(status) ? (givenOutNotes || null) : null,
         }),
         ...(orderId !== undefined && { orderId: String(orderId) }),
         ...(category !== undefined && { category }),

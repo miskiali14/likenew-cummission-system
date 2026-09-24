@@ -11,6 +11,13 @@ const METHOD_LABEL = {
   DELIVERY: 'Delivery personnel',
   INCLUDED_IN_ORDER: 'Included with order',
 };
+const STATUS_LABEL = { IN_STOCK: 'In Stock', GIVEN_OUT: 'Given Out', DONATED: 'Donated', DISCARDED: 'Discarded' };
+const STATUS_STYLE = {
+  IN_STOCK: 'bg-amber-50 text-amber-700 border-amber-200',
+  GIVEN_OUT: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DONATED: 'bg-violet-50 text-violet-700 border-violet-200',
+  DISCARDED: 'bg-slate-100 text-slate-600 border-slate-300',
+};
 
 const exportToCSV = (filename, rows) => {
   if (!rows || rows.length === 0) return;
@@ -78,11 +85,19 @@ export default function DeadStockReportPage() {
     const totalQuantity = items.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const inStock = items.filter((it) => it.status === 'IN_STOCK');
     const givenOut = items.filter((it) => it.status === 'GIVEN_OUT');
+    const donated = items.filter((it) => it.status === 'DONATED');
+    const discarded = items.filter((it) => it.status === 'DISCARDED');
     const inStockQty = inStock.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutQty = givenOut.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutRate = totalEntries > 0 ? (givenOut.length / totalEntries) * 100 : 0;
     const totalCommission = Number((givenOut.length * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2));
-    return { totalEntries, totalQuantity, inStockCount: inStock.length, inStockQty, givenOutCount: givenOut.length, givenOutQty, givenOutRate, totalCommission };
+    return {
+      totalEntries, totalQuantity,
+      inStockCount: inStock.length, inStockQty,
+      givenOutCount: givenOut.length, givenOutQty,
+      donatedCount: donated.length, discardedCount: discarded.length,
+      givenOutRate, totalCommission,
+    };
   }, [items]);
 
   const byUser = useMemo(() => {
@@ -191,7 +206,7 @@ export default function DeadStockReportPage() {
                   OrderRef: it.orderId,
                   Category: it.category,
                   Quantity: it.quantity,
-                  Status: it.status === 'GIVEN_OUT' ? 'Given Out' : 'In Stock',
+                  Status: STATUS_LABEL[it.status] || it.status,
                   LoggedBy: it.createdByName || '',
                   GivenOutBy: it.givenOutByName || '',
                   GivenOutMethod: METHOD_LABEL[it.givenOutMethod] || it.givenOutMethod || '',
@@ -216,7 +231,7 @@ export default function DeadStockReportPage() {
       ) : (
         <>
           {/* Summary cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
               <div className="p-3 bg-slate-50 text-slate-600 rounded-xl border border-slate-100">
                 <Boxes size={24} />
@@ -248,6 +263,24 @@ export default function DeadStockReportPage() {
                 <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
                   {stats.givenOutCount} <span className="text-sm font-medium text-slate-400">({stats.givenOutQty} pcs)</span>
                 </h3>
+              </div>
+            </div>
+            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+              <div className="p-3 bg-violet-50 text-violet-600 rounded-xl border border-violet-100">
+                <CheckCircle2 size={24} />
+              </div>
+              <div>
+                <p className="text-xs uppercase font-semibold text-slate-400">Donated</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.donatedCount}</h3>
+              </div>
+            </div>
+            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+              <div className="p-3 bg-slate-100 text-slate-600 rounded-xl border border-slate-200">
+                <CheckCircle2 size={24} />
+              </div>
+              <div>
+                <p className="text-xs uppercase font-semibold text-slate-400">Discarded</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.discardedCount}</h3>
               </div>
             </div>
             <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
@@ -365,14 +398,8 @@ export default function DeadStockReportPage() {
                       </td>
                       <td className="py-3 px-3 text-right font-semibold text-slate-700">{it.quantity}</td>
                       <td className="py-3 px-3">
-                        <span
-                          className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
-                            it.status === 'GIVEN_OUT'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-amber-50 text-amber-700 border border-amber-200'
-                          }`}
-                        >
-                          {it.status === 'GIVEN_OUT' ? 'Given Out' : 'In Stock'}
+                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[it.status]}`}>
+                          {STATUS_LABEL[it.status] || it.status}
                         </span>
                       </td>
                       <td className="py-3 px-3 text-slate-600">{it.givenOutByName || <span className="text-slate-300">—</span>}</td>
