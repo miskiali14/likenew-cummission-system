@@ -45,6 +45,7 @@ export default function ComplaintsReportPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [branchFilter, setBranchFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [complaints, setComplaints] = useState([]);
@@ -69,7 +70,7 @@ export default function ComplaintsReportPage() {
     try {
       const branchParam = branchFilter !== 'All' ? branchFilter : '';
       const res = await API.get(
-        `/complaints?branch=${branchParam}&status=All&dateFrom=${dateFrom || ''}&dateTo=${dateTo || ''}`
+        `/complaints?branch=${branchParam}&status=${statusFilter}&dateFrom=${dateFrom || ''}&dateTo=${dateTo || ''}`
       );
       setComplaints(res.data || []);
     } catch (err) {
@@ -77,7 +78,7 @@ export default function ComplaintsReportPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, branchFilter, dateFrom, dateTo]);
+  }, [user, branchFilter, statusFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchComplaints();
@@ -127,6 +128,8 @@ export default function ComplaintsReportPage() {
     ? `${dateFrom}_to_${dateTo}`
     : (dateFrom || dateTo || 'all');
 
+  const statusFilterLabel = statusFilter === 'All' ? 'All' : STATUS_LABEL[statusFilter];
+
   const formatHours = (hours) => {
     if (hours == null) return '—';
     if (hours < 1) return `${Math.round(hours * 60)} min`;
@@ -145,6 +148,19 @@ export default function ComplaintsReportPage() {
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+        <div className="flex items-center bg-slate-100 rounded-xl p-1">
+          {['All', 'OPEN', 'IN_PROGRESS', 'RESOLVED'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setStatusFilter(tab)}
+              className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
+                statusFilter === tab ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {tab === 'All' ? 'All' : STATUS_LABEL[tab]}
+            </button>
+          ))}
+        </div>
         <select
           value={branchFilter}
           onChange={(e) => setBranchFilter(e.target.value)}
@@ -189,7 +205,7 @@ export default function ComplaintsReportPage() {
           <button
             onClick={() =>
               exportToCSV(
-                `complaints-report-${dateRangeLabel}.csv`,
+                `complaints-report-${statusFilterLabel}-${dateRangeLabel}.csv`,
                 sortedComplaints.map((c) => ({
                   Date: c.date,
                   Branch: c.branch,
@@ -297,7 +313,9 @@ export default function ComplaintsReportPage() {
 
           {/* Full complaints table */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-700">All Complaints</h3>
+            <h3 className="text-sm font-bold text-slate-700">
+              {statusFilter === 'All' ? 'All Complaints' : `${STATUS_LABEL[statusFilter]} Complaints`}
+            </h3>
             <div className="overflow-x-auto rounded-xl border border-slate-100">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
