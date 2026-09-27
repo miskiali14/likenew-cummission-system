@@ -2,9 +2,16 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
+const VALID_RESPONSIBLE_DEPARTMENTS = [
+  'SALES_HQ', 'SALES_KM5',
+  'WASHING_HQ', 'WASHING_KM5',
+  'IRONING_HQ', 'IRONING_KM5',
+];
+
 // Update a complaint (status, resolution notes, details) — Admin and
 // Customer Care only, any branch. Sales can log complaints but does not
-// manage or see how they were resolved.
+// manage or see how they were resolved. Resolving requires saying which
+// team/branch was actually responsible for the issue.
 export async function PATCH(request, { params }) {
   const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
   if (auth.response) return auth.response;
@@ -17,7 +24,17 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const { status, customerName, phone, orderId, category, description, date, resolutionNotes, branch } = body;
+    const {
+      status, customerName, phone, orderId, category, description, date,
+      resolutionNotes, branch, responsibleDepartment, responsibleName,
+    } = body;
+
+    if (status === 'RESOLVED' && !VALID_RESPONSIBLE_DEPARTMENTS.includes(responsibleDepartment)) {
+      return NextResponse.json(
+        { message: 'Please select who is responsible for this complaint' },
+        { status: 400 }
+      );
+    }
 
     // Admin and Customer Care may move a complaint between branches.
     const nextBranch = branch !== undefined ? branch : undefined;
@@ -28,6 +45,8 @@ export async function PATCH(request, { params }) {
         ...(status !== undefined && {
           status,
           resolvedAt: status === 'RESOLVED' ? new Date() : null,
+          responsibleDepartment: status === 'RESOLVED' ? responsibleDepartment : null,
+          responsibleName: status === 'RESOLVED' ? (responsibleName || null) : null,
         }),
         ...(customerName !== undefined && { customerName }),
         ...(phone !== undefined && { phone: phone || null }),

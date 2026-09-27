@@ -21,9 +21,21 @@ const STATUS_STYLE = {
 };
 const STATUS_LABEL = { OPEN: 'Open', IN_PROGRESS: 'In Progress', RESOLVED: 'Resolved' };
 
+// Which team/branch actually caused the issue — picked when resolving.
+const RESPONSIBLE_DEPARTMENTS = [
+  { value: 'SALES_HQ', label: 'Sales — HQ' },
+  { value: 'SALES_KM5', label: 'Sales — KM5' },
+  { value: 'WASHING_HQ', label: 'Dhaqmo (Washing) — HQ' },
+  { value: 'WASHING_KM5', label: 'Dhaqmo (Washing) — KM5' },
+  { value: 'IRONING_HQ', label: 'Feero (Ironing) — HQ' },
+  { value: 'IRONING_KM5', label: 'Feero (Ironing) — KM5' },
+];
+const responsibleLabel = (val) => RESPONSIBLE_DEPARTMENTS.find((d) => d.value === val)?.label || val;
+
 const emptyForm = {
   customerName: '', phone: '', orderId: '', category: 'OTHER',
   description: '', date: '', branch: 'HQ', status: 'OPEN', resolutionNotes: '',
+  responsibleDepartment: '', responsibleName: '',
 };
 
 export default function ComplaintsPage() {
@@ -40,6 +52,9 @@ export default function ComplaintsPage() {
   const [notification, setNotification] = useState(null);
   const [resolveTarget, setResolveTarget] = useState(null);
   const [resolveNotes, setResolveNotes] = useState('');
+  const [resolveDepartment, setResolveDepartment] = useState('');
+  const [resolveResponsibleName, setResolveResponsibleName] = useState('');
+  const [statusCounts, setStatusCounts] = useState(null);
 
   // Admin, Customer Care, and Call Center oversee complaints across both
   // branches; only Admin and Customer Care can manage/resolve them — Sales
@@ -86,6 +101,29 @@ export default function ComplaintsPage() {
     fetchComplaints();
   }, [fetchComplaints]);
 
+  // Independent of the current status tab, so the summary bar always shows
+  // the full breakdown (Open / In Progress / Resolved) regardless of filter.
+  const fetchStatusCounts = useCallback(async () => {
+    if (!user) return;
+    try {
+      const branchParam = canSeeAllBranches && branchFilter !== 'All' ? branchFilter : '';
+      const res = await API.get(`/complaints?branch=${branchParam}&status=All`);
+      const all = res.data || [];
+      setStatusCounts({
+        open: all.filter((c) => c.status === 'OPEN').length,
+        inProgress: all.filter((c) => c.status === 'IN_PROGRESS').length,
+        resolved: all.filter((c) => c.status === 'RESOLVED').length,
+        total: all.length,
+      });
+    } catch (err) {
+      console.error('Failed to load status counts:', err);
+    }
+  }, [user, branchFilter, canSeeAllBranches]);
+
+  useEffect(() => {
+    fetchStatusCounts();
+  }, [fetchStatusCounts]);
+
   const filteredComplaints = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return complaints;
@@ -117,6 +155,8 @@ export default function ComplaintsPage() {
       branch: c.branch,
       status: c.status,
       resolutionNotes: c.resolutionNotes || '',
+      responsibleDepartment: c.responsibleDepartment || '',
+      responsibleName: c.responsibleName || '',
     });
     setShowModal(true);
   };
@@ -134,6 +174,7 @@ export default function ComplaintsPage() {
       setShowModal(false);
       setEditingId(null);
       fetchComplaints();
+      fetchStatusCounts();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to save complaint');
     }
@@ -142,6 +183,8 @@ export default function ComplaintsPage() {
   const openResolveModal = (c) => {
     setResolveTarget(c);
     setResolveNotes(c.resolutionNotes || '');
+    setResolveDepartment(c.responsibleDepartment || '');
+    setResolveResponsibleName(c.responsibleName || '');
   };
 
   const handleResolveSubmit = async (e) => {
@@ -151,11 +194,16 @@ export default function ComplaintsPage() {
       await API.patch(`/complaints/${resolveTarget.id}`, {
         status: 'RESOLVED',
         resolutionNotes: resolveNotes,
+        responsibleDepartment: resolveDepartment,
+        responsibleName: resolveResponsibleName,
       });
       showToast('success', 'Complaint marked as resolved!');
       setResolveTarget(null);
       setResolveNotes('');
+      setResolveDepartment('');
+      setResolveResponsibleName('');
       fetchComplaints();
+      fetchStatusCounts();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to resolve complaint');
     }
@@ -166,6 +214,7 @@ export default function ComplaintsPage() {
       await API.patch(`/complaints/${id}`, { status: 'IN_PROGRESS' });
       showToast('success', 'Complaint marked as in progress');
       fetchComplaints();
+      fetchStatusCounts();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to update complaint');
     }
@@ -177,6 +226,7 @@ export default function ComplaintsPage() {
       await API.delete(`/complaints/${id}`);
       showToast('success', 'Complaint deleted');
       fetchComplaints();
+      fetchStatusCounts();
     } catch (err) {
       showToast('error', 'Failed to delete complaint');
     }
@@ -218,6 +268,28 @@ export default function ComplaintsPage() {
           <PlusCircle size={18} /> Log Complaint
         </button>
       </div>
+
+      {/* Status counts — always shows the full breakdown, independent of the active tab */}
+      {statusCounts && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white border border-slate-200/80 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <span className="text-sm text-slate-500">Total</span>
+            <span className="text-lg font-bold text-slate-800">{statusCounts.total}</span>
+          </div>
+          <div className="bg-white border border-red-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <span className="text-sm text-red-600">Open</span>
+            <span className="text-lg font-bold text-red-700">{statusCounts.open}</span>
+          </div>
+          <div className="bg-white border border-amber-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <span className="text-sm text-amber-600">In Progress</span>
+            <span className="text-lg font-bold text-amber-700">{statusCounts.inProgress}</span>
+          </div>
+          <div className="bg-white border border-emerald-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+            <span className="text-sm text-emerald-600">Resolved</span>
+            <span className="text-lg font-bold text-emerald-700">{statusCounts.resolved}</span>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
@@ -287,6 +359,7 @@ export default function ComplaintsPage() {
                   <th className="p-4">Date</th>
                   <th className="p-4">Status</th>
                   {canManage && <th className="p-4">Resolution</th>}
+                  {canManage && <th className="p-4">Responsible</th>}
                   {canManage && <th className="p-4 text-right">Actions</th>}
                 </tr>
               </thead>
@@ -312,6 +385,18 @@ export default function ComplaintsPage() {
                     {canManage && (
                       <td className="p-4 text-gray-600 max-w-xs truncate" title={c.resolutionNotes || ''}>
                         {c.resolutionNotes || <span className="text-slate-300">—</span>}
+                      </td>
+                    )}
+                    {canManage && (
+                      <td className="p-4 text-gray-600" title={c.responsibleName || ''}>
+                        {c.responsibleDepartment ? (
+                          <>
+                            {responsibleLabel(c.responsibleDepartment)}
+                            {c.responsibleName ? ` — ${c.responsibleName}` : ''}
+                          </>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
                       </td>
                     )}
                     {canManage && (
@@ -462,16 +547,44 @@ export default function ComplaintsPage() {
                     </select>
                   </div>
                   {formData.status === 'RESOLVED' && (
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-600 mb-1">Resolution Notes</label>
-                      <textarea
-                        rows={2}
-                        placeholder="How was this resolved?"
-                        value={formData.resolutionNotes}
-                        onChange={(e) => setFormData({ ...formData, resolutionNotes: e.target.value })}
-                        className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
-                      />
-                    </div>
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Resolution Notes</label>
+                        <textarea
+                          rows={2}
+                          placeholder="How was this resolved?"
+                          value={formData.resolutionNotes}
+                          onChange={(e) => setFormData({ ...formData, resolutionNotes: e.target.value })}
+                          className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Who is responsible?</label>
+                        <select
+                          required
+                          value={formData.responsibleDepartment}
+                          onChange={(e) => setFormData({ ...formData, responsibleDepartment: e.target.value })}
+                          className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        >
+                          <option value="" disabled>Select one...</option>
+                          {RESPONSIBLE_DEPARTMENTS.map((d) => (
+                            <option key={d.value} value={d.value}>{d.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {formData.responsibleDepartment && (
+                        <div>
+                          <label className="block text-xs font-semibold text-gray-600 mb-1">Staff Name (optional)</label>
+                          <input
+                            type="text"
+                            placeholder="E.g. Sakarie Abdikadir"
+                            value={formData.responsibleName}
+                            onChange={(e) => setFormData({ ...formData, responsibleName: e.target.value })}
+                            className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          />
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}
@@ -525,10 +638,40 @@ export default function ComplaintsPage() {
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Who is responsible?
+                </label>
+                <select
+                  required
+                  value={resolveDepartment}
+                  onChange={(e) => setResolveDepartment(e.target.value)}
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="" disabled>Select one...</option>
+                  {RESPONSIBLE_DEPARTMENTS.map((d) => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+              </div>
+              {resolveDepartment && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    Staff Name (optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="E.g. Sakarie Abdikadir"
+                    value={resolveResponsibleName}
+                    onChange={(e) => setResolveResponsibleName(e.target.value)}
+                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              )}
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => { setResolveTarget(null); setResolveNotes(''); }}
+                  onClick={() => { setResolveTarget(null); setResolveNotes(''); setResolveDepartment(''); setResolveResponsibleName(''); }}
                   className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
                 >
                   Cancel
