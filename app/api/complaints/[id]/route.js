@@ -6,6 +6,8 @@ const VALID_RESPONSIBLE_DEPARTMENTS = [
   'SALES_HQ', 'SALES_KM5',
   'WASHING_HQ', 'WASHING_KM5',
   'IRONING_HQ', 'IRONING_KM5',
+  'QC_WASHING_HQ', 'QC_WASHING_KM5',
+  'QC_IRONING_HQ', 'QC_IRONING_KM5',
 ];
 
 // Update a complaint (status, resolution notes, details) — Admin and

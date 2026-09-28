@@ -29,6 +29,10 @@ const RESPONSIBLE_DEPARTMENTS = [
   { value: 'WASHING_KM5', label: 'Dhaqmo (Washing) — KM5' },
   { value: 'IRONING_HQ', label: 'Feero (Ironing) — HQ' },
   { value: 'IRONING_KM5', label: 'Feero (Ironing) — KM5' },
+  { value: 'QC_WASHING_HQ', label: 'QC — Washing HQ' },
+  { value: 'QC_WASHING_KM5', label: 'QC — Washing KM5' },
+  { value: 'QC_IRONING_HQ', label: 'QC — Ironing HQ' },
+  { value: 'QC_IRONING_KM5', label: 'QC — Ironing KM5' },
 ];
 const responsibleLabel = (val) => RESPONSIBLE_DEPARTMENTS.find((d) => d.value === val)?.label || val;
 
