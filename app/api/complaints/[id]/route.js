@@ -31,7 +31,11 @@ export async function PATCH(request, { params }) {
       resolutionNotes, branch, responsibleDepartment, responsibleName,
     } = body;
 
-    if (status === 'RESOLVED' && !VALID_RESPONSIBLE_DEPARTMENTS.includes(responsibleDepartment)) {
+    const responsibleDepartments = Array.isArray(responsibleDepartment) ? responsibleDepartment : [];
+    if (
+      status === 'RESOLVED' &&
+      (responsibleDepartments.length === 0 || !responsibleDepartments.every((d) => VALID_RESPONSIBLE_DEPARTMENTS.includes(d)))
+    ) {
       return NextResponse.json(
         { message: 'Please select who is responsible for this complaint' },
         { status: 400 }
@@ -47,7 +51,7 @@ export async function PATCH(request, { params }) {
         ...(status !== undefined && {
           status,
           resolvedAt: status === 'RESOLVED' ? new Date() : null,
-          responsibleDepartment: status === 'RESOLVED' ? responsibleDepartment : null,
+          responsibleDepartment: status === 'RESOLVED' ? responsibleDepartments : [],
           responsibleName: status === 'RESOLVED' ? (responsibleName || null) : null,
         }),
         ...(customerName !== undefined && { customerName }),

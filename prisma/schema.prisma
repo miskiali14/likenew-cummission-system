@@ -207,10 +207,11 @@ model Complaint {
   description    String
   status         ComplaintStatus   @default(OPEN)
   resolutionNotes String?
-  // Which team/branch actually caused the issue, picked at resolution time —
-  // one of SALES_HQ, SALES_KM5, WASHING_HQ, WASHING_KM5, IRONING_HQ,
-  // IRONING_KM5 (see RESPONSIBLE_DEPARTMENTS in the complaints page).
-  responsibleDepartment String?
+  // Team(s)/branch(es) actually responsible for the issue, picked at
+  // resolution time — more than one can apply to a single complaint (e.g.
+  // both Sales HQ and QC Ironing HQ). See RESPONSIBLE_DEPARTMENTS in the
+  // complaints page for the valid values.
+  responsibleDepartment String[]  @default([])
   responsibleName        String?   // the specific staff member, if known — optional
   date           String            // YYYY-MM-DD, when it was logged
   createdAt      DateTime          @default(now())

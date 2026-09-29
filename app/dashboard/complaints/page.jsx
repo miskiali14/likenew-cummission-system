@@ -35,11 +35,13 @@ const RESPONSIBLE_DEPARTMENTS = [
   { value: 'QC_IRONING_KM5', label: 'QC — Ironing KM5' },
 ];
 const responsibleLabel = (val) => RESPONSIBLE_DEPARTMENTS.find((d) => d.value === val)?.label || val;
+const responsibleLabels = (vals) => (vals || []).map(responsibleLabel).join(', ');
+const toggleInArray = (arr, val) => (arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]);
 
 const emptyForm = {
   customerName: '', phone: '', orderId: '', category: 'OTHER',
   description: '', date: '', branch: 'HQ', status: 'OPEN', resolutionNotes: '',
-  responsibleDepartment: '', responsibleName: '',
+  responsibleDepartment: [], responsibleName: '',
 };
 
 export default function ComplaintsPage() {
@@ -56,7 +58,7 @@ export default function ComplaintsPage() {
   const [notification, setNotification] = useState(null);
   const [resolveTarget, setResolveTarget] = useState(null);
   const [resolveNotes, setResolveNotes] = useState('');
-  const [resolveDepartment, setResolveDepartment] = useState('');
+  const [resolveDepartment, setResolveDepartment] = useState([]);
   const [resolveResponsibleName, setResolveResponsibleName] = useState('');
   const [statusCounts, setStatusCounts] = useState(null);
 
@@ -159,7 +161,7 @@ export default function ComplaintsPage() {
       branch: c.branch,
       status: c.status,
       resolutionNotes: c.resolutionNotes || '',
-      responsibleDepartment: c.responsibleDepartment || '',
+      responsibleDepartment: c.responsibleDepartment || [],
       responsibleName: c.responsibleName || '',
     });
     setShowModal(true);
@@ -187,7 +189,7 @@ export default function ComplaintsPage() {
   const openResolveModal = (c) => {
     setResolveTarget(c);
     setResolveNotes(c.resolutionNotes || '');
-    setResolveDepartment(c.responsibleDepartment || '');
+    setResolveDepartment(c.responsibleDepartment || []);
     setResolveResponsibleName(c.responsibleName || '');
   };
 
@@ -204,7 +206,7 @@ export default function ComplaintsPage() {
       showToast('success', 'Complaint marked as resolved!');
       setResolveTarget(null);
       setResolveNotes('');
-      setResolveDepartment('');
+      setResolveDepartment([]);
       setResolveResponsibleName('');
       fetchComplaints();
       fetchStatusCounts();
@@ -393,9 +395,9 @@ export default function ComplaintsPage() {
                     )}
                     {canManage && (
                       <td className="p-4 text-gray-600" title={c.responsibleName || ''}>
-                        {c.responsibleDepartment ? (
+                        {c.responsibleDepartment?.length > 0 ? (
                           <>
-                            {responsibleLabel(c.responsibleDepartment)}
+                            {responsibleLabels(c.responsibleDepartment)}
                             {c.responsibleName ? ` — ${c.responsibleName}` : ''}
                           </>
                         ) : (
@@ -563,20 +565,29 @@ export default function ComplaintsPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Who is responsible?</label>
-                        <select
-                          required
-                          value={formData.responsibleDepartment}
-                          onChange={(e) => setFormData({ ...formData, responsibleDepartment: e.target.value })}
-                          className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                        >
-                          <option value="" disabled>Select one...</option>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">
+                          Who is responsible? (pick one or more)
+                        </label>
+                        <div className="grid grid-cols-2 gap-1.5 border rounded-lg p-2.5 max-h-40 overflow-y-auto">
                           {RESPONSIBLE_DEPARTMENTS.map((d) => (
-                            <option key={d.value} value={d.value}>{d.label}</option>
+                            <label key={d.value} className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.responsibleDepartment.includes(d.value)}
+                                onChange={() =>
+                                  setFormData({
+                                    ...formData,
+                                    responsibleDepartment: toggleInArray(formData.responsibleDepartment, d.value),
+                                  })
+                                }
+                                className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                              />
+                              {d.label}
+                            </label>
                           ))}
-                        </select>
+                        </div>
                       </div>
-                      {formData.responsibleDepartment && (
+                      {formData.responsibleDepartment.length > 0 && (
                         <div>
                           <label className="block text-xs font-semibold text-gray-600 mb-1">Staff Name (optional)</label>
                           <input
@@ -644,21 +655,23 @@ export default function ComplaintsPage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  Who is responsible?
+                  Who is responsible? (pick one or more)
                 </label>
-                <select
-                  required
-                  value={resolveDepartment}
-                  onChange={(e) => setResolveDepartment(e.target.value)}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                >
-                  <option value="" disabled>Select one...</option>
+                <div className="grid grid-cols-2 gap-1.5 border rounded-lg p-2.5 max-h-40 overflow-y-auto">
                   {RESPONSIBLE_DEPARTMENTS.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
+                    <label key={d.value} className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={resolveDepartment.includes(d.value)}
+                        onChange={() => setResolveDepartment(toggleInArray(resolveDepartment, d.value))}
+                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      {d.label}
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
-              {resolveDepartment && (
+              {resolveDepartment.length > 0 && (
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
                     Staff Name (optional)
@@ -675,7 +688,7 @@ export default function ComplaintsPage() {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => { setResolveTarget(null); setResolveNotes(''); setResolveDepartment(''); setResolveResponsibleName(''); }}
+                  onClick={() => { setResolveTarget(null); setResolveNotes(''); setResolveDepartment([]); setResolveResponsibleName(''); }}
                   className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
                 >
                   Cancel
