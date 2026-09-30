@@ -33,6 +33,8 @@ const RESPONSIBLE_DEPARTMENTS = [
   { value: 'QC_WASHING_KM5', label: 'QC — Washing KM5' },
   { value: 'QC_IRONING_HQ', label: 'QC — Ironing HQ' },
   { value: 'QC_IRONING_KM5', label: 'QC — Ironing KM5' },
+  { value: 'DELIVERY_HQ', label: 'Delivery — HQ' },
+  { value: 'DELIVERY_KM5', label: 'Delivery — KM5' },
 ];
 const responsibleLabel = (val) => RESPONSIBLE_DEPARTMENTS.find((d) => d.value === val)?.label || val;
 const responsibleLabels = (vals) => (vals || []).map(responsibleLabel).join(', ');
