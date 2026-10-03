@@ -43,7 +43,7 @@ const toggleInArray = (arr, val) => (arr.includes(val) ? arr.filter((v) => v !==
 const emptyForm = {
   customerName: '', phone: '', orderId: '', category: 'OTHER',
   description: '', date: '', branch: 'HQ', status: 'OPEN', resolutionNotes: '',
-  responsibleDepartment: [], responsibleName: '',
+  responsibleDepartment: [], responsibleName: '', loggedByName: '',
 };
 
 export default function ComplaintsPage() {
@@ -165,6 +165,7 @@ export default function ComplaintsPage() {
       resolutionNotes: c.resolutionNotes || '',
       responsibleDepartment: c.responsibleDepartment || [],
       responsibleName: c.responsibleName || '',
+      loggedByName: c.loggedByName || '',
     });
     setShowModal(true);
   };
@@ -360,6 +361,7 @@ export default function ComplaintsPage() {
                 <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
                   {canSeeAllBranches && <th className="p-4">Branch</th>}
                   <th className="p-4">Customer</th>
+                  <th className="p-4">Logged By</th>
                   <th className="p-4">Phone</th>
                   <th className="p-4">Order ID</th>
                   <th className="p-4">Category</th>
@@ -376,6 +378,7 @@ export default function ComplaintsPage() {
                   <tr key={c.id} className="hover:bg-gray-50/50 transition">
                     {canSeeAllBranches && <td className="p-4 text-gray-600">{c.branch}</td>}
                     <td className="p-4 font-medium text-gray-900">{c.customerName}</td>
+                    <td className="p-4 text-gray-600">{c.loggedByName || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4 text-gray-600">{c.phone || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4 text-gray-600">{c.orderId || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4">
@@ -468,6 +471,17 @@ export default function ComplaintsPage() {
                   onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                   className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Logged By (your name)</label>
+                <input
+                  type="text"
+                  placeholder="E.g. Samira"
+                  value={formData.loggedByName}
+                  onChange={(e) => setFormData({ ...formData, loggedByName: e.target.value })}
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+                <p className="text-xs text-gray-400 mt-1">So this complaint can be followed up with whoever logged it.</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

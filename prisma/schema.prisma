@@ -213,6 +213,11 @@ model Complaint {
   // complaints page for the valid values.
   responsibleDepartment String[]  @default([])
   responsibleName        String?   // the specific staff member, if known — optional
+  // The real staff member who personally logged this complaint, typed in at
+  // creation — shared branch logins (e.g. "Sales HQ") are used by several
+  // people day to day, so this is how a complaint gets traced back to whoever
+  // actually filed it, in case it needs to be followed up with them later.
+  loggedByName   String?
   date           String            // YYYY-MM-DD, when it was logged
   createdAt      DateTime          @default(now())
   resolvedAt     DateTime?

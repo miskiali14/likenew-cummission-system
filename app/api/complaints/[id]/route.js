@@ -29,7 +29,7 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
     const {
       status, customerName, phone, orderId, category, description, date,
-      resolutionNotes, branch, responsibleDepartment, responsibleName,
+      resolutionNotes, branch, responsibleDepartment, responsibleName, loggedByName,
     } = body;
 
     const responsibleDepartments = Array.isArray(responsibleDepartment) ? responsibleDepartment : [];
@@ -62,6 +62,7 @@ export async function PATCH(request, { params }) {
         ...(description !== undefined && { description }),
         ...(date !== undefined && { date }),
         ...(resolutionNotes !== undefined && { resolutionNotes: resolutionNotes || null }),
+        ...(loggedByName !== undefined && { loggedByName: loggedByName || null }),
         ...(nextBranch !== undefined && { branch: nextBranch }),
       },
     });

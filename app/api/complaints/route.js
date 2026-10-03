@@ -49,7 +49,7 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { customerName, phone, orderId, category, description, date } = body;
+    const { customerName, phone, orderId, category, description, date, loggedByName } = body;
 
     if (!customerName || !description) {
       return NextResponse.json(
@@ -71,6 +71,7 @@ export async function POST(request) {
         category: category || 'OTHER',
         description,
         date: date || todayStr(),
+        loggedByName: loggedByName || null,
       },
     });
 
