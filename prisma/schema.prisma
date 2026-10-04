@@ -76,6 +76,17 @@ model DeadStockCategoryOption {
   createdAt DateTime @default(now())
 }
 
+// Short-lived conversation state for the WhatsApp bot (a separate project,
+// likenew-web) — lets it ask "what happened?" and treat the customer's next
+// message as the answer, since WhatsApp webhooks are otherwise stateless.
+// Consumed (deleted) on read; a row older than a few minutes is ignored as
+// stale so an unrelated message days later doesn't get mistaken for a reply.
+model BotSession {
+  waId      String   @id
+  awaiting  String   // e.g. "COMPLAINT"
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id         String      @id @default(uuid())
   fullName   String
