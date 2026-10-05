@@ -32,7 +32,8 @@ import {
   Trash2,
   Download,
   Calendar,
-  X
+  X,
+  Printer
 } from 'lucide-react';
 
 const BRANCHES = [
@@ -1437,6 +1438,13 @@ export default function DashboardPage() {
             scoped to just one. */}
         {user?.role === 'VIEWER' && (
           <div className="space-y-8">
+            <style>{`
+              @media print {
+                aside, .no-print { display: none !important; }
+                main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+                body { background: #fff !important; }
+              }
+            `}</style>
             <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
@@ -1449,7 +1457,13 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
+              <button
+                onClick={() => window.print()}
+                className="no-print flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-4 py-2 text-sm font-medium transition shrink-0"
+              >
+                <Printer size={16} /> Print / Save as PDF
+              </button>
+              <div className="no-print flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
                 <Calendar size={15} className="text-brand-500 shrink-0" />
                 <div className="flex items-center gap-1.5">
                   <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
@@ -1483,7 +1497,7 @@ export default function DashboardPage() {
             </div>
 
             {/* STAFF FILTER — narrow everything below to one person's complete record */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+            <div className="no-print bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center gap-3">
               <Users size={15} className="text-brand-500 shrink-0" />
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Staff</span>
               <select
