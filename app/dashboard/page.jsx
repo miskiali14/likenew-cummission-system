@@ -396,6 +396,9 @@ export default function DashboardPage() {
   // Sales/QC a Viewer can widen it to see past dates.
   const [viewerDateFrom, setViewerDateFrom] = useState('');
   const [viewerDateTo, setViewerDateTo] = useState('');
+  // Lets a Viewer narrow the branch report down to one staff member's
+  // complete record, instead of always seeing everyone mixed together.
+  const [viewerStaffFilter, setViewerStaffFilter] = useState('');
   const [stats, setStats] = useState({ washing: 0, ironing: 0, totalOrders: 0, totalCommission: 0 });
   const [logs, setLogs] = useState([]);
   const [staffSummary, setStaffSummary] = useState([]);
@@ -1479,11 +1482,36 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* STAFF FILTER — narrow everything below to one person's complete record */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+              <Users size={15} className="text-brand-500 shrink-0" />
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Staff</span>
+              <select
+                value={viewerStaffFilter}
+                onChange={(e) => setViewerStaffFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              >
+                <option value="">Everyone</option>
+                {[...new Set(staffSummary.map((s) => s.staffName))].sort().map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+              {viewerStaffFilter && (
+                <button
+                  onClick={() => setViewerStaffFilter('')}
+                  title="Clear — show everyone again"
+                  className="text-slate-400 hover:text-red-500 transition"
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+
             {/* STAFF SUMMARY — scoped to assigned department (or both), with its own date range */}
             <StaffSummaryReport
-              staffSummary={staffSummary}
-              title={`${currentBranch} Branch Report`}
-              subtitle={`How everyone in your branch is performing${user?.department ? '' : ' (Washing & Ironing)'}`}
+              staffSummary={viewerStaffFilter ? staffSummary.filter((s) => s.staffName === viewerStaffFilter) : staffSummary}
+              title={viewerStaffFilter ? `${viewerStaffFilter} — Full Report` : `${currentBranch} Branch Report`}
+              subtitle={viewerStaffFilter ? `Everything logged under ${viewerStaffFilter} in this date range` : `How everyone in your branch is performing${user?.department ? '' : ' (Washing & Ironing)'}`}
               showBranchColumn={false}
               showChart={false}
             />
@@ -1491,7 +1519,7 @@ export default function DashboardPage() {
             {/* LOGS — no actions */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
               <h3 className="text-md font-bold text-slate-800 mb-4">
-                Logs — {currentBranch} Branch ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
+                Logs — {viewerStaffFilter || `${currentBranch} Branch`} ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
               </h3>
 
               <div className="overflow-x-auto">
@@ -1506,14 +1534,14 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {logs.length === 0 ? (
+                    {(viewerStaffFilter ? logs.filter((l) => l.staffName === viewerStaffFilter) : logs).length === 0 ? (
                       <tr>
                         <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400">
-                          No logs found for {currentBranch} branch in this date range.
+                          No logs found for {viewerStaffFilter || `${currentBranch} branch`} in this date range.
                         </td>
                       </tr>
                     ) : (
-                      groupLogsByStaff(logs).flatMap((group) =>
+                      groupLogsByStaff(viewerStaffFilter ? logs.filter((l) => l.staffName === viewerStaffFilter) : logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
                           <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
                             <td className="py-3 px-2 font-extrabold text-slate-900 text-base">
