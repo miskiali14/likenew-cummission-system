@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { UserPlus, Trash2, Shield, Building, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { UserPlus, Trash2, Shield, Building, AlertCircle, CheckCircle2, X, KeyRound } from 'lucide-react';
 
 export default function UsersPage() {
   const router = useRouter();
@@ -12,6 +12,8 @@ export default function UsersPage() {
   const [showModal, setShowModal] = useState(false);
 
   const [notification, setNotification] = useState(null);
+  const [passwordTarget, setPasswordTarget] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -72,6 +74,18 @@ export default function UsersPage() {
       fetchUsers();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'An error occurred while saving the user');
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    try {
+      await API.patch(`/users/${passwordTarget.id}`, { password: newPassword });
+      showToast('success', `Password updated for ${passwordTarget.fullName}`);
+      setPasswordTarget(null);
+      setNewPassword('');
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to update password');
     }
   };
 
@@ -163,13 +177,22 @@ export default function UsersPage() {
                     {u.role === 'VIEWER' ? (u.department || 'Both') : '—'}
                   </td>
                   <td className="p-4 text-right">
-                    <button
-                      onClick={() => handleDelete(u.id)}
-                      className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => { setPasswordTarget(u); setNewPassword(''); }}
+                        className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
+                        title="Change Password"
+                      >
+                        <KeyRound size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(u.id)}
+                        className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                        title="Delete"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -277,6 +300,48 @@ export default function UsersPage() {
                   className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700"
                 >
                   Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal - Change Password */}
+      {passwordTarget && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-xl font-bold text-gray-800">Change Password</h2>
+            <p className="text-sm text-gray-500">
+              Setting a new password for <span className="font-semibold text-gray-700">{passwordTarget.fullName}</span> ({passwordTarget.email})
+            </p>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">New Password</label>
+                <input
+                  type="text"
+                  required
+                  minLength={6}
+                  autoFocus
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setPasswordTarget(null)}
+                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700"
+                >
+                  Update Password
                 </button>
               </div>
             </form>
