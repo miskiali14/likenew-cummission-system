@@ -214,7 +214,9 @@ model Complaint {
   customerName   String
   phone          String?
   orderId        String?           // free-text reference to the related order, if any
-  category       ComplaintCategory @default(OTHER)
+  // More than one can apply to a single complaint (e.g. both a damaged
+  // item and a delayed order).
+  category       ComplaintCategory[] @default([OTHER])
   description    String
   status         ComplaintStatus   @default(OPEN)
   resolutionNotes String?

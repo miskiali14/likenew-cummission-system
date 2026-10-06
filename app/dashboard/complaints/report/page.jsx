@@ -105,8 +105,10 @@ export default function ComplaintsReportPage() {
   const byCategory = useMemo(() => {
     const map = new Map();
     for (const c of complaints) {
-      const key = c.category;
-      map.set(key, (map.get(key) || 0) + 1);
+      const cats = Array.isArray(c.category) ? c.category : [c.category];
+      for (const key of cats) {
+        map.set(key, (map.get(key) || 0) + 1);
+      }
     }
     return [...map.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
   }, [complaints]);
@@ -212,7 +214,7 @@ export default function ComplaintsReportPage() {
                   Customer: c.customerName,
                   Phone: c.phone || '',
                   OrderID: c.orderId || '',
-                  Category: CATEGORY_LABEL[c.category] || c.category,
+                  Category: (Array.isArray(c.category) ? c.category : [c.category]).map((cat) => CATEGORY_LABEL[cat] || cat).join(', '),
                   Status: STATUS_LABEL[c.status] || c.status,
                   ResolutionNotes: c.resolutionNotes || '',
                   ResolvedAt: c.resolvedAt ? new Date(c.resolvedAt).toISOString().split('T')[0] : '',
@@ -335,9 +337,13 @@ export default function ComplaintsReportPage() {
                       <td className="py-3 px-3 text-slate-600">{c.branch}</td>
                       <td className="py-3 px-3 font-semibold text-slate-800">{c.customerName}</td>
                       <td className="py-3 px-3">
-                        <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
-                          {CATEGORY_LABEL[c.category] || c.category}
-                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {(Array.isArray(c.category) ? c.category : [c.category]).map((cat) => (
+                            <span key={cat} className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                              {CATEGORY_LABEL[cat] || cat}
+                            </span>
+                          ))}
+                        </div>
                       </td>
                       <td className="py-3 px-3">
                         <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[c.status]}`}>

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
+const VALID_CATEGORIES = ['DAMAGED', 'DELAYED', 'LOST', 'QUALITY', 'STAFF', 'OTHER'];
+
 const VALID_RESPONSIBLE_DEPARTMENTS = [
   'SALES_HQ', 'SALES_KM5',
   'WASHING_HQ', 'WASHING_KM5',
@@ -58,7 +60,12 @@ export async function PATCH(request, { params }) {
         ...(customerName !== undefined && { customerName }),
         ...(phone !== undefined && { phone: phone || null }),
         ...(orderId !== undefined && { orderId: orderId || null }),
-        ...(category !== undefined && { category }),
+        ...(category !== undefined && {
+          category: (() => {
+            const categories = Array.isArray(category) ? category.filter((c) => VALID_CATEGORIES.includes(c)) : [];
+            return categories.length > 0 ? categories : ['OTHER'];
+          })(),
+        }),
         ...(description !== undefined && { description }),
         ...(date !== undefined && { date }),
         ...(resolutionNotes !== undefined && { resolutionNotes: resolutionNotes || null }),

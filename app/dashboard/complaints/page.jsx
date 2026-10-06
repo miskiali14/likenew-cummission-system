@@ -41,7 +41,7 @@ const responsibleLabels = (vals) => (vals || []).map(responsibleLabel).join(', '
 const toggleInArray = (arr, val) => (arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]);
 
 const emptyForm = {
-  customerName: '', phone: '', orderId: '', category: 'OTHER',
+  customerName: '', phone: '', orderId: '', category: ['OTHER'],
   description: '', date: '', branch: 'HQ', status: 'OPEN', resolutionNotes: '',
   responsibleDepartment: [], responsibleName: '', loggedByName: '',
 };
@@ -157,7 +157,7 @@ export default function ComplaintsPage() {
       customerName: c.customerName,
       phone: c.phone || '',
       orderId: c.orderId || '',
-      category: c.category,
+      category: Array.isArray(c.category) ? c.category : [c.category],
       description: c.description,
       date: c.date,
       branch: c.branch,
@@ -242,6 +242,7 @@ export default function ComplaintsPage() {
   };
 
   const categoryLabel = (val) => CATEGORIES.find((c) => c.value === val)?.label || val;
+  const categoryLabels = (vals) => (Array.isArray(vals) ? vals : [vals]).map(categoryLabel).join(', ');
 
   return (
     <div className="p-6 space-y-6 relative">
@@ -382,9 +383,13 @@ export default function ComplaintsPage() {
                     <td className="p-4 text-gray-600">{c.phone || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4 text-gray-600">{c.orderId || <span className="text-slate-300">—</span>}</td>
                     <td className="p-4">
-                      <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
-                        {categoryLabel(c.category)}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {(Array.isArray(c.category) ? c.category : [c.category]).map((cat) => (
+                          <span key={cat} className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                            {categoryLabel(cat)}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="p-4 text-gray-600 max-w-xs truncate" title={c.description}>{c.description}</td>
                     <td className="p-4 text-gray-500">{c.date}</td>
@@ -506,16 +511,20 @@ export default function ComplaintsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Category</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                >
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Category (pick one or more)</label>
+                <div className="grid grid-cols-2 gap-1.5 border rounded-lg p-2.5">
                   {CATEGORIES.map((c) => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
+                    <label key={c.value} className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.category.includes(c.value)}
+                        onChange={() => setFormData({ ...formData, category: toggleInArray(formData.category, c.value) })}
+                        className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                      />
+                      {c.label}
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Complaint Details</label>

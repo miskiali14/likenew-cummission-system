@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
+const VALID_CATEGORIES = ['DAMAGED', 'DELAYED', 'LOST', 'QUALITY', 'STAFF', 'OTHER'];
+
 // Customer complaints — Admin, Customer Care, and Call Center see every
 // branch; Sales sees and registers complaints for their own branch only
 // (Call Center can view/add but not edit, resolve, or delete — see [id]).
@@ -62,13 +64,15 @@ export async function POST(request) {
       ? (body.branch || user.branch || 'HQ')
       : user.branch;
 
+    const categories = Array.isArray(category) ? category.filter((c) => VALID_CATEGORIES.includes(c)) : [];
+
     const complaint = await prisma.complaint.create({
       data: {
         branch,
         customerName,
         phone: phone || null,
         orderId: orderId || null,
-        category: category || 'OTHER',
+        category: categories.length > 0 ? categories : ['OTHER'],
         description,
         date: date || todayStr(),
         loggedByName: loggedByName || null,
