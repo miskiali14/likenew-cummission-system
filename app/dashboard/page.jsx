@@ -135,44 +135,44 @@ function StaffSummaryReport({
   }, [staffSummary]);
 
   return (
-    <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 dark:border-slate-700 pb-4">
+    <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 dark:border-ink-700 pb-4">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700">
             <Users size={20} />
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
+            <p className="text-xs text-slate-500 dark:text-ink-400">{subtitle}</p>
           </div>
         </div>
         {hasDateRangePicker && (
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
             <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => onDateFromChange(e.target.value)}
-                className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+                className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
               />
             </div>
-            <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
+            <span className="w-3 h-px bg-slate-300 dark:bg-ink-600" />
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">To</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => onDateToChange(e.target.value)}
-                className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+                className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
               />
             </div>
             {(dateFrom || dateTo) && (
               <button
                 onClick={() => { onDateFromChange(''); onDateToChange(''); }}
                 title="Clear date range — show all dates"
-                className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
+                className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition ml-1"
               >
                 <X size={15} />
               </button>
@@ -198,22 +198,22 @@ function StaffSummaryReport({
                 }))
               )
             }
-            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition"
+            className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 hover:bg-slate-100 dark:hover:bg-ink-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-ink-200 transition"
           >
             <Download size={16} /> Export CSV
           </button>
         )}
         {staffSummary.length > 0 && (
-          <div className="flex items-center gap-4 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-2.5">
-            <span className="text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-4 text-xs bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-4 py-2.5">
+            <span className="text-slate-500 dark:text-ink-400">
               Team Total: <b className="text-emerald-600 dark:text-emerald-400">{staffSummaryTotals.totalItems} Pcs</b>
             </span>
-            <span className="w-px h-4 bg-slate-200 dark:bg-slate-600" />
-            <span className="text-slate-500 dark:text-slate-400">
+            <span className="w-px h-4 bg-slate-200 dark:bg-ink-600" />
+            <span className="text-slate-500 dark:text-ink-400">
               <b className="text-slate-900 dark:text-white">{staffSummaryTotals.totalOrders}</b> Orders
             </span>
-            <span className="w-px h-4 bg-slate-200 dark:bg-slate-600" />
-            <span className="text-slate-500 dark:text-slate-400">
+            <span className="w-px h-4 bg-slate-200 dark:bg-ink-600" />
+            <span className="text-slate-500 dark:text-ink-400">
               <b className="text-brand-700 dark:text-brand-300">{staffSummaryTotals.totalMinutes}</b> Min
             </span>
           </div>
@@ -221,8 +221,8 @@ function StaffSummaryReport({
       </div>
 
       {staffSummary.length === 0 ? (
-        <div className="py-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500">
-          <Users size={28} className="text-slate-300 dark:text-slate-600" />
+        <div className="py-10 flex flex-col items-center gap-2 text-slate-400 dark:text-ink-500">
+          <Users size={28} className="text-slate-300 dark:text-ink-600" />
           <p className="text-sm">No staff summary data found for this filter.</p>
         </div>
       ) : (
@@ -240,7 +240,7 @@ function StaffSummaryReport({
               return (
                 <div
                   key={idx}
-                  className={`relative rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/60 ring-1 ${ringColor} dark:ring-opacity-40 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
+                  className={`relative rounded-2xl p-4 border border-slate-200/80 dark:border-ink-700 bg-gradient-to-br from-white to-slate-50 dark:from-ink-800 dark:to-ink-800/60 ring-1 ${ringColor} dark:ring-opacity-40 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
                 >
                   <span className={`absolute -top-2.5 -right-2.5 text-xs font-bold px-2 py-1 rounded-full border shadow-sm ${badgeColor}`}>
                     {medal} #{idx + 1}
@@ -251,22 +251,22 @@ function StaffSummaryReport({
                     </div>
                     <div className="min-w-0">
                       <p className="font-bold text-slate-800 dark:text-white truncate">{staff.staffName}</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500">{staff.branch} &middot; {staff.department}</p>
+                      <p className="text-[11px] text-slate-400 dark:text-ink-500">{staff.branch} &middot; {staff.department}</p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-baseline justify-between">
                     <span className="text-2xl font-extrabold text-slate-900 dark:text-white">{staff.totalOrdersHandled}</span>
-                    <span className="text-[11px] text-slate-400 dark:text-slate-500">orders handled</span>
+                    <span className="text-[11px] text-slate-400 dark:text-ink-500">orders handled</span>
                   </div>
-                  <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 overflow-hidden">
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-ink-700 rounded-full mt-2 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-brand-500 to-brand-400 rounded-full"
                       style={{ width: `${(Number(staff.totalQuantity || 0) / maxStaffQuantity) * 100}%` }}
                     />
                   </div>
-                  <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+                  <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-500 dark:text-ink-400">
                     <span>{staff.totalQuantity} pieces</span>
-                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-ink-600" />
                     <span>{staff.totalDuration} min</span>
                   </div>
                 </div>
@@ -290,10 +290,10 @@ function StaffSummaryReport({
           )}
 
           {/* Full ranked table */}
-          <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
+          <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-ink-700">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/70 dark:bg-slate-700/40">
+                <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/70 dark:bg-ink-700/40">
                   <th className="py-3 px-3">#</th>
                   <th className="py-3 px-3">Staff Name</th>
                   <th className="py-3 px-3">Department</th>
@@ -307,8 +307,8 @@ function StaffSummaryReport({
               </thead>
               <tbody>
                 {rankedStaffSummary.map((staff, idx) => (
-                  <tr key={idx} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition">
-                    <td className="py-3 px-3 text-slate-400 dark:text-slate-500 font-semibold">{idx + 1}</td>
+                  <tr key={idx} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50/80 dark:hover:bg-ink-700/40 transition">
+                    <td className="py-3 px-3 text-slate-400 dark:text-ink-500 font-semibold">{idx + 1}</td>
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 shrink-0 rounded-full bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 border border-brand-100 dark:border-brand-700 flex items-center justify-center text-[10px] font-bold">
@@ -328,9 +328,9 @@ function StaffSummaryReport({
                         {staff.department}
                       </span>
                     </td>
-                    {showBranchColumn && <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{staff.branch}</td>}
+                    {showBranchColumn && <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{staff.branch}</td>}
                     <td className="py-3 px-3">
-                      <div className="w-28 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div className="w-28 h-1.5 bg-slate-100 dark:bg-ink-700 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-gradient-to-r from-brand-500 to-brand-400 rounded-full"
                           style={{ width: `${(Number(staff.totalQuantity || 0) / maxStaffQuantity) * 100}%` }}
@@ -356,7 +356,7 @@ function StaffSummaryReport({
                   </tr>
                 ))}
               </tbody>
-              <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+              <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                 <tr>
                   <td colSpan={showBranchColumn ? 5 : 4} className="py-3 px-3 text-slate-800 dark:text-white">Overall Report Total:</td>
                   <td className="py-3 px-3 text-right text-slate-900 dark:text-white">{staffSummaryTotals.totalOrders} Orders</td>
@@ -829,16 +829,16 @@ export default function DashboardPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-ink-900 flex items-center justify-center">
         <Loader2 className="animate-spin text-brand-600" size={36} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-6 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-ink-900 text-slate-800 dark:text-ink-100 p-6 transition-colors">
       {/* Top Header */}
-      <header className="max-w-7xl mx-auto flex justify-between items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm">
+      <header className="max-w-7xl mx-auto flex justify-between items-center gap-4 pb-6 border-b border-slate-200 dark:border-ink-700 bg-white dark:bg-ink-800 p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3.5">
           <img src="/likenew-logo.png" alt="" className="w-11 h-11 rounded-xl shadow-sm shrink-0" />
           <div>
@@ -848,10 +848,10 @@ export default function DashboardPage() {
                 {user?.role || 'STAFF'}
               </span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            <p className="text-slate-500 dark:text-ink-400 text-sm mt-1">
               Welcome back, <span className="text-slate-900 dark:text-white font-medium">{user?.fullName || 'User'}</span>
               {user?.role !== 'ADMIN' && (
-                <span className="ml-2 font-bold text-slate-700 dark:text-slate-300">({currentBranch})</span>
+                <span className="ml-2 font-bold text-slate-700 dark:text-ink-300">({currentBranch})</span>
               )}
             </p>
           </div>
@@ -861,15 +861,15 @@ export default function DashboardPage() {
           {user?.role === 'ADMIN' && (
             <>
               {/* Branch Filter Dropdown */}
-              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
-                <Building2 size={18} className="text-slate-500 dark:text-slate-400" />
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
+                <Building2 size={18} className="text-slate-500 dark:text-ink-400" />
                 <select
                   value={selectedBranch}
                   onChange={(e) => setSelectedBranch(e.target.value)}
-                  className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+                  className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none cursor-pointer"
                 >
                   {BRANCHES.map((b) => (
-                    <option key={b.id} value={b.id} className="bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                    <option key={b.id} value={b.id} className="bg-white dark:bg-ink-800 text-slate-800 dark:text-white">
                       {b.name}
                     </option>
                   ))}
@@ -878,7 +878,7 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => fetchAdminDashboardData()}
-                className="p-2.5 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-slate-600 dark:text-slate-300 transition"
+                className="p-2.5 bg-slate-100 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 hover:bg-slate-200 dark:hover:bg-ink-600 rounded-xl text-slate-600 dark:text-ink-300 transition"
                 title="Refresh Data"
               >
                 <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
@@ -905,84 +905,84 @@ export default function DashboardPage() {
           <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
                 <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800 group-hover:scale-105 transition-transform">
                   <Shirt size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Washing Logs</p>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Washing Logs</p>
                   <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.washing}</h3>
                 </div>
               </div>
 
-              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
                 <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/40 dark:to-amber-800/40 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-100 dark:border-amber-800 group-hover:scale-105 transition-transform">
                   <Flame size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Ironing Logs</p>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Ironing Logs</p>
                   <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.ironing}</h3>
                 </div>
               </div>
 
-              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
                 <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700 group-hover:scale-105 transition-transform">
                   <ShoppingBag size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Total Orders</p>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Total Orders</p>
                   <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.totalOrders}</h3>
                 </div>
               </div>
 
-              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
                 <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-105 transition-transform">
                   <DollarSign size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Total Commission</p>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Total Commission</p>
                   <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
                 </div>
               </div>
             </div>
 
             {/* Chart Graph */}
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div>
                   <h2 className="text-lg font-bold text-slate-800 dark:text-white">Registration Analytics</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Washing vs. Ironing volume — {selectedBranch}</p>
+                  <p className="text-xs text-slate-500 dark:text-ink-400 mt-0.5">Washing vs. Ironing volume — {selectedBranch}</p>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
                   <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
                     <input
                       type="date"
                       value={analyticsDateFrom}
                       onChange={(e) => setAnalyticsDateFrom(e.target.value)}
-                      className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+                      className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
                     />
                   </div>
-                  <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
+                  <span className="w-3 h-px bg-slate-300 dark:bg-ink-600" />
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">To</span>
                     <input
                       type="date"
                       value={analyticsDateTo}
                       onChange={(e) => setAnalyticsDateTo(e.target.value)}
-                      className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+                      className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
                     />
                   </div>
                   {(analyticsDateFrom || analyticsDateTo) && (
                     <button
                       onClick={() => { setAnalyticsDateFrom(''); setAnalyticsDateTo(''); }}
                       title="Clear date range — show all dates"
-                      className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
+                      className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition ml-1"
                     >
                       <X size={15} />
                     </button>
@@ -1019,31 +1019,31 @@ export default function DashboardPage() {
             />
 
             {/* ALL LOGS TABLE FOR ADMIN */}
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 dark:border-ink-700 pb-4">
                 <div>
                   <h2 className="text-lg font-bold text-slate-800 dark:text-white">All Registered Logs</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">View and manage all registered logs from KM5 and HQ branches</p>
+                  <p className="text-xs text-slate-500 dark:text-ink-400">View and manage all registered logs from KM5 and HQ branches</p>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Filter size={16} className="text-slate-500 dark:text-slate-400" />
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Department:</span>
+                  <Filter size={16} className="text-slate-500 dark:text-ink-400" />
+                  <span className="text-xs font-semibold text-slate-600 dark:text-ink-300">Department:</span>
                   <select
                     value={selectedDept}
                     onChange={(e) => setSelectedDept(e.target.value)}
-                    className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none cursor-pointer"
+                    className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2 focus:outline-none cursor-pointer"
                   >
                     <option value="All">All Departments</option>
                     <option value="WASHING">Washing</option>
                     <option value="IRONING">Ironing</option>
                   </select>
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 ml-1">Date:</span>
+                  <span className="text-xs font-semibold text-slate-600 dark:text-ink-300 ml-1">Date:</span>
                   <input
                     type="date"
                     value={allLogsDate}
                     onChange={(e) => setAllLogsDate(e.target.value)}
-                    className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none"
+                    className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2 focus:outline-none"
                   />
                   {allLogsDate && (
                     <button
@@ -1070,7 +1070,7 @@ export default function DashboardPage() {
                           }))
                         )
                       }
-                      className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition"
+                      className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 hover:bg-slate-100 dark:hover:bg-ink-600 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 dark:text-ink-200 transition"
                     >
                       <Download size={16} /> Export CSV
                     </button>
@@ -1081,7 +1081,7 @@ export default function DashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/50 dark:bg-slate-700/40">
+                    <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/50 dark:bg-ink-700/40">
                       <th className="py-3 px-3">Order ID</th>
                       <th className="py-3 px-3">Branch</th>
                       <th className="py-3 px-3">Department</th>
@@ -1096,14 +1096,14 @@ export default function DashboardPage() {
                   <tbody>
                     {logs.length === 0 ? (
                       <tr>
-                        <td colSpan="9" className="text-center py-6 text-slate-400 dark:text-slate-500">
+                        <td colSpan="9" className="text-center py-6 text-slate-400 dark:text-ink-500">
                           No log records found.
                         </td>
                       </tr>
                     ) : (
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
-                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                          <tr key={item.id} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50 dark:hover:bg-ink-700/40 transition">
                             <td className="py-3 px-3 font-extrabold text-slate-900 dark:text-white text-base">
                               #{item.orderId}
                               {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
@@ -1113,7 +1113,7 @@ export default function DashboardPage() {
                               )}
                             </td>
                             <td className="py-3 px-3">
-                              <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+                              <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-ink-700 text-slate-700 dark:text-ink-300 border border-slate-200 dark:border-ink-600">
                                 {item.branch || 'HQ'}
                               </span>
                             </td>
@@ -1130,7 +1130,7 @@ export default function DashboardPage() {
                             </td>
                             {idx === 0 && (
                               <td
-                                className="py-3 px-3 font-medium text-slate-700 dark:text-slate-200 align-top border-l border-slate-100 dark:border-slate-700"
+                                className="py-3 px-3 font-medium text-slate-700 dark:text-ink-200 align-top border-l border-slate-100 dark:border-ink-700"
                                 rowSpan={group.orders.length}
                               >
                                 {group.staffName}
@@ -1147,27 +1147,27 @@ export default function DashboardPage() {
                               </span>
                             </td>
                             <td className="py-3 px-3">
-                              <span className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
-                                <Clock size={14} className="text-slate-400 dark:text-slate-500" />
+                              <span className="flex items-center gap-1 text-slate-600 dark:text-ink-300">
+                                <Clock size={14} className="text-slate-400 dark:text-ink-500" />
                                 {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                  <span className="text-slate-400 dark:text-slate-500 italic">Not set</span>
+                                  <span className="text-slate-400 dark:text-ink-500 italic">Not set</span>
                                 )}
                               </span>
                             </td>
-                            <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{item.assignedBy}</td>
-                            <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{item.date}</td>
+                            <td className="py-3 px-3 text-slate-500 dark:text-ink-400">{item.assignedBy}</td>
+                            <td className="py-3 px-3 text-slate-500 dark:text-ink-400">{item.date}</td>
                             <td className="py-3 px-3 text-right">
                                 <div className="flex items-center justify-end gap-1">
                                   <button
                                     onClick={() => openEditOrderModal(item)}
-                                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 rounded-lg transition"
+                                    className="p-1.5 text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 rounded-lg transition"
                                     title="Edit Order"
                                   >
                                     <Edit2 size={16} />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteLog(item.id)}
-                                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
+                                    className="p-1.5 text-slate-400 dark:text-ink-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
                                     title="Delete Log"
                                   >
                                     <Trash2 size={16} />
@@ -1180,7 +1180,7 @@ export default function DashboardPage() {
                     )}
                   </tbody>
                   {logs.length > 0 && (
-                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+                    <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                       <tr>
                         <td colSpan="4" className="py-3 px-3 text-slate-800 dark:text-white">Total ({logs.length} Log Entries):</td>
                         <td className="py-3 px-3 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
@@ -1199,59 +1199,59 @@ export default function DashboardPage() {
         {user?.role !== 'ADMIN' && user?.role !== 'VIEWER' && (
           <div className="space-y-8">
             {/* Form */}
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
-              <div className="border-b border-slate-100 dark:border-slate-700 pb-3 mb-5 flex justify-between items-center">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm">
+              <div className="border-b border-slate-100 dark:border-ink-700 pb-3 mb-5 flex justify-between items-center">
                 <h2 className="text-lg font-bold text-slate-800 dark:text-white">
                   Register New Log ({user?.role === 'QUALITY_CONTROL' ? 'Ironing' : 'Washing'})
                 </h2>
-                <span className="text-xs px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg font-semibold border border-slate-200 dark:border-slate-600">
+                <span className="text-xs px-3 py-1 bg-slate-100 dark:bg-ink-700 text-slate-600 dark:text-ink-300 rounded-lg font-semibold border border-slate-200 dark:border-ink-600">
                   Branch: {currentBranch}
                 </span>
               </div>
 
               <form onSubmit={handleSubmitLog} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">1. Order ID</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">1. Order ID</label>
                   <input
                     type="number"
                     required
                     placeholder="E.g. 1024"
                     value={formData.orderId}
                     onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">2. Quantity</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">2. Quantity</label>
                   <input
                     type="number"
                     required
                     placeholder="E.g. 12"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">3. Date (today only)</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">3. Date (today only)</label>
                   <input
                     type="date"
                     required
                     disabled
                     value={formData.date}
-                    className="w-full border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 text-sm bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                    className="w-full border border-slate-200 dark:border-ink-600 rounded-xl p-2.5 text-sm bg-slate-100 dark:bg-ink-700 text-slate-500 dark:text-ink-400 cursor-not-allowed"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">4. Assigned By</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">4. Assigned By</label>
                   <select
                     required
                     value={formData.registrarId}
                     onChange={(e) => setFormData({ ...formData, registrarId: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                    className="w-full border border-slate-200 dark:border-ink-600 bg-white dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                   >
                     {registrars.length === 0 && <option value="">No one found — add one first</option>}
                     {registrars.map((reg) => (
@@ -1263,11 +1263,11 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">5. Shift</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">5. Shift</label>
                   <select
                     value={formData.shift}
                     onChange={(e) => setFormData({ ...formData, shift: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                   >
                     <option value="SHIFT_1">SHIFT 1</option>
                     <option value="SHIFT_2">SHIFT 2</option>
@@ -1275,12 +1275,12 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">6. Staff Member ({currentBranch})</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">6. Staff Member ({currentBranch})</label>
                   <select
                     required
                     value={formData.employeeId}
                     onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                    className="w-full border border-slate-200 dark:border-ink-600 bg-white dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                   >
                     {employees.length === 0 && <option value="">No employees found — add one first</option>}
                     {employees.map((emp) => (
@@ -1292,13 +1292,13 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">7. Duration (Min) — optional</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">7. Duration (Min) — optional</label>
                   <input
                     type="number"
                     placeholder="Leave blank if not known yet"
                     value={formData.durationMinutes}
                     onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
 
@@ -1353,7 +1353,7 @@ export default function DashboardPage() {
             />
 
             {/* LOGS LIST FOR STAFF */}
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm">
               <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4">
                 Today's Logs — {currentBranch} Branch ({user?.role === 'QUALITY_CONTROL' ? 'Ironing' : 'Washing'})
               </h3>
@@ -1361,7 +1361,7 @@ export default function DashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase">
+                    <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase">
                       <th className="py-3 px-2">Order ID</th>
                       <th className="py-3 px-2">Staff</th>
                       <th className="py-3 px-2">Qty</th>
@@ -1372,14 +1372,14 @@ export default function DashboardPage() {
                   <tbody>
                     {logs.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="text-center py-6 text-slate-400 dark:text-slate-500">
+                        <td colSpan="5" className="text-center py-6 text-slate-400 dark:text-ink-500">
                           No logs registered today for {currentBranch} branch yet.
                         </td>
                       </tr>
                     ) : (
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
-                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                          <tr key={item.id} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50 dark:hover:bg-ink-700/40">
                             <td className="py-3 px-2 font-extrabold text-slate-900 dark:text-white text-base">
                               #{item.orderId}
                               {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
@@ -1405,24 +1405,24 @@ export default function DashboardPage() {
                             </td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                <span className="text-slate-400 dark:text-slate-500 italic">Not set</span>
+                                <span className="text-slate-400 dark:text-ink-500 italic">Not set</span>
                               )}
                             </td>
                             <td className="py-3 px-2">
                               {item.date !== todayStr ? (
-                                <span className="text-[11px] text-slate-400 dark:text-slate-500 italic">Locked</span>
+                                <span className="text-[11px] text-slate-400 dark:text-ink-500 italic">Locked</span>
                               ) : (
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => openEditOrderModal(item)}
-                                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 rounded"
+                                    className="p-1 text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 rounded"
                                     title="Edit Order"
                                   >
                                     <Edit2 size={16} />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteLog(item.id)}
-                                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded"
+                                    className="p-1 text-slate-400 dark:text-ink-500 hover:text-red-600 dark:hover:text-red-400 rounded"
                                     title="Delete Log"
                                   >
                                     <Trash2 size={16} />
@@ -1436,7 +1436,7 @@ export default function DashboardPage() {
                     )}
                   </tbody>
                   {logs.length > 0 && (
-                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+                    <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                       <tr>
                         <td colSpan="2" className="py-3 px-2 text-slate-800 dark:text-white">Total ({logs.length} Orders):</td>
                         <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
@@ -1463,14 +1463,14 @@ export default function DashboardPage() {
                 body { background: #fff !important; }
               }
             `}</style>
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700">
                   <Users size={22} />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-slate-800 dark:text-white">{currentBranch} Branch — Read-Only View</h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-500 dark:text-ink-400">
                     You can view {user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing and Ironing'} activity for {currentBranch}. Viewing only — no changes can be made.
                   </p>
                 </div>
@@ -1481,32 +1481,32 @@ export default function DashboardPage() {
               >
                 <Printer size={16} /> Print / Save as PDF
               </button>
-              <div className="no-print flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+              <div className="no-print flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
                 <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
                   <input
                     type="date"
                     value={viewerDateFrom}
                     onChange={(e) => setViewerDateFrom(e.target.value)}
-                    className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+                    className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
                   />
                 </div>
-                <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
+                <span className="w-3 h-px bg-slate-300 dark:bg-ink-600" />
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">To</span>
                   <input
                     type="date"
                     value={viewerDateTo}
                     onChange={(e) => setViewerDateTo(e.target.value)}
-                    className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+                    className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
                   />
                 </div>
                 {(viewerDateFrom || viewerDateTo) && (
                   <button
                     onClick={() => { setViewerDateFrom(''); setViewerDateTo(''); }}
                     title="Clear date range — show all dates"
-                    className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
+                    className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition ml-1"
                   >
                     <X size={15} />
                   </button>
@@ -1515,13 +1515,13 @@ export default function DashboardPage() {
             </div>
 
             {/* STAFF FILTER — narrow everything below to one person's complete record */}
-            <div className="no-print bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+            <div className="no-print bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex items-center gap-3">
               <Users size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
-              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Staff</span>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">Staff</span>
               <select
                 value={viewerStaffFilter}
                 onChange={(e) => setViewerStaffFilter(e.target.value)}
-                className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
               >
                 <option value="">Everyone</option>
                 {[...new Set(staffSummary.map((s) => s.staffName))].sort().map((name) => (
@@ -1532,7 +1532,7 @@ export default function DashboardPage() {
                 <button
                   onClick={() => setViewerStaffFilter('')}
                   title="Clear — show everyone again"
-                  className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition"
+                  className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition"
                 >
                   <X size={15} />
                 </button>
@@ -1549,7 +1549,7 @@ export default function DashboardPage() {
             />
 
             {/* LOGS — no actions */}
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm">
               <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4">
                 Logs — {viewerStaffFilter || `${currentBranch} Branch`} ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
               </h3>
@@ -1557,7 +1557,7 @@ export default function DashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase">
+                    <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase">
                       <th className="py-3 px-2">Order ID</th>
                       {!user?.department && <th className="py-3 px-2">Department</th>}
                       <th className="py-3 px-2">Staff</th>
@@ -1568,14 +1568,14 @@ export default function DashboardPage() {
                   <tbody>
                     {(viewerStaffFilter ? logs.filter((l) => l.staffName === viewerStaffFilter) : logs).length === 0 ? (
                       <tr>
-                        <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400 dark:text-slate-500">
+                        <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400 dark:text-ink-500">
                           No logs found for {viewerStaffFilter || `${currentBranch} branch`} in this date range.
                         </td>
                       </tr>
                     ) : (
                       groupLogsByStaff(viewerStaffFilter ? logs.filter((l) => l.staffName === viewerStaffFilter) : logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
-                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                          <tr key={item.id} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50 dark:hover:bg-ink-700/40">
                             <td className="py-3 px-2 font-extrabold text-slate-900 dark:text-white text-base">
                               #{item.orderId}
                               {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
@@ -1614,7 +1614,7 @@ export default function DashboardPage() {
                             </td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                <span className="text-slate-400 dark:text-slate-500 italic">Not set</span>
+                                <span className="text-slate-400 dark:text-ink-500 italic">Not set</span>
                               )}
                             </td>
                           </tr>
@@ -1623,7 +1623,7 @@ export default function DashboardPage() {
                     )}
                   </tbody>
                   {logs.length > 0 && (
-                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+                    <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                       <tr>
                         <td colSpan={user?.department ? 2 : 3} className="py-3 px-2 text-slate-800 dark:text-white">Total ({logs.length} Orders):</td>
                         <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
@@ -1641,65 +1641,65 @@ export default function DashboardPage() {
       {/* EDIT ORDER MODAL */}
       {editingOrderLog && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+          <div className="bg-white dark:bg-ink-800 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
             <h2 className="text-xl font-bold text-slate-800 dark:text-white">
               Edit Order #{editingOrderLog.orderId}
             </h2>
             <form onSubmit={handleSaveOrderEdit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Order ID</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">Order ID</label>
                   <input
                     type="number"
                     required
                     value={editOrderForm.orderId}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, orderId: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Quantity</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">Quantity</label>
                   <input
                     type="number"
                     required
                     value={editOrderForm.quantity}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, quantity: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Shift</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">Shift</label>
                   <select
                     value={editOrderForm.shift}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, shift: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="SHIFT_1">SHIFT 1</option>
                     <option value="SHIFT_2">SHIFT 2</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Duration (Min) — optional</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">Duration (Min) — optional</label>
                   <input
                     type="number"
                     placeholder="Leave blank if not known yet"
                     value={editOrderForm.durationMinutes}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, durationMinutes: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Staff Member</label>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-ink-300 mb-1">Staff Member</label>
                 <select
                   required
                   value={editOrderForm.employeeId}
                   onChange={(e) => setEditOrderForm({ ...editOrderForm, employeeId: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                  className="w-full border border-slate-200 dark:border-ink-600 bg-white dark:bg-ink-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                 >
                   {editOrderEmployees.length === 0 && <option value="">Loading employees…</option>}
                   {editOrderEmployees.map((emp) => (
@@ -1714,7 +1714,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={closeEditOrderModal}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 border border-slate-300 dark:border-ink-600 rounded-lg text-sm font-medium text-slate-600 dark:text-ink-300 hover:bg-slate-50 dark:hover:bg-ink-700"
                 >
                   Cancel
                 </button>

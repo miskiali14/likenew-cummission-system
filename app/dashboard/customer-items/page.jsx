@@ -232,7 +232,7 @@ export default function CustomerItemsPage() {
             <CheckCircle2 className="text-emerald-600" size={20} />
           )}
           <span>{notification.message}</span>
-          <button onClick={() => setNotification(null)} className="ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
+          <button onClick={() => setNotification(null)} className="ml-2 text-gray-400 dark:text-ink-500 hover:text-gray-600 dark:hover:text-ink-300">
             <X size={16} />
           </button>
         </div>
@@ -241,7 +241,7 @@ export default function CustomerItemsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Customer Items</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">Belongings customers left behind — registered, tracked, and marked once claimed</p>
+          <p className="text-sm text-gray-500 dark:text-ink-400">Belongings customers left behind — registered, tracked, and marked once claimed</p>
         </div>
         <button
           onClick={openAddModal}
@@ -261,8 +261,8 @@ export default function CustomerItemsPage() {
 
       {/* Customer Item Collection Commission — separate from washing/ironing commission */}
       {commission && (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">
+        <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-ink-200 mb-3">
             <Wallet size={16} className="text-brand-600" />
             Customer Item Resolution Commission
           </div>
@@ -271,21 +271,21 @@ export default function CustomerItemsPage() {
               <div className="space-y-2">
                 {commission.byUser.map((u) => (
                   <div key={u.userId} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-300">{u.name}</span>
-                    <span className="font-medium text-slate-800 dark:text-slate-100">{u.count} items — ${u.commission.toFixed(2)}</span>
+                    <span className="text-slate-600 dark:text-ink-300">{u.name}</span>
+                    <span className="font-medium text-slate-800 dark:text-ink-100">{u.count} items — ${u.commission.toFixed(2)}</span>
                   </div>
                 ))}
-                <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-100 dark:border-slate-700 font-semibold text-slate-900 dark:text-white">
+                <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-100 dark:border-ink-700 font-semibold text-slate-900 dark:text-white">
                   <span>Total</span>
                   <span>{commission.totalClaimedCount} items — ${commission.totalCommission.toFixed(2)}</span>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-400 dark:text-slate-500">No items resolved yet.</p>
+              <p className="text-sm text-slate-400 dark:text-ink-500">No items resolved yet.</p>
             )
           ) : (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-300">Your total ({commission.myClaimedCount} items resolved)</span>
+              <span className="text-slate-600 dark:text-ink-300">Your total ({commission.myClaimedCount} items resolved)</span>
               <span className="font-semibold text-slate-900 dark:text-white text-base">${commission.myCommission.toFixed(2)}</span>
             </div>
           )}
@@ -293,14 +293,14 @@ export default function CustomerItemsPage() {
       )}
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 dark:bg-slate-700 rounded-xl p-1 flex-wrap">
+      <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+        <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1 flex-wrap">
           {['HELD', 'CLAIMED', 'DONATED', 'DISCARDED', 'All'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusTab(tab)}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
-                statusTab === tab ? 'bg-white dark:bg-slate-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                statusTab === tab ? 'bg-white dark:bg-ink-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-ink-400 hover:text-slate-700 dark:hover:text-ink-200'
               }`}
             >
               {tab === 'All' ? 'All' : STATUS_LABEL[tab]}
@@ -312,7 +312,7 @@ export default function CustomerItemsPage() {
           <select
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
-            className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none cursor-pointer"
+            className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2 focus:outline-none cursor-pointer"
           >
             <option value="All">All Branches</option>
             <option value="HQ">HQ</option>
@@ -320,17 +320,17 @@ export default function CustomerItemsPage() {
           </select>
         )}
 
-        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2 flex-1 min-w-[220px]">
-          <Search size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
+        <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2 flex-1 min-w-[220px]">
+          <Search size={15} className="text-slate-400 dark:text-ink-500 shrink-0" />
           <input
             type="text"
             placeholder="Search by customer ID, name, phone, or item..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none w-full"
+            className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none w-full"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition">
+            <button onClick={() => setSearch('')} className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition">
               <X size={15} />
             </button>
           )}
@@ -338,19 +338,19 @@ export default function CustomerItemsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-ink-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : filteredItems.length === 0 ? (
-          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-sm flex flex-col items-center gap-2">
-            <Package size={28} className="text-slate-300 dark:text-slate-600" />
+          <div className="p-10 text-center text-slate-400 dark:text-ink-500 text-sm flex flex-col items-center gap-2">
+            <Package size={28} className="text-slate-300 dark:text-ink-600" />
             No items found.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="bg-gray-50 dark:bg-slate-700/40 border-b border-gray-100 dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                <tr className="bg-gray-50 dark:bg-ink-700/40 border-b border-gray-100 dark:border-ink-700 text-xs text-gray-500 dark:text-ink-400 uppercase tracking-wider">
                   {canSeeAllBranches && <th className="p-4">Branch</th>}
                   <th className="p-4">Customer ID</th>
                   <th className="p-4">Customer Name</th>
@@ -364,15 +364,15 @@ export default function CustomerItemsPage() {
                   {canManage && <th className="p-4 text-right">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-slate-700 text-sm text-gray-700 dark:text-slate-300">
+              <tbody className="divide-y divide-gray-100 dark:divide-ink-700 text-sm text-gray-700 dark:text-ink-300">
                 {filteredItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/40 transition">
-                    {canSeeAllBranches && <td className="p-4 text-gray-600 dark:text-slate-300">{item.branch}</td>}
+                  <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-ink-700/40 transition">
+                    {canSeeAllBranches && <td className="p-4 text-gray-600 dark:text-ink-300">{item.branch}</td>}
                     <td className="p-4 font-extrabold text-slate-900 dark:text-white">{item.customerId}</td>
                     <td className="p-4 font-medium text-gray-900 dark:text-white">{item.customerName}</td>
-                    <td className="p-4 text-gray-600 dark:text-slate-300">{item.phone || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
-                    <td className="p-4 text-gray-600 dark:text-slate-300">{item.description}</td>
-                    <td className="p-4 text-gray-500 dark:text-slate-400">{item.date}</td>
+                    <td className="p-4 text-gray-600 dark:text-ink-300">{item.phone || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
+                    <td className="p-4 text-gray-600 dark:text-ink-300">{item.description}</td>
+                    <td className="p-4 text-gray-500 dark:text-ink-400">{item.date}</td>
                     <td className="p-4">
                       {item.status === 'HELD' ? (
                         <span
@@ -386,7 +386,7 @@ export default function CustomerItemsPage() {
                           )}
                         </span>
                       ) : (
-                        <span className="text-slate-300 dark:text-slate-600">—</span>
+                        <span className="text-slate-300 dark:text-ink-600">—</span>
                       )}
                     </td>
                     <td className="p-4">
@@ -395,16 +395,16 @@ export default function CustomerItemsPage() {
                       </span>
                     </td>
                     {user?.role === 'ADMIN' && (
-                      <td className="p-4 text-gray-500 dark:text-slate-400">{item.createdByName || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
+                      <td className="p-4 text-gray-500 dark:text-ink-400">{item.createdByName || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
                     )}
                     {user?.role === 'ADMIN' && (
-                      <td className="p-4 text-gray-500 dark:text-slate-400">
+                      <td className="p-4 text-gray-500 dark:text-ink-400">
                         {RESOLVED_STATUSES.includes(item.status) ? (
                           <span title={item.collectionMethod ? collectionMethodLabel(item.collectionMethod) : ''}>
                             {item.claimedByName || '—'}
                           </span>
                         ) : (
-                          <span className="text-slate-300 dark:text-slate-600">—</span>
+                          <span className="text-slate-300 dark:text-ink-600">—</span>
                         )}
                       </td>
                     )}
@@ -430,7 +430,7 @@ export default function CustomerItemsPage() {
                           )}
                           <button
                             onClick={() => openEditModal(item)}
-                            className="text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
+                            className="text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
                             title="Edit"
                           >
                             <Edit2 size={18} />
@@ -456,68 +456,68 @@ export default function CustomerItemsPage() {
       {/* Modal — Add / Edit Item */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white dark:bg-ink-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">{editingId ? 'Edit Customer Item' : 'Add Customer Item'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Customer ID</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Customer ID</label>
                 <input
                   type="text"
                   required
                   value={formData.customerId}
                   onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Customer Name</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Customer Name</label>
                 <input
                   type="text"
                   required
                   value={formData.customerName}
                   onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Phone Number</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Phone Number</label>
                 <input
                   type="tel"
                   placeholder="E.g. 0615xxxxxx"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Item Description</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Item Description</label>
                 <input
                   type="text"
                   required
                   placeholder="E.g. ID card, wallet, phone charger..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Date</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Date</label>
                   <input
                     type="date"
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 {canSeeAllBranches && (
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Branch</label>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Branch</label>
                     <select
                       value={formData.branch}
                       onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                      className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                     >
                       <option value="HQ">HQ</option>
                       <option value="KM5">KM5</option>
@@ -530,7 +530,7 @@ export default function CustomerItemsPage() {
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); setEditingId(null); }}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 border border-slate-300 dark:border-ink-600 rounded-lg text-sm font-medium text-gray-600 dark:text-ink-300 hover:bg-gray-50 dark:hover:bg-ink-700"
                 >
                   Cancel
                 </button>
@@ -549,21 +549,21 @@ export default function CustomerItemsPage() {
       {/* Modal — Resolve Item (Claimed / Donated / Discarded) */}
       {resolveTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white dark:bg-ink-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <div>
               <h2 className="text-xl font-bold text-gray-800 dark:text-white">Resolve Item</h2>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+              <p className="text-sm text-gray-500 dark:text-ink-400 mt-1">
                 {resolveTarget.customerName} — {resolveTarget.description}
               </p>
             </div>
             <form onSubmit={handleResolveSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Outcome</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Outcome</label>
                 <select
                   required
                   value={resolveOutcome}
                   onChange={(e) => setResolveOutcome(e.target.value)}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   {OUTCOMES.map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -572,14 +572,14 @@ export default function CustomerItemsPage() {
               </div>
               {resolveOutcome === 'CLAIMED' && (
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
                     How did the customer get it back?
                   </label>
                   <select
                     required
                     value={resolveMethod}
                     onChange={(e) => setResolveMethod(e.target.value)}
-                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="" disabled>Select one...</option>
                     {COLLECTION_METHODS.map((m) => (
@@ -589,7 +589,7 @@ export default function CustomerItemsPage() {
                 </div>
               )}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
                   {resolveOutcome === 'CLAIMED' ? 'Notes (optional)' : 'How/why was it donated or discarded?'}
                 </label>
                 <textarea
@@ -598,14 +598,14 @@ export default function CustomerItemsPage() {
                   placeholder={resolveOutcome === 'CLAIMED' ? 'E.g. where/how it was collected' : 'E.g. donated to the mosque, or thrown out — damaged beyond use'}
                   value={resolveNotes}
                   onChange={(e) => setResolveNotes(e.target.value)}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setResolveTarget(null)}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 border border-slate-300 dark:border-ink-600 rounded-lg text-sm font-medium text-gray-600 dark:text-ink-300 hover:bg-gray-50 dark:hover:bg-ink-700"
                 >
                   Cancel
                 </button>

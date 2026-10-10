@@ -118,21 +118,21 @@ export default function CustomerItemCommissionReportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Customer Item Commission Report</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">
+          <p className="text-sm text-gray-500 dark:text-ink-400">
             $0.50 per item resolved (claimed, donated, or discarded) — tracked entirely separately from washing/ironing commission
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+      <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
         {isAdmin && data?.byUser?.length > 0 && (
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
             <User size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
             <select
               value={selectedPersonId}
               onChange={(e) => setSelectedPersonId(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none cursor-pointer"
             >
               <option value="All">Everyone</option>
               {data.byUser.map((u) => (
@@ -141,32 +141,32 @@ export default function CustomerItemCommissionReportPage() {
             </select>
           </div>
         )}
-        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+        <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
           <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
             />
           </div>
-          <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
+          <span className="w-3 h-px bg-slate-300 dark:bg-ink-600" />
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">To</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
             />
           </div>
           {(dateFrom || dateTo) && (
             <button
               onClick={() => { setDateFrom(''); setDateTo(''); }}
               title="Clear date range — show all dates"
-              className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
+              className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition ml-1"
             >
               <X size={15} />
             </button>
@@ -180,7 +180,7 @@ export default function CustomerItemCommissionReportPage() {
                 : '';
               exportToCSV(`customer-item-commission-${dateRangeLabel}${personSlug}.csv`, csvRows);
             }}
-            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition ml-auto"
+            className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 hover:bg-slate-100 dark:hover:bg-ink-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-ink-200 transition ml-auto"
           >
             <Download size={16} /> Export CSV
           </button>
@@ -188,18 +188,18 @@ export default function CustomerItemCommissionReportPage() {
       </div>
 
       {loading ? (
-        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
+        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-ink-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
       ) : !data ? null : (
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
               <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-105 transition-transform">
                 <DollarSign size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">
                   {isAdmin ? (selectedPersonId === 'All' ? 'Total Commission' : `${data.byUser.find((u) => u.userId === selectedPersonId)?.name || ''}'s Commission`) : 'Your Commission'}
                 </p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">
@@ -207,13 +207,13 @@ export default function CustomerItemCommissionReportPage() {
                 </h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
               <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700 group-hover:scale-105 transition-transform">
                 <Package size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">
                   {isAdmin ? 'Items Resolved' : 'Your Items Resolved'}
                 </p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">
@@ -225,18 +225,18 @@ export default function CustomerItemCommissionReportPage() {
 
           {/* Per-person breakdown — Admin only */}
           {isAdmin && (
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-3">
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-ink-200">
                 <Wallet size={16} className="text-brand-600" />
                 Breakdown by Person
               </div>
               {data.byUser.length === 0 ? (
-                <p className="text-sm text-slate-400 dark:text-slate-500">No items resolved in this date range.</p>
+                <p className="text-sm text-slate-400 dark:text-ink-500">No items resolved in this date range.</p>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
+                <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-ink-700">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/70 dark:bg-slate-700/40">
+                      <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/70 dark:bg-ink-700/40">
                         <th className="py-3 px-3">Name</th>
                         <th className="py-3 px-3 text-right">Items Resolved</th>
                         <th className="py-3 px-3 text-right">Commission</th>
@@ -244,14 +244,14 @@ export default function CustomerItemCommissionReportPage() {
                     </thead>
                     <tbody>
                       {data.byUser.map((u) => (
-                        <tr key={u.userId} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition">
+                        <tr key={u.userId} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50/80 dark:hover:bg-ink-700/40 transition">
                           <td className="py-3 px-3 font-semibold text-slate-800 dark:text-white">{u.name}</td>
-                          <td className="py-3 px-3 text-right text-slate-600 dark:text-slate-300">{u.count}</td>
+                          <td className="py-3 px-3 text-right text-slate-600 dark:text-ink-300">{u.count}</td>
                           <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400">${u.commission.toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
-                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+                    <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                       <tr>
                         <td className="py-3 px-3 text-slate-800 dark:text-white">Total</td>
                         <td className="py-3 px-3 text-right text-slate-900 dark:text-white">{data.totalClaimedCount}</td>
@@ -265,8 +265,8 @@ export default function CustomerItemCommissionReportPage() {
           )}
 
           {/* Full claimed items history */}
-          <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">
+          <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-700 dark:text-ink-200">
               {isAdmin
                 ? selectedPersonId === 'All'
                   ? 'All Resolved Items'
@@ -274,15 +274,15 @@ export default function CustomerItemCommissionReportPage() {
                 : 'Your Resolved Items'}
             </h3>
             {items.length === 0 ? (
-              <div className="py-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 text-sm">
-                <Package size={28} className="text-slate-300 dark:text-slate-600" />
+              <div className="py-10 flex flex-col items-center gap-2 text-slate-400 dark:text-ink-500 text-sm">
+                <Package size={28} className="text-slate-300 dark:text-ink-600" />
                 No items resolved in this date range.
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
+              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-ink-700">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/70 dark:bg-slate-700/40">
+                    <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/70 dark:bg-ink-700/40">
                       <th className="py-3 px-3">Date Claimed</th>
                       <th className="py-3 px-3">Customer</th>
                       <th className="py-3 px-3">Item</th>
@@ -296,30 +296,30 @@ export default function CustomerItemCommissionReportPage() {
                   </thead>
                   <tbody>
                     {items.map((it) => (
-                      <tr key={it.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition">
-                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300">
+                      <tr key={it.id} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50/80 dark:hover:bg-ink-700/40 transition">
+                        <td className="py-3 px-3 text-slate-600 dark:text-ink-300">
                           {it.claimedAt ? new Date(it.claimedAt).toISOString().split('T')[0] : '—'}
                         </td>
                         <td className="py-3 px-3 font-semibold text-slate-800 dark:text-white">{it.customerName}</td>
-                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{it.description}</td>
-                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{it.branch}</td>
-                        {isAdmin && <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{it.claimedByName}</td>}
+                        <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{it.description}</td>
+                        <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{it.branch}</td>
+                        {isAdmin && <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{it.claimedByName}</td>}
                         <td className="py-3 px-3">
                           <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${OUTCOME_STYLE[it.status]}`}>
                             {OUTCOME_LABEL[it.status] || it.status}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300">
-                          {it.collectionMethod ? (COLLECTION_METHOD_LABEL[it.collectionMethod] || it.collectionMethod) : <span className="text-slate-300 dark:text-slate-600">—</span>}
+                        <td className="py-3 px-3 text-slate-600 dark:text-ink-300">
+                          {it.collectionMethod ? (COLLECTION_METHOD_LABEL[it.collectionMethod] || it.collectionMethod) : <span className="text-slate-300 dark:text-ink-600">—</span>}
                         </td>
-                        <td className="py-3 px-3 text-slate-500 dark:text-slate-400 max-w-xs truncate" title={it.collectionNotes || ''}>
-                          {it.collectionNotes || <span className="text-slate-300 dark:text-slate-600">—</span>}
+                        <td className="py-3 px-3 text-slate-500 dark:text-ink-400 max-w-xs truncate" title={it.collectionNotes || ''}>
+                          {it.collectionNotes || <span className="text-slate-300 dark:text-ink-600">—</span>}
                         </td>
                         <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400">${it.commission.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+                  <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                     <tr>
                       <td colSpan={isAdmin ? 8 : 7} className="py-3 px-3 text-slate-800 dark:text-white">Total:</td>
                       <td className="py-3 px-3 text-right text-amber-800 dark:text-amber-400">

@@ -119,7 +119,7 @@ export default function UsersPage() {
           <span>{notification.message}</span>
           <button
             onClick={() => setNotification(null)}
-            className="ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
+            className="ml-2 text-gray-400 dark:text-ink-500 hover:text-gray-600 dark:hover:text-ink-300"
           >
             <X size={16} />
           </button>
@@ -129,7 +129,7 @@ export default function UsersPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">System Users Management</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">Add, view, or remove accounts that access the system</p>
+          <p className="text-sm text-gray-500 dark:text-ink-400">Add, view, or remove accounts that access the system</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -139,13 +139,13 @@ export default function UsersPage() {
         </button>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white dark:bg-ink-800 rounded-xl shadow-sm border border-gray-100 dark:border-ink-700 overflow-hidden">
         {loading ? (
-          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500 dark:text-brand-400" /><span className="text-sm font-medium">Loading data...</span></div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-ink-500"><Loader2 size={28} className="animate-spin text-brand-500 dark:text-brand-400" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 dark:bg-slate-700/40 border-b border-gray-100 dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+              <tr className="bg-gray-50 dark:bg-ink-700/40 border-b border-gray-100 dark:border-ink-700 text-xs text-gray-500 dark:text-ink-400 uppercase tracking-wider">
                 <th className="p-4">Name</th>
                 <th className="p-4">Email</th>
                 <th className="p-4">Role</th>
@@ -154,11 +154,11 @@ export default function UsersPage() {
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-slate-700 text-sm text-gray-700 dark:text-slate-300">
+            <tbody className="divide-y divide-gray-100 dark:divide-ink-700 text-sm text-gray-700 dark:text-ink-300">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/40 transition">
+                <tr key={u.id} className="hover:bg-gray-50/50 dark:hover:bg-ink-700/40 transition">
                   <td className="p-4 font-medium text-gray-900 dark:text-white">{u.fullName}</td>
-                  <td className="p-4 text-gray-500 dark:text-slate-400">{u.email}</td>
+                  <td className="p-4 text-gray-500 dark:text-ink-400">{u.email}</td>
                   <td className="p-4">
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
@@ -169,18 +169,18 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className="p-4">
-                    <span className="inline-flex items-center gap-1 text-gray-600 dark:text-slate-300">
+                    <span className="inline-flex items-center gap-1 text-gray-600 dark:text-ink-300">
                       <Building size={14} /> {u.branch || '—'}
                     </span>
                   </td>
-                  <td className="p-4 text-gray-500 dark:text-slate-400">
+                  <td className="p-4 text-gray-500 dark:text-ink-400">
                     {u.role === 'VIEWER' ? (u.department || 'Both') : '—'}
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => { setPasswordTarget(u); setNewPassword(''); }}
-                        className="text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
+                        className="text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
                         title="Change Password"
                       >
                         <KeyRound size={18} />
@@ -204,49 +204,49 @@ export default function UsersPage() {
       {/* Modal - Create User */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white dark:bg-ink-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">Add New User</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Full Name</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Email</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Email</label>
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Password</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Password</label>
                 <input
                   type="password"
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Role</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Role</label>
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="SALES">SALES</option>
                     <option value="ADMIN">ADMIN</option>
@@ -259,11 +259,11 @@ export default function UsersPage() {
 
                 {formData.role !== 'ADMIN' && (
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Branch</label>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Branch</label>
                     <select
                       value={formData.branch}
                       onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                      className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                     >
                       <option value="HQ">HQ</option>
                       <option value="KM5">KM5</option>
@@ -274,11 +274,11 @@ export default function UsersPage() {
 
               {formData.role === 'VIEWER' && (
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Department Access</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Department Access</label>
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="">Both (Washing &amp; Ironing)</option>
                     <option value="WASHING">Washing only</option>
@@ -291,7 +291,7 @@ export default function UsersPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 border border-slate-300 dark:border-ink-600 rounded-lg text-sm font-medium text-gray-600 dark:text-ink-300 hover:bg-gray-50 dark:hover:bg-ink-700"
                 >
                   Cancel
                 </button>
@@ -310,14 +310,14 @@ export default function UsersPage() {
       {/* Modal - Change Password */}
       {passwordTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white dark:bg-ink-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">Change Password</h2>
-            <p className="text-sm text-gray-500 dark:text-slate-400">
-              Setting a new password for <span className="font-semibold text-gray-700 dark:text-slate-200">{passwordTarget.fullName}</span> ({passwordTarget.email})
+            <p className="text-sm text-gray-500 dark:text-ink-400">
+              Setting a new password for <span className="font-semibold text-gray-700 dark:text-ink-200">{passwordTarget.fullName}</span> ({passwordTarget.email})
             </p>
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">New Password</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">New Password</label>
                 <input
                   type="text"
                   required
@@ -326,14 +326,14 @@ export default function UsersPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setPasswordTarget(null)}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 border border-slate-300 dark:border-ink-600 rounded-lg text-sm font-medium text-gray-600 dark:text-ink-300 hover:bg-gray-50 dark:hover:bg-ink-700"
                 >
                   Cancel
                 </button>

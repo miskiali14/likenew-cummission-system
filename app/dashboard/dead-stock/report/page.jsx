@@ -153,47 +153,47 @@ export default function DeadStockReportPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dead Stock Report</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">Old, uncollected orders — what's still sitting vs. what's gone back out</p>
+          <p className="text-sm text-gray-500 dark:text-ink-400">Old, uncollected orders — what's still sitting vs. what's gone back out</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+      <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
         <select
           value={branchFilter}
           onChange={(e) => setBranchFilter(e.target.value)}
-          className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none cursor-pointer"
+          className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2 focus:outline-none cursor-pointer"
         >
           <option value="All">All Branches</option>
           <option value="HQ">HQ</option>
           <option value="KM5">KM5</option>
         </select>
-        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+        <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
           <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
             />
           </div>
-          <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
+          <span className="w-3 h-px bg-slate-300 dark:bg-ink-600" />
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
+            <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">To</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
+              className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none"
             />
           </div>
           {(dateFrom || dateTo) && (
             <button
               onClick={() => { setDateFrom(''); setDateTo(''); }}
               title="Clear date range — show all dates"
-              className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
+              className="text-slate-400 dark:text-ink-500 hover:text-red-500 transition ml-1"
             >
               <X size={15} />
             </button>
@@ -219,7 +219,7 @@ export default function DeadStockReportPage() {
                 }))
               )
             }
-            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition ml-auto"
+            className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 hover:bg-slate-100 dark:hover:bg-ink-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-ink-200 transition ml-auto"
           >
             <Download size={16} /> Export CSV
           </button>
@@ -227,107 +227,107 @@ export default function DeadStockReportPage() {
       </div>
 
       {loading ? (
-        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
+        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-ink-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
       ) : items.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 text-sm shadow-sm">
-          <Boxes size={28} className="text-slate-300 dark:text-slate-600" />
+        <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-ink-500 text-sm shadow-sm">
+          <Boxes size={28} className="text-slate-300 dark:text-ink-600" />
           No dead stock entries found for this filter.
         </div>
       ) : (
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-400 to-slate-600" />
-              <div className="p-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-700/60 text-slate-600 dark:text-slate-300 rounded-xl border border-slate-100 dark:border-slate-600 group-hover:scale-105 transition-transform">
+              <div className="p-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-ink-700 dark:to-ink-700/60 text-slate-600 dark:text-ink-300 rounded-xl border border-slate-100 dark:border-ink-600 group-hover:scale-105 transition-transform">
                 <Boxes size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Total Entries</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Total Entries</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">
-                  {stats.totalEntries} <span className="text-sm font-medium text-slate-400 dark:text-slate-500">({stats.totalQuantity} pcs)</span>
+                  {stats.totalEntries} <span className="text-sm font-medium text-slate-400 dark:text-ink-500">({stats.totalQuantity} pcs)</span>
                 </h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
               <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/40 dark:to-amber-800/40 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-100 dark:border-amber-800 group-hover:scale-105 transition-transform">
                 <Clock size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">In Stock</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">In Stock</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">
-                  {stats.inStockCount} <span className="text-sm font-medium text-slate-400 dark:text-slate-500">({stats.inStockQty} pcs)</span>
+                  {stats.inStockCount} <span className="text-sm font-medium text-slate-400 dark:text-ink-500">({stats.inStockQty} pcs)</span>
                 </h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
               <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Given Out</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Given Out</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">
-                  {stats.givenOutCount} <span className="text-sm font-medium text-slate-400 dark:text-slate-500">({stats.givenOutQty} pcs)</span>
+                  {stats.givenOutCount} <span className="text-sm font-medium text-slate-400 dark:text-ink-500">({stats.givenOutQty} pcs)</span>
                 </h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-400 to-violet-600" />
               <div className="p-3 bg-gradient-to-br from-violet-50 to-violet-100 text-violet-600 rounded-xl border border-violet-100 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Donated</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Donated</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.donatedCount}</h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-300 to-slate-500" />
-              <div className="p-3 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-700/60 text-slate-600 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-600 group-hover:scale-105 transition-transform">
+              <div className="p-3 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-ink-700 dark:to-ink-700/60 text-slate-600 dark:text-ink-300 rounded-xl border border-slate-200 dark:border-ink-600 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Discarded</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Discarded</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.discardedCount}</h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
               <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Given Out Rate</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Given Out Rate</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.givenOutRate.toFixed(0)}%</h3>
               </div>
             </div>
-            <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
               <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-105 transition-transform">
                 <DollarSign size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Resolution Commission</p>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Resolution Commission</p>
                 <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
               </div>
             </div>
           </div>
 
           {/* Commission breakdown by person — separate from every other commission */}
-          <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200">
+          <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-ink-200">
               <Wallet size={16} className="text-brand-600" />
               Commission by Person (${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)} per order resolved — given out, donated, or discarded)
             </div>
             {byUser.length === 0 ? (
-              <p className="text-sm text-slate-400 dark:text-slate-500">No orders resolved in this date range.</p>
+              <p className="text-sm text-slate-400 dark:text-ink-500">No orders resolved in this date range.</p>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
+              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-ink-700">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/70 dark:bg-slate-700/40">
+                    <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/70 dark:bg-ink-700/40">
                       <th className="py-3 px-3">Name</th>
                       <th className="py-3 px-3 text-right">Orders Resolved</th>
                       <th className="py-3 px-3 text-right">Commission</th>
@@ -335,14 +335,14 @@ export default function DeadStockReportPage() {
                   </thead>
                   <tbody>
                     {byUser.map((u) => (
-                      <tr key={u.userId} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition">
+                      <tr key={u.userId} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50/80 dark:hover:bg-ink-700/40 transition">
                         <td className="py-3 px-3 font-semibold text-slate-800 dark:text-white">{u.name}</td>
-                        <td className="py-3 px-3 text-right text-slate-600 dark:text-slate-300">{u.count}</td>
+                        <td className="py-3 px-3 text-right text-slate-600 dark:text-ink-300">{u.count}</td>
                         <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400">${u.commission.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
+                  <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
                     <tr>
                       <td className="py-3 px-3 text-slate-800 dark:text-white">Total</td>
                       <td className="py-3 px-3 text-right text-slate-900 dark:text-white">{stats.resolvedCount}</td>
@@ -356,23 +356,23 @@ export default function DeadStockReportPage() {
 
           {/* Breakdown by category / branch */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-3">
-              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">By Category</h3>
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-700 dark:text-ink-200">By Category</h3>
               <div className="space-y-2">
                 {byCategory.map((c) => (
                   <div key={c.category} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-300">{c.category}</span>
+                    <span className="text-slate-600 dark:text-ink-300">{c.category}</span>
                     <span className="font-semibold text-slate-800 dark:text-white">{c.count} entries — {c.quantity} pcs</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-3">
-              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">By Branch</h3>
+            <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-700 dark:text-ink-200">By Branch</h3>
               <div className="space-y-2">
                 {byBranch.map((b) => (
                   <div key={b.branch} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-300">{b.branch}</span>
+                    <span className="text-slate-600 dark:text-ink-300">{b.branch}</span>
                     <span className="font-semibold text-slate-800 dark:text-white">{b.count} entries — {b.quantity} pcs</span>
                   </div>
                 ))}
@@ -381,12 +381,12 @@ export default function DeadStockReportPage() {
           </div>
 
           {/* Full table */}
-          <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">All Entries</h3>
-            <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
+          <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-700 dark:text-ink-200">All Entries</h3>
+            <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-ink-700">
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/70 dark:bg-slate-700/40">
+                  <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/70 dark:bg-ink-700/40">
                     <th className="py-3 px-3">Date</th>
                     <th className="py-3 px-3">Branch</th>
                     <th className="py-3 px-3">Order Ref</th>
@@ -399,24 +399,24 @@ export default function DeadStockReportPage() {
                 </thead>
                 <tbody>
                   {sortedItems.map((it) => (
-                    <tr key={it.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition">
-                      <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{it.date}</td>
-                      <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{it.branch}</td>
+                    <tr key={it.id} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50/80 dark:hover:bg-ink-700/40 transition">
+                      <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{it.date}</td>
+                      <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{it.branch}</td>
                       <td className="py-3 px-3 font-extrabold text-slate-900 dark:text-white">{it.orderId}</td>
                       <td className="py-3 px-3">
-                        <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+                        <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-ink-700 text-slate-700 dark:text-ink-300 border border-slate-200 dark:border-ink-600">
                           {it.category}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-right font-semibold text-slate-700 dark:text-slate-200">{it.quantity}</td>
+                      <td className="py-3 px-3 text-right font-semibold text-slate-700 dark:text-ink-200">{it.quantity}</td>
                       <td className="py-3 px-3">
                         <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[it.status]}`}>
                           {STATUS_LABEL[it.status] || it.status}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{it.givenOutByName || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
+                      <td className="py-3 px-3 text-slate-600 dark:text-ink-300">{it.givenOutByName || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
                       <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400">
-                        {RESOLVED_STATUSES.includes(it.status) ? `$${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)}` : <span className="text-slate-300 dark:text-slate-600">—</span>}
+                        {RESOLVED_STATUSES.includes(it.status) ? `$${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)}` : <span className="text-slate-300 dark:text-ink-600">—</span>}
                       </td>
                     </tr>
                   ))}

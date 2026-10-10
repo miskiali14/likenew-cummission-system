@@ -369,13 +369,13 @@ export default function ReportsPage() {
       <div className="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Reports</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">Generate a printable weekly overview or an individual staff record</p>
+          <p className="text-sm text-gray-500 dark:text-ink-400">Generate a printable weekly overview or an individual staff record</p>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="no-print bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 dark:bg-slate-700 rounded-xl p-1">
+      <div className="no-print bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+        <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
           <button
             onClick={() => setReportType('weekly')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
@@ -398,7 +398,7 @@ export default function ReportsPage() {
           <select
             value={selectedEmployeeId}
             onChange={(e) => setSelectedEmployeeId(e.target.value)}
-            className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2.5 focus:outline-none cursor-pointer min-w-[220px]"
+            className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2.5 focus:outline-none cursor-pointer min-w-[220px]"
           >
             <option value="">Select a staff member...</option>
             {employees.map((emp) => (
@@ -414,14 +414,14 @@ export default function ReportsPage() {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none"
+            className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2 focus:outline-none"
           />
-          <span className="text-slate-400 dark:text-slate-500">–</span>
+          <span className="text-slate-400 dark:text-ink-500">–</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none"
+            className="border border-slate-200 dark:border-ink-600 bg-slate-50 dark:bg-ink-700 text-sm font-medium text-slate-700 dark:text-ink-200 rounded-xl p-2 focus:outline-none"
           />
         </div>
 
@@ -435,25 +435,25 @@ export default function ReportsPage() {
         )}
       </div>
 
-      {loading && <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>}
+      {loading && <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-ink-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>}
 
       {reportType === 'weekly' && !loading && !weekly && (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 text-sm shadow-sm">
-          <FileText size={28} className="text-slate-300 dark:text-slate-600" />
+        <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-ink-500 text-sm shadow-sm">
+          <FileText size={28} className="text-slate-300 dark:text-ink-600" />
           No orders found for this date range.
         </div>
       )}
 
       {reportType === 'individual' && !loading && !selectedEmployee && (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 text-sm shadow-sm">
-          <Users size={28} className="text-slate-300 dark:text-slate-600" />
+        <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-ink-500 text-sm shadow-sm">
+          <Users size={28} className="text-slate-300 dark:text-ink-600" />
           Select a staff member above to generate their report.
         </div>
       )}
 
       {reportType === 'individual' && !loading && selectedEmployee && !individual && (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500 text-sm shadow-sm">
-          <FileText size={28} className="text-slate-300 dark:text-slate-600" />
+        <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 dark:text-ink-500 text-sm shadow-sm">
+          <FileText size={28} className="text-slate-300 dark:text-ink-600" />
           No orders found for {selectedEmployee.name} in this date range.
         </div>
       )}
