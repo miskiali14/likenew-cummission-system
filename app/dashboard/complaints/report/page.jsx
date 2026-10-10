@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { MessageSquareWarning, CheckCircle2, Clock, Calendar, Download, X, Timer } from 'lucide-react';
+import { Loader2, MessageSquareWarning, CheckCircle2, Clock, Calendar, Download, X, Timer } from 'lucide-react';
 
 const CATEGORY_LABEL = {
   DAMAGED: 'Damaged Item',
@@ -229,9 +229,10 @@ export default function ComplaintsReportPage() {
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-gray-500">Loading data...</div>
+        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
       ) : complaints.length === 0 ? (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-400 text-sm shadow-sm">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 text-sm shadow-sm">
+          <MessageSquareWarning size={28} className="text-slate-300" />
           No complaints found for this filter.
         </div>
       ) : (

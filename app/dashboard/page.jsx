@@ -220,9 +220,10 @@ function StaffSummaryReport({
       </div>
 
       {staffSummary.length === 0 ? (
-        <p className="text-center py-8 text-slate-400 text-sm">
-          No staff summary data found for this filter.
-        </p>
+        <div className="py-10 flex flex-col items-center gap-2 text-slate-400">
+          <Users size={28} className="text-slate-300" />
+          <p className="text-sm">No staff summary data found for this filter.</p>
+        </div>
       ) : (
         <>
           {/* Top performer highlight cards */}

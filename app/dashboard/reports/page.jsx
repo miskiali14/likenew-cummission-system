@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
 import { calculateOrderCommission } from '@/lib/commission';
 import { getCommissionCountedIds } from '@/lib/duplicates';
-import { Printer, FileText, Users } from 'lucide-react';
+import { Loader2, Printer, FileText, Users } from 'lucide-react';
 
 const SECTION_LABEL = { WASHING: 'Dhaqmo', IRONING: 'Feero' };
 const RATE_LABEL = { WASHING: '$0.07 / $0.10 / $0.15', IRONING: '$0.10 / $0.15 / $0.20' };
@@ -435,22 +435,25 @@ export default function ReportsPage() {
         )}
       </div>
 
-      {loading && <div className="p-8 text-center text-gray-500">Loading data...</div>}
+      {loading && <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>}
 
       {reportType === 'weekly' && !loading && !weekly && (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-400 text-sm shadow-sm">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 text-sm shadow-sm">
+          <FileText size={28} className="text-slate-300" />
           No orders found for this date range.
         </div>
       )}
 
       {reportType === 'individual' && !loading && !selectedEmployee && (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-400 text-sm shadow-sm">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 text-sm shadow-sm">
+          <Users size={28} className="text-slate-300" />
           Select a staff member above to generate their report.
         </div>
       )}
 
       {reportType === 'individual' && !loading && selectedEmployee && !individual && (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-400 text-sm shadow-sm">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 text-sm shadow-sm">
+          <FileText size={28} className="text-slate-300" />
           No orders found for {selectedEmployee.name} in this date range.
         </div>
       )}

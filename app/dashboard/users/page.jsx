@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { UserPlus, Trash2, Shield, Building, AlertCircle, CheckCircle2, X, KeyRound } from 'lucide-react';
+import { Loader2, UserPlus, Trash2, Shield, Building, AlertCircle, CheckCircle2, X, KeyRound } from 'lucide-react';
 
 export default function UsersPage() {
   const router = useRouter();
@@ -105,7 +105,7 @@ export default function UsersPage() {
       {/* Dynamic Browser UI Notification Banner */}
       {notification && (
         <div
-          className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium border transition-all animate-bounce-short ${
+          className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium border transition-all animate-toast-in ${
             notification.type === 'error'
               ? 'bg-red-50 text-red-800 border-red-200'
               : 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -141,7 +141,7 @@ export default function UsersPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading data...</div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>

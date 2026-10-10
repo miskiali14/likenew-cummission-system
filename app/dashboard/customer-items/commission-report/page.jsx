@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { DollarSign, Package, Calendar, Download, X, Wallet, User } from 'lucide-react';
+import { Loader2, DollarSign, Package, Calendar, Download, X, Wallet, User } from 'lucide-react';
 
 const COLLECTION_METHOD_LABEL = {
   IN_PERSON: 'Picked up in person',
@@ -188,7 +188,7 @@ export default function CustomerItemCommissionReportPage() {
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-gray-500">Loading data...</div>
+        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
       ) : !data ? null : (
         <>
           {/* Summary cards */}
@@ -274,7 +274,10 @@ export default function CustomerItemCommissionReportPage() {
                 : 'Your Resolved Items'}
             </h3>
             {items.length === 0 ? (
-              <p className="text-center py-8 text-slate-400 text-sm">No items resolved in this date range.</p>
+              <div className="py-10 flex flex-col items-center gap-2 text-slate-400 text-sm">
+                <Package size={28} className="text-slate-300" />
+                No items resolved in this date range.
+              </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-slate-100">
                 <table className="w-full text-left border-collapse text-sm">

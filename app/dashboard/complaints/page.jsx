@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, Clock, X } from 'lucide-react';
+import { Loader2, Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, Clock, X } from 'lucide-react';
 
 const CATEGORIES = [
   { value: 'DAMAGED', label: 'Damaged Item' },
@@ -353,7 +353,7 @@ export default function ComplaintsPage() {
       {/* Table */}
       <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading data...</div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : filteredComplaints.length === 0 ? (
           <div className="p-10 text-center text-slate-400 text-sm flex flex-col items-center gap-2">
             <MessageSquareWarning size={28} className="text-slate-300" />

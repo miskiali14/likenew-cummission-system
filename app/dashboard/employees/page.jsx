@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { UserPlus, Trash2, Edit2, Building, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { Loader2, UserPlus, Trash2, Edit2, Building, AlertCircle, CheckCircle2, X } from 'lucide-react';
 
 const emptyForm = { name: '', branch: 'HQ', department: 'WASHING' };
 
@@ -133,7 +133,7 @@ export default function EmployeesPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading data...</div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>

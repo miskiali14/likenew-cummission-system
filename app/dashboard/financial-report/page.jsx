@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { DollarSign, Calendar, Download, TrendingUp, Package, X, User } from 'lucide-react';
+import { Loader2, Inbox, DollarSign, Calendar, Download, TrendingUp, Package, X, User } from 'lucide-react';
 import { calculateOrderCommission } from '@/lib/commission';
 import { findDuplicateOrderKeys, getCommissionCountedIds } from '@/lib/duplicates';
 
@@ -303,9 +303,10 @@ export default function FinancialReportPage() {
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-gray-500">Loading data...</div>
+        <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
       ) : rows.length === 0 ? (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 text-center text-slate-400 text-sm shadow-sm">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-10 flex flex-col items-center gap-2 text-slate-400 text-sm shadow-sm">
+          <Inbox size={28} className="text-slate-300" />
           No commission data found for this filter.
         </div>
       ) : (
@@ -527,15 +528,17 @@ export default function FinancialReportPage() {
         </div>
 
         {!personalEmployeeId ? (
-          <p className="text-center py-8 text-slate-400 text-sm">
+          <div className="py-10 flex flex-col items-center gap-2 text-slate-400 text-sm">
+            <User size={28} className="text-slate-300" />
             Select a staff member above to view their personal report.
-          </p>
+          </div>
         ) : personalLoading ? (
-          <div className="p-8 text-center text-gray-500">Loading data...</div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : personalLogs.length === 0 ? (
-          <p className="text-center py-8 text-slate-400 text-sm">
+          <div className="py-10 flex flex-col items-center gap-2 text-slate-400 text-sm">
+            <Inbox size={28} className="text-slate-300" />
             No orders found for {selectedEmployee?.name} in this date range.
-          </p>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
