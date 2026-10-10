@@ -28,8 +28,10 @@ function NavLink({ href, icon: Icon, label, isActive, onClose, indent }) {
     <Link
       href={href}
       onClick={onClose}
-      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition text-sm ${indent ? 'ml-2' : ''} ${
-        isActive ? 'bg-brand-600 text-white font-medium' : 'text-gray-300 hover:bg-gray-800'
+      className={`flex items-center gap-2.5 pr-3 py-2.5 rounded-lg transition text-sm border-l-2 ${indent ? 'ml-2' : ''} ${
+        isActive
+          ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white font-medium border-l-white/80 pl-[10px] shadow-[0_4px_12px_-2px_rgba(109,70,152,0.6)]'
+          : 'text-slate-300 border-l-transparent hover:bg-white/5 hover:text-white pl-3'
       }`}
     >
       <Icon size={16} className="shrink-0" />
@@ -66,7 +68,7 @@ function NavGroup({ storageKey, label, children, defaultOpen = true }) {
     <div>
       <button
         onClick={toggle}
-        className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-300 transition"
+        className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 uppercase tracking-wide hover:text-slate-300 hover:bg-white/5 transition"
       >
         <span>{label}</span>
         <ChevronDown size={14} className={`transition-transform ${open ? '' : '-rotate-90'}`} />
@@ -93,14 +95,17 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
         />
       )}
       <aside
-        className={`w-64 bg-gray-900 text-white min-h-screen p-4 flex flex-col justify-between
+        className={`w-64 bg-gradient-to-b from-brand-900 via-slate-900 to-slate-900 text-white min-h-screen p-4 flex flex-col justify-between
           fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-in-out
           md:static md:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
       <div onClick={(e) => { if (e.target.closest('a')) onClose(); }}>
-        <div className="mb-6 font-bold text-xl tracking-wide text-center border-b border-gray-800 pb-4">
-          Likenew Laundry
+        <div className="mb-6 flex items-center gap-2.5 border-b border-white/10 pb-4">
+          <img src="/likenew-logo.png" alt="" className="w-9 h-9 rounded-lg shadow-sm shrink-0" />
+          <div className="font-bold text-base tracking-wide leading-tight">
+            Likenew<br />Laundry
+          </div>
         </div>
 
         <nav className="space-y-4 overflow-y-auto max-h-[calc(100vh-140px)] pr-1">
@@ -135,14 +140,14 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
                 <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} indent />
               </NavGroup>
 
-              <div className="border-t border-gray-800 pt-1" />
+              <div className="border-t border-white/10 pt-1" />
             </>
           )}
 
           {/* ================= SALES ================= */}
           {userRole === 'SALES' && (
             <>
-              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Sales Section</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1">Sales Section</div>
               <NavLink href="/dashboard" icon={WashingMachine} label="Washing Logs & Report" isActive={isActive('/dashboard')} />
               <NavLink href="/dashboard/complaints" icon={MessageSquareWarning} label="Complaints" isActive={isActive('/dashboard/complaints')} />
             </>
@@ -151,7 +156,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
           {/* ================= CUSTOMER CARE ================= */}
           {userRole === 'CUSTOMER_CARE' && (
             <>
-              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1 flex items-center gap-1.5">
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1 flex items-center gap-1.5">
                 <Headset size={14} /> Customer Care
               </div>
               <NavLink href="/dashboard/complaints" icon={MessageSquareWarning} label="Complaints" isActive={isActive('/dashboard/complaints')} />
@@ -164,7 +169,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
           {/* ================= CALL CENTER ================= */}
           {userRole === 'CALL_CENTER' && (
             <>
-              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1 flex items-center gap-1.5">
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1 flex items-center gap-1.5">
                 <PhoneCall size={14} /> Call Center
               </div>
               <NavLink href="/dashboard/customer-items" icon={Briefcase} label="Customer Items" isActive={isActive('/dashboard/customer-items')} />
@@ -176,7 +181,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
           {/* ================= QUALITY CONTROL ================= */}
           {userRole === 'QUALITY_CONTROL' && (
             <>
-              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">QC Section</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1">QC Section</div>
               <NavLink href="/dashboard" icon={Shirt} label="Ironing Logs & Report" isActive={isActive('/dashboard')} />
             </>
           )}
@@ -184,7 +189,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
           {/* ================= VIEWER (read-only) ================= */}
           {userRole === 'VIEWER' && (
             <>
-              <div className="text-xs font-semibold text-gray-500 uppercase px-3 py-1">Viewer</div>
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1">Viewer</div>
               <NavLink href="/dashboard" icon={Eye} label="Branch Overview" isActive={isActive('/dashboard')} />
             </>
           )}
@@ -192,9 +197,14 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
       </div>
 
       {/* Profile Info */}
-      <div className="border-t border-gray-800 pt-4">
-        <div className="text-sm font-semibold">{user?.fullName || 'User'}</div>
-        <div className="text-xs text-brand-300 capitalize">{user?.role} — {user?.branch || 'HQ'}</div>
+      <div className="border-t border-white/10 pt-4 flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">
+          {(user?.fullName || 'U').trim().charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0">
+          <div className="text-sm font-semibold truncate">{user?.fullName || 'User'}</div>
+          <div className="text-xs text-brand-300 capitalize truncate">{user?.role} — {user?.branch || 'HQ'}</div>
+        </div>
       </div>
       </aside>
     </>
