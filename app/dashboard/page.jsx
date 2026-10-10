@@ -137,7 +137,7 @@ function StaffSummaryReport({
     <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+          <div className="p-2.5 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100">
             <Users size={20} />
           </div>
           <div>
@@ -238,13 +238,13 @@ function StaffSummaryReport({
               return (
                 <div
                   key={idx}
-                  className={`relative rounded-2xl p-4 border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 ring-1 ${ringColor} shadow-sm`}
+                  className={`relative rounded-2xl p-4 border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 ring-1 ${ringColor} shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
                 >
                   <span className={`absolute -top-2.5 -right-2.5 text-xs font-bold px-2 py-1 rounded-full border shadow-sm ${badgeColor}`}>
                     {medal} #{idx + 1}
                   </span>
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 shrink-0 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-sm">
+                    <div className="w-11 h-11 shrink-0 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
                       {getInitials(staff.staffName)}
                     </div>
                     <div className="min-w-0">

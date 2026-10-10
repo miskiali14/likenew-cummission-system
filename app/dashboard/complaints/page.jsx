@@ -282,21 +282,25 @@ export default function ComplaintsPage() {
       {/* Status counts — always shows the full breakdown, independent of the active tab */}
       {statusCounts && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white border border-slate-200/80 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+          <div className="relative bg-white border border-slate-200/80 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-400 to-slate-600" />
             <span className="text-sm text-slate-500">Total</span>
-            <span className="text-lg font-bold text-slate-800">{statusCounts.total}</span>
+            <span className="text-lg font-bold text-slate-800 tabular-nums">{statusCounts.total}</span>
           </div>
-          <div className="bg-white border border-red-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+          <div className="relative bg-white border border-red-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
             <span className="text-sm text-red-600">Open</span>
-            <span className="text-lg font-bold text-red-700">{statusCounts.open}</span>
+            <span className="text-lg font-bold text-red-700 tabular-nums">{statusCounts.open}</span>
           </div>
-          <div className="bg-white border border-amber-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+          <div className="relative bg-white border border-amber-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
             <span className="text-sm text-amber-600">In Progress</span>
-            <span className="text-lg font-bold text-amber-700">{statusCounts.inProgress}</span>
+            <span className="text-lg font-bold text-amber-700 tabular-nums">{statusCounts.inProgress}</span>
           </div>
-          <div className="bg-white border border-emerald-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+          <div className="relative bg-white border border-emerald-200 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
             <span className="text-sm text-emerald-600">Resolved</span>
-            <span className="text-lg font-bold text-emerald-700">{statusCounts.resolved}</span>
+            <span className="text-lg font-bold text-emerald-700 tabular-nums">{statusCounts.resolved}</span>
           </div>
         </div>
       )}
