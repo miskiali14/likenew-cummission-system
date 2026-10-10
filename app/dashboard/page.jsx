@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '../../lib/api';
 import { findDuplicateOrderKeys } from '../../lib/duplicates';
+import ThemeToggle from '../../components/ThemeToggle';
 import {
   BarChart,
   Bar,
@@ -134,37 +135,37 @@ function StaffSummaryReport({
   }, [staffSummary]);
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+    <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 dark:border-slate-700 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100">
+          <div className="p-2.5 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700">
             <Users size={20} />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-800">{title}</h2>
-            <p className="text-xs text-slate-500">{subtitle}</p>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
           </div>
         </div>
         {hasDateRangePicker && (
-          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
-            <Calendar size={15} className="text-brand-500 shrink-0" />
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+            <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => onDateFromChange(e.target.value)}
-                className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
               />
             </div>
-            <span className="w-3 h-px bg-slate-300" />
+            <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">To</span>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => onDateToChange(e.target.value)}
-                className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
               />
             </div>
             {(dateFrom || dateTo) && (
@@ -197,31 +198,31 @@ function StaffSummaryReport({
                 }))
               )
             }
-            className="flex items-center gap-2 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 transition"
+            className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition"
           >
             <Download size={16} /> Export CSV
           </button>
         )}
         {staffSummary.length > 0 && (
-          <div className="flex items-center gap-4 text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5">
-            <span className="text-slate-500">
-              Team Total: <b className="text-emerald-600">{staffSummaryTotals.totalItems} Pcs</b>
+          <div className="flex items-center gap-4 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-2.5">
+            <span className="text-slate-500 dark:text-slate-400">
+              Team Total: <b className="text-emerald-600 dark:text-emerald-400">{staffSummaryTotals.totalItems} Pcs</b>
             </span>
-            <span className="w-px h-4 bg-slate-200" />
-            <span className="text-slate-500">
-              <b className="text-slate-900">{staffSummaryTotals.totalOrders}</b> Orders
+            <span className="w-px h-4 bg-slate-200 dark:bg-slate-600" />
+            <span className="text-slate-500 dark:text-slate-400">
+              <b className="text-slate-900 dark:text-white">{staffSummaryTotals.totalOrders}</b> Orders
             </span>
-            <span className="w-px h-4 bg-slate-200" />
-            <span className="text-slate-500">
-              <b className="text-brand-700">{staffSummaryTotals.totalMinutes}</b> Min
+            <span className="w-px h-4 bg-slate-200 dark:bg-slate-600" />
+            <span className="text-slate-500 dark:text-slate-400">
+              <b className="text-brand-700 dark:text-brand-300">{staffSummaryTotals.totalMinutes}</b> Min
             </span>
           </div>
         )}
       </div>
 
       {staffSummary.length === 0 ? (
-        <div className="py-10 flex flex-col items-center gap-2 text-slate-400">
-          <Users size={28} className="text-slate-300" />
+        <div className="py-10 flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500">
+          <Users size={28} className="text-slate-300 dark:text-slate-600" />
           <p className="text-sm">No staff summary data found for this filter.</p>
         </div>
       ) : (
@@ -239,7 +240,7 @@ function StaffSummaryReport({
               return (
                 <div
                   key={idx}
-                  className={`relative rounded-2xl p-4 border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 ring-1 ${ringColor} shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
+                  className={`relative rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/60 ring-1 ${ringColor} dark:ring-opacity-40 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
                 >
                   <span className={`absolute -top-2.5 -right-2.5 text-xs font-bold px-2 py-1 rounded-full border shadow-sm ${badgeColor}`}>
                     {medal} #{idx + 1}
@@ -249,23 +250,23 @@ function StaffSummaryReport({
                       {getInitials(staff.staffName)}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-800 truncate">{staff.staffName}</p>
-                      <p className="text-[11px] text-slate-400">{staff.branch} &middot; {staff.department}</p>
+                      <p className="font-bold text-slate-800 dark:text-white truncate">{staff.staffName}</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500">{staff.branch} &middot; {staff.department}</p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-slate-900">{staff.totalOrdersHandled}</span>
-                    <span className="text-[11px] text-slate-400">orders handled</span>
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white">{staff.totalOrdersHandled}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500">orders handled</span>
                   </div>
-                  <div className="w-full h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden">
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-brand-500 to-brand-400 rounded-full"
                       style={{ width: `${(Number(staff.totalQuantity || 0) / maxStaffQuantity) * 100}%` }}
                     />
                   </div>
-                  <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-500">
+                  <div className="mt-3 flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
                     <span>{staff.totalQuantity} pieces</span>
-                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
                     <span>{staff.totalDuration} min</span>
                   </div>
                 </div>
@@ -289,10 +290,10 @@ function StaffSummaryReport({
           )}
 
           {/* Full ranked table */}
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-700">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase bg-slate-50/70">
+                <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/70 dark:bg-slate-700/40">
                   <th className="py-3 px-3">#</th>
                   <th className="py-3 px-3">Staff Name</th>
                   <th className="py-3 px-3">Department</th>
@@ -306,30 +307,30 @@ function StaffSummaryReport({
               </thead>
               <tbody>
                 {rankedStaffSummary.map((staff, idx) => (
-                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/80 transition">
-                    <td className="py-3 px-3 text-slate-400 font-semibold">{idx + 1}</td>
+                  <tr key={idx} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition">
+                    <td className="py-3 px-3 text-slate-400 dark:text-slate-500 font-semibold">{idx + 1}</td>
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 shrink-0 rounded-full bg-brand-50 text-brand-700 border border-brand-100 flex items-center justify-center text-[10px] font-bold">
+                        <div className="w-7 h-7 shrink-0 rounded-full bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 border border-brand-100 dark:border-brand-700 flex items-center justify-center text-[10px] font-bold">
                           {getInitials(staff.staffName)}
                         </div>
-                        <span className="font-semibold text-slate-800">{staff.staffName}</span>
+                        <span className="font-semibold text-slate-800 dark:text-white">{staff.staffName}</span>
                       </div>
                     </td>
                     <td className="py-3 px-3">
                       <span
                         className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
                           staff.department === 'IRONING'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                            : 'bg-blue-50 text-blue-700 border border-blue-200'
+                            ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                            : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
                         }`}
                       >
                         {staff.department}
                       </span>
                     </td>
-                    {showBranchColumn && <td className="py-3 px-3 text-slate-600">{staff.branch}</td>}
+                    {showBranchColumn && <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{staff.branch}</td>}
                     <td className="py-3 px-3">
-                      <div className="w-28 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="w-28 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-gradient-to-r from-brand-500 to-brand-400 rounded-full"
                           style={{ width: `${(Number(staff.totalQuantity || 0) / maxStaffQuantity) * 100}%` }}
@@ -337,32 +338,32 @@ function StaffSummaryReport({
                       </div>
                     </td>
                     <td className="py-3 px-3 text-right">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-brand-50 border-2 border-brand-200 text-brand-700 font-extrabold text-base">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-brand-50 dark:bg-brand-900/30 border-2 border-brand-200 dark:border-brand-700 text-brand-700 dark:text-brand-300 font-extrabold text-base">
                         {staff.totalOrdersHandled} Orders
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-extrabold text-base">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border-2 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-extrabold text-base">
                         {staff.totalQuantity} Pcs
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right font-semibold text-brand-700">{staff.totalDuration} Min</td>
+                    <td className="py-3 px-3 text-right font-semibold text-brand-700 dark:text-brand-300">{staff.totalDuration} Min</td>
                     {showCommission && (
-                      <td className="py-3 px-3 text-right font-bold text-amber-700">
+                      <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400">
                         {staff.commissionEarned != null ? `$${staff.commissionEarned.toFixed(2)}` : '—'}
                       </td>
                     )}
                   </tr>
                 ))}
               </tbody>
-              <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
+              <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
                 <tr>
-                  <td colSpan={showBranchColumn ? 5 : 4} className="py-3 px-3 text-slate-800">Overall Report Total:</td>
-                  <td className="py-3 px-3 text-right text-slate-900">{staffSummaryTotals.totalOrders} Orders</td>
-                  <td className="py-3 px-3 text-right text-emerald-700">{staffSummaryTotals.totalItems} Pcs</td>
-                  <td className="py-3 px-3 text-right text-brand-800">{staffSummaryTotals.totalMinutes} Min</td>
+                  <td colSpan={showBranchColumn ? 5 : 4} className="py-3 px-3 text-slate-800 dark:text-white">Overall Report Total:</td>
+                  <td className="py-3 px-3 text-right text-slate-900 dark:text-white">{staffSummaryTotals.totalOrders} Orders</td>
+                  <td className="py-3 px-3 text-right text-emerald-700 dark:text-emerald-400">{staffSummaryTotals.totalItems} Pcs</td>
+                  <td className="py-3 px-3 text-right text-brand-800 dark:text-brand-300">{staffSummaryTotals.totalMinutes} Min</td>
                   {showCommission && (
-                    <td className="py-3 px-3 text-right text-amber-800">
+                    <td className="py-3 px-3 text-right text-amber-800 dark:text-amber-400">
                       $
                       {rankedStaffSummary
                         .reduce((sum, s) => sum + (s.commissionEarned || 0), 0)
@@ -835,22 +836,22 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-6 transition-colors">
       {/* Top Header */}
-      <header className="max-w-7xl mx-auto flex justify-between items-center gap-4 pb-6 border-b border-slate-200 bg-white p-5 rounded-2xl shadow-sm">
+      <header className="max-w-7xl mx-auto flex justify-between items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3.5">
           <img src="/likenew-logo.png" alt="" className="w-11 h-11 rounded-xl shadow-sm shrink-0" />
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-              <span className="text-slate-900">Likenew</span>
-              <span className="text-xs px-3 py-1 rounded-full font-semibold text-brand-700 bg-brand-100 border border-brand-200">
+              <span className="text-slate-900 dark:text-white">Likenew</span>
+              <span className="text-xs px-3 py-1 rounded-full font-semibold text-brand-700 dark:text-brand-200 bg-brand-100 dark:bg-brand-900/50 border border-brand-200 dark:border-brand-700">
                 {user?.role || 'STAFF'}
               </span>
             </h1>
-            <p className="text-slate-500 text-sm mt-1">
-              Welcome back, <span className="text-slate-900 font-medium">{user?.fullName || 'User'}</span>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+              Welcome back, <span className="text-slate-900 dark:text-white font-medium">{user?.fullName || 'User'}</span>
               {user?.role !== 'ADMIN' && (
-                <span className="ml-2 font-bold text-slate-700">({currentBranch})</span>
+                <span className="ml-2 font-bold text-slate-700 dark:text-slate-300">({currentBranch})</span>
               )}
             </p>
           </div>
@@ -860,12 +861,12 @@ export default function DashboardPage() {
           {user?.role === 'ADMIN' && (
             <>
               {/* Branch Filter Dropdown */}
-              <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2">
-                <Building2 size={18} className="text-slate-500" />
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+                <Building2 size={18} className="text-slate-500 dark:text-slate-400" />
                 <select
                   value={selectedBranch}
                   onChange={(e) => setSelectedBranch(e.target.value)}
-                  className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none cursor-pointer"
+                  className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
                 >
                   {BRANCHES.map((b) => (
                     <option key={b.id} value={b.id} className="bg-white text-slate-800">
@@ -877,13 +878,15 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => fetchAdminDashboardData()}
-                className="p-2.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 rounded-xl text-slate-600 transition"
+                className="p-2.5 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl text-slate-600 dark:text-slate-300 transition"
                 title="Refresh Data"
               >
                 <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
               </button>
             </>
           )}
+
+          <ThemeToggle />
 
           <button
             onClick={handleLogout}
@@ -902,77 +905,77 @@ export default function DashboardPage() {
           <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
-                <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-xl border border-blue-100 group-hover:scale-105 transition-transform">
+                <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-800 group-hover:scale-105 transition-transform">
                   <Shirt size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Washing Logs</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.washing}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Washing Logs</p>
+                  <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.washing}</h3>
                 </div>
               </div>
 
-              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
-                <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 rounded-xl border border-amber-100 group-hover:scale-105 transition-transform">
+                <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/40 dark:to-amber-800/40 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-100 dark:border-amber-800 group-hover:scale-105 transition-transform">
                   <Flame size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Ironing Logs</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.ironing}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Ironing Logs</p>
+                  <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.ironing}</h3>
                 </div>
               </div>
 
-              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
-                <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100 group-hover:scale-105 transition-transform">
+                <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700 group-hover:scale-105 transition-transform">
                   <ShoppingBag size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Orders</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.totalOrders}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Total Orders</p>
+                  <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.totalOrders}</h3>
                 </div>
               </div>
 
-              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <div className="group relative bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
                 <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
-                <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
+                <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-105 transition-transform">
                   <DollarSign size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Commission</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wide">Total Commission</p>
+                  <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
                 </div>
               </div>
             </div>
 
             {/* Chart Graph */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-800">Registration Analytics</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Washing vs. Ironing volume — {selectedBranch}</p>
+                  <h2 className="text-lg font-bold text-slate-800 dark:text-white">Registration Analytics</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Washing vs. Ironing volume — {selectedBranch}</p>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
-                  <Calendar size={15} className="text-brand-500 shrink-0" />
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+                  <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
                     <input
                       type="date"
                       value={analyticsDateFrom}
                       onChange={(e) => setAnalyticsDateFrom(e.target.value)}
-                      className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                      className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
                     />
                   </div>
-                  <span className="w-3 h-px bg-slate-300" />
+                  <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">To</span>
+                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
                     <input
                       type="date"
                       value={analyticsDateTo}
                       onChange={(e) => setAnalyticsDateTo(e.target.value)}
-                      className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                      className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
                     />
                   </div>
                   {(analyticsDateFrom || analyticsDateTo) && (
