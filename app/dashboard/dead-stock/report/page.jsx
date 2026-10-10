@@ -236,73 +236,80 @@ export default function DeadStockReportPage() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-slate-50 text-slate-600 rounded-xl border border-slate-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-400 to-slate-600" />
+              <div className="p-3 bg-gradient-to-br from-slate-50 to-slate-100 text-slate-600 rounded-xl border border-slate-100 group-hover:scale-105 transition-transform">
                 <Boxes size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Total Entries</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Entries</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
                   {stats.totalEntries} <span className="text-sm font-medium text-slate-400">({stats.totalQuantity} pcs)</span>
                 </h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl border border-amber-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+              <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 rounded-xl border border-amber-100 group-hover:scale-105 transition-transform">
                 <Clock size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">In Stock</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">In Stock</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
                   {stats.inStockCount} <span className="text-sm font-medium text-slate-400">({stats.inStockQty} pcs)</span>
                 </h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Given Out</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Given Out</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
                   {stats.givenOutCount} <span className="text-sm font-medium text-slate-400">({stats.givenOutQty} pcs)</span>
                 </h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-violet-50 text-violet-600 rounded-xl border border-violet-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-400 to-violet-600" />
+              <div className="p-3 bg-gradient-to-br from-violet-50 to-violet-100 text-violet-600 rounded-xl border border-violet-100 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Donated</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.donatedCount}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Donated</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.donatedCount}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-slate-100 text-slate-600 rounded-xl border border-slate-200">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-300 to-slate-500" />
+              <div className="p-3 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 rounded-xl border border-slate-200 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Discarded</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.discardedCount}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Discarded</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.discardedCount}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
+              <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Given Out Rate</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.givenOutRate.toFixed(0)}%</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Given Out Rate</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.givenOutRate.toFixed(0)}%</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
                 <DollarSign size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Resolution Commission</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">${stats.totalCommission.toFixed(2)}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Resolution Commission</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
               </div>
             </div>
           </div>

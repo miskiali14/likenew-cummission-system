@@ -312,31 +312,34 @@ export default function FinancialReportPage() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
                 <DollarSign size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Total Commission</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">${overall.commission.toFixed(2)}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Commission</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">${overall.commission.toFixed(2)}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
+              <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100 group-hover:scale-105 transition-transform">
                 <TrendingUp size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Total Orders</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{overall.orders}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Orders</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{overall.orders}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl border border-amber-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+              <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 rounded-xl border border-amber-100 group-hover:scale-105 transition-transform">
                 <Package size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Total Items</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{overall.items}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Items</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{overall.items}</h3>
               </div>
             </div>
           </div>

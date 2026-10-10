@@ -193,28 +193,30 @@ export default function CustomerItemCommissionReportPage() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
                 <DollarSign size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">
                   {isAdmin ? (selectedPersonId === 'All' ? 'Total Commission' : `${data.byUser.find((u) => u.userId === selectedPersonId)?.name || ''}'s Commission`) : 'Your Commission'}
                 </p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
                   ${(isAdmin ? viewCommission : data.myCommission).toFixed(2)}
                 </h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
+              <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100 group-hover:scale-105 transition-transform">
                 <Package size={26} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">
                   {isAdmin ? 'Items Resolved' : 'Your Items Resolved'}
                 </p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
                   {isAdmin ? viewCount : data.myClaimedCount}
                 </h3>
               </div>

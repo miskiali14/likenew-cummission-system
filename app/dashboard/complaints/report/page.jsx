@@ -238,51 +238,56 @@ export default function ComplaintsReportPage() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-slate-50 text-slate-600 rounded-xl border border-slate-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-400 to-slate-600" />
+              <div className="p-3 bg-gradient-to-br from-slate-50 to-slate-100 text-slate-600 rounded-xl border border-slate-100 group-hover:scale-105 transition-transform">
                 <MessageSquareWarning size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Total</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.total}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.total}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+              <div className="p-3 bg-gradient-to-br from-red-50 to-red-100 text-red-600 rounded-xl border border-red-100 group-hover:scale-105 transition-transform">
                 <MessageSquareWarning size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Open</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.open}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Open</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.open}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl border border-amber-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+              <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 rounded-xl border border-amber-100 group-hover:scale-105 transition-transform">
                 <Clock size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">In Progress</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.inProgress}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">In Progress</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.inProgress}</h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
                 <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Resolved</p>
-                <h3 className="text-2xl font-bold text-slate-800 mt-0.5">
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Resolved</p>
+                <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">
                   {stats.resolved} <span className="text-sm font-medium text-slate-400">({stats.resolutionRate.toFixed(0)}%)</span>
                 </h3>
               </div>
             </div>
-            <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+            <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
+              <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100 group-hover:scale-105 transition-transform">
                 <Timer size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400">Avg. Resolution Time</p>
-                <h3 className="text-xl font-bold text-slate-800 mt-0.5">{formatHours(stats.avgResolutionHours)}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Avg. Resolution Time</p>
+                <h3 className="text-xl font-bold text-slate-800 mt-0.5 tabular-nums">{formatHours(stats.avgResolutionHours)}</h3>
               </div>
             </div>
           </div>
