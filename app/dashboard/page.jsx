@@ -281,7 +281,7 @@ function StaffSummaryReport({
                   <XAxis type="number" allowDecimals={false} />
                   <YAxis type="category" dataKey="staffName" width={110} tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="totalQuantity" name="Pieces Handled" fill="#7c3aed" radius={[0, 8, 8, 0]} />
+                  <Bar dataKey="totalQuantity" name="Pieces Handled" fill="#6d4698" radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

@@ -17,8 +17,8 @@ import { DollarSign, Calendar, Download, TrendingUp, Package, X, User } from 'lu
 import { calculateOrderCommission } from '@/lib/commission';
 import { findDuplicateOrderKeys, getCommissionCountedIds } from '@/lib/duplicates';
 
-const BRANCH_COLORS = { HQ: '#7c3aed', KM5: '#f59e0b' };
-const DEPT_COLORS = { WASHING: '#3b82f6', IRONING: '#f59e0b' };
+const BRANCH_COLORS = { HQ: '#6d4698', KM5: '#d97706' };
+const DEPT_COLORS = { WASHING: '#2563eb', IRONING: '#d97706' };
 
 const exportToCSV = (filename, rows) => {
   if (!rows || rows.length === 0) return;
@@ -357,7 +357,7 @@ export default function FinancialReportPage() {
                     <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
                     <Bar dataKey="commission" radius={[8, 8, 0, 0]}>
                       {byBranch.map((entry) => (
-                        <Cell key={entry.name} fill={BRANCH_COLORS[entry.name] || '#7c3aed'} />
+                        <Cell key={entry.name} fill={BRANCH_COLORS[entry.name] || '#6d4698'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -375,7 +375,7 @@ export default function FinancialReportPage() {
                     <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
                     <Bar dataKey="commission" radius={[8, 8, 0, 0]}>
                       {byDepartment.map((entry) => (
-                        <Cell key={entry.name} fill={DEPT_COLORS[entry.name] || '#3b82f6'} />
+                        <Cell key={entry.name} fill={DEPT_COLORS[entry.name] || '#2563eb'} />
                       ))}
                     </Bar>
                   </BarChart>
