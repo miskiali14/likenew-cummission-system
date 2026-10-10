@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
       <Sidebar user={user} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile top bar — hidden on md+ where the sidebar is always visible */}
@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }) {
           </button>
           <span className="font-bold tracking-wide">Likenew Laundry</span>
         </div>
-        <main className="flex-1">
+        <main className="flex-1 text-slate-800 dark:text-slate-100">
           {children}
         </main>
       </div>

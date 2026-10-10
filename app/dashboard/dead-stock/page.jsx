@@ -29,8 +29,8 @@ const OUTCOMES = [
 ];
 const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
 const STATUS_STYLE = {
-  IN_STOCK: 'bg-amber-50 text-amber-700 border-amber-200',
-  GIVEN_OUT: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  IN_STOCK: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  GIVEN_OUT: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
   DONATED: 'bg-violet-50 text-violet-700 border-violet-200',
   DISCARDED: 'bg-slate-100 text-slate-600 border-slate-300',
 };
@@ -256,7 +256,7 @@ export default function DeadStockPage() {
             <CheckCircle2 className="text-emerald-600" size={20} />
           )}
           <span>{notification.message}</span>
-          <button onClick={() => setNotification(null)} className="ml-2 text-gray-400 hover:text-gray-600">
+          <button onClick={() => setNotification(null)} className="ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
             <X size={16} />
           </button>
         </div>
@@ -264,8 +264,8 @@ export default function DeadStockPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Dead Stock</h1>
-          <p className="text-sm text-gray-500">Old, uncollected orders sitting at the branch — logged and given back out</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dead Stock</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400">Old, uncollected orders sitting at the branch — logged and given back out</p>
         </div>
         <button
           onClick={openAddModal}
@@ -277,7 +277,7 @@ export default function DeadStockPage() {
 
       {/* Aging alert — orders sitting IN_STOCK past the threshold are easy to forget */}
       {agingCount > 0 && (
-        <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm font-medium">
+        <div className="flex items-center gap-2.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3 text-sm font-medium">
           <AlertTriangle size={18} className="shrink-0" />
           {agingCount} entr{agingCount > 1 ? 'ies have' : 'y has'} been in stock for over {AGING_THRESHOLD_DAYS} days — worth following up.
         </div>
@@ -285,26 +285,26 @@ export default function DeadStockPage() {
 
       {/* Resolution Commission (Given Out / Donated / Discarded) — separate from every other commission */}
       {commission && (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+        <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
             <Wallet size={16} className="text-brand-600" />
             Resolution Commission
           </div>
-          <span className="text-sm text-slate-600">
-            {commission.count} resolved — <span className="font-bold text-slate-900">${commission.total.toFixed(2)}</span>
+          <span className="text-sm text-slate-600 dark:text-slate-300">
+            {commission.count} resolved — <span className="font-bold text-slate-900 dark:text-white">${commission.total.toFixed(2)}</span>
           </span>
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 rounded-xl p-1 flex-wrap">
+      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-700 rounded-xl p-1 flex-wrap">
           {['IN_STOCK', 'GIVEN_OUT', 'DONATED', 'DISCARDED', 'All'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusTab(tab)}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
-                statusTab === tab ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                statusTab === tab ? 'bg-white dark:bg-slate-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               {tab === 'All' ? 'All' : STATUS_LABEL[tab]}
@@ -315,24 +315,24 @@ export default function DeadStockPage() {
         <select
           value={branchFilter}
           onChange={(e) => setBranchFilter(e.target.value)}
-          className="border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 rounded-xl p-2 focus:outline-none cursor-pointer"
+          className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none cursor-pointer"
         >
           <option value="All">All Branches</option>
           <option value="HQ">HQ</option>
           <option value="KM5">KM5</option>
         </select>
 
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 flex-1 min-w-[220px]">
-          <Search size={15} className="text-slate-400 shrink-0" />
+        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2 flex-1 min-w-[220px]">
+          <Search size={15} className="text-slate-400 dark:text-slate-500 shrink-0" />
           <input
             type="text"
             placeholder="Search by order reference..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none w-full"
+            className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none w-full"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="text-slate-400 hover:text-red-500 transition">
+            <button onClick={() => setSearch('')} className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition">
               <X size={15} />
             </button>
           )}
@@ -340,19 +340,19 @@ export default function DeadStockPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : filteredItems.length === 0 ? (
-          <div className="p-10 text-center text-slate-400 text-sm flex flex-col items-center gap-2">
-            <Boxes size={28} className="text-slate-300" />
+          <div className="p-10 text-center text-slate-400 dark:text-slate-500 text-sm flex flex-col items-center gap-2">
+            <Boxes size={28} className="text-slate-300 dark:text-slate-600" />
             No entries found.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
+                <tr className="bg-gray-50 dark:bg-slate-700/40 border-b border-gray-100 dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                   <th className="p-4">Branch</th>
                   <th className="p-4">Order Ref</th>
                   <th className="p-4">Category</th>
@@ -365,18 +365,18 @@ export default function DeadStockPage() {
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-700 text-sm text-gray-700 dark:text-slate-300">
                 {filteredItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50/50 transition">
-                    <td className="p-4 text-gray-600">{item.branch}</td>
-                    <td className="p-4 font-extrabold text-slate-900">{item.orderId}</td>
+                  <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/40 transition">
+                    <td className="p-4 text-gray-600 dark:text-slate-300">{item.branch}</td>
+                    <td className="p-4 font-extrabold text-slate-900 dark:text-white">{item.orderId}</td>
                     <td className="p-4">
-                      <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                         {item.category}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-600">{item.quantity}</td>
-                    <td className="p-4 text-gray-500">{item.date}</td>
+                    <td className="p-4 text-gray-600 dark:text-slate-300">{item.quantity}</td>
+                    <td className="p-4 text-gray-500 dark:text-slate-400">{item.date}</td>
                     <td className="p-4">
                       {item.status === 'IN_STOCK' ? (
                         <span
@@ -390,7 +390,7 @@ export default function DeadStockPage() {
                           )}
                         </span>
                       ) : (
-                        <span className="text-slate-300">—</span>
+                        <span className="text-slate-300 dark:text-slate-600">—</span>
                       )}
                     </td>
                     <td className="p-4">
@@ -398,14 +398,14 @@ export default function DeadStockPage() {
                         {STATUS_LABEL[item.status]}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-500">{item.createdByName || <span className="text-slate-300">—</span>}</td>
-                    <td className="p-4 text-gray-500">{item.givenOutByName || <span className="text-slate-300">—</span>}</td>
+                    <td className="p-4 text-gray-500 dark:text-slate-400">{item.createdByName || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
+                    <td className="p-4 text-gray-500 dark:text-slate-400">{item.givenOutByName || <span className="text-slate-300 dark:text-slate-600">—</span>}</td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
                         {item.status === 'IN_STOCK' ? (
                           <button
                             onClick={() => openGiveOutModal(item)}
-                            className="text-emerald-600 hover:text-emerald-700 p-1.5 rounded-lg hover:bg-emerald-50 transition"
+                            className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
                             title="Resolve (Given Out / Donated / Discarded)"
                           >
                             <CheckCircle2 size={18} />
@@ -413,7 +413,7 @@ export default function DeadStockPage() {
                         ) : (
                           <button
                             onClick={() => handleMarkInStock(item.id)}
-                            className="text-amber-600 hover:text-amber-700 p-1.5 rounded-lg hover:bg-amber-50 transition"
+                            className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition"
                             title="Move back to In Stock"
                           >
                             <RotateCcw size={18} />
@@ -421,14 +421,14 @@ export default function DeadStockPage() {
                         )}
                         <button
                           onClick={() => openEditModal(item)}
-                          className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
+                          className="text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
                           title="Edit"
                         >
                           <Edit2 size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
                           title="Delete"
                         >
                           <Trash2 size={18} />
@@ -446,29 +446,29 @@ export default function DeadStockPage() {
       {/* Modal — Add / Edit Entry */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">{editingId ? 'Edit Entry' : 'Add Dead Stock Entry'}</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">{editingId ? 'Edit Entry' : 'Add Dead Stock Entry'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Order Reference</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Order Reference</label>
                 <input
                   type="text"
                   required
                   placeholder="E.g. 45327-1/1"
                   value={formData.orderId}
                   onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Category</label>
                   <div className="flex items-center gap-1.5">
                     <select
                       required
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                     >
                       <option value="" disabled>Select...</option>
                       {categories.map((c) => (
@@ -479,41 +479,41 @@ export default function DeadStockPage() {
                       type="button"
                       onClick={() => setShowAddCategory(true)}
                       title="Add a new category"
-                      className="shrink-0 p-2.5 border rounded-lg text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition"
+                      className="shrink-0 p-2.5 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
                     >
                       <Plus size={16} />
                     </button>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Quantity</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Quantity</label>
                   <input
                     type="number"
                     min="1"
                     required
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Date</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Date</label>
                   <input
                     type="date"
                     required
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Branch</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Branch</label>
                   <select
                     value={formData.branch}
                     onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="HQ">HQ</option>
                     <option value="KM5">KM5</option>
@@ -525,7 +525,7 @@ export default function DeadStockPage() {
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); setEditingId(null); }}
-                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -544,21 +544,21 @@ export default function DeadStockPage() {
       {/* Modal — Resolve Entry (Given Out / Donated / Discarded) */}
       {giveOutTarget && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-800">Resolve Entry</h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Resolve Entry</h2>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
                 {giveOutTarget.orderId} — {giveOutTarget.category} ({giveOutTarget.quantity})
               </p>
             </div>
             <form onSubmit={handleGiveOutSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Outcome</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Outcome</label>
                 <select
                   required
                   value={resolveOutcome}
                   onChange={(e) => setResolveOutcome(e.target.value)}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   {OUTCOMES.map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -567,14 +567,14 @@ export default function DeadStockPage() {
               </div>
               {resolveOutcome === 'GIVEN_OUT' && (
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
                     How did the customer get it back?
                   </label>
                   <select
                     required
                     value={giveOutMethod}
                     onChange={(e) => setGiveOutMethod(e.target.value)}
-                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="" disabled>Select one...</option>
                     {COLLECTION_METHODS.map((m) => (
@@ -584,7 +584,7 @@ export default function DeadStockPage() {
                 </div>
               )}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">
                   {resolveOutcome === 'GIVEN_OUT' ? 'Notes (optional)' : 'How/why was it donated or discarded?'}
                 </label>
                 <textarea
@@ -593,14 +593,14 @@ export default function DeadStockPage() {
                   placeholder={resolveOutcome === 'GIVEN_OUT' ? 'E.g. where/how it was collected' : 'E.g. donated to the mosque, or thrown out — damaged beyond use'}
                   value={giveOutNotes}
                   onChange={(e) => setGiveOutNotes(e.target.value)}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setGiveOutTarget(null)}
-                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -619,11 +619,11 @@ export default function DeadStockPage() {
       {/* Modal — Add Category */}
       {showAddCategory && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">Add Category</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-sm p-6 space-y-4">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">Add Category</h2>
             <form onSubmit={handleAddCategory} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Category Name</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Category Name</label>
                 <input
                   type="text"
                   required
@@ -631,14 +631,14 @@ export default function DeadStockPage() {
                   placeholder="E.g. Sherwac"
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => { setShowAddCategory(false); setNewCategoryName(''); }}
-                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>

@@ -112,7 +112,7 @@ export default function RegistrarsPage() {
             <CheckCircle2 className="text-emerald-600" size={20} />
           )}
           <span>{notification.message}</span>
-          <button onClick={() => setNotification(null)} className="ml-2 text-gray-400 hover:text-gray-600">
+          <button onClick={() => setNotification(null)} className="ml-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
             <X size={16} />
           </button>
         </div>
@@ -120,8 +120,8 @@ export default function RegistrarsPage() {
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Assigned By List</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Assigned By List</h1>
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             Names of Sales/QC staff who register logs — these appear in the "Assigned By" dropdown
           </p>
         </div>
@@ -133,39 +133,39 @@ export default function RegistrarsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
         {loading ? (
-          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400"><Loader2 size={28} className="animate-spin text-brand-500" /><span className="text-sm font-medium">Loading data...</span></div>
+          <div className="p-10 flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500"><Loader2 size={28} className="animate-spin text-brand-500 dark:text-brand-400" /><span className="text-sm font-medium">Loading data...</span></div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100 text-xs text-gray-500 uppercase tracking-wider">
+              <tr className="bg-gray-50 dark:bg-slate-700/40 border-b border-gray-100 dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                 <th className="p-4">Name</th>
                 <th className="p-4">Branch</th>
                 <th className="p-4">Role</th>
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-700 text-sm text-gray-700 dark:text-slate-300">
               {registrars.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="p-6 text-center text-gray-400 text-sm">
+                  <td colSpan={4} className="p-6 text-center text-gray-400 dark:text-slate-500 text-sm">
                     No one added yet.
                   </td>
                 </tr>
               ) : (
                 registrars.map((reg) => (
-                  <tr key={reg.id} className="hover:bg-gray-50/50 transition">
-                    <td className="p-4 font-medium text-gray-900">{reg.name}</td>
+                  <tr key={reg.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/40 transition">
+                    <td className="p-4 font-medium text-gray-900 dark:text-white">{reg.name}</td>
                     <td className="p-4">
-                      <span className="inline-flex items-center gap-1 text-gray-600">
+                      <span className="inline-flex items-center gap-1 text-gray-600 dark:text-slate-300">
                         <Building size={14} /> {reg.branch}
                       </span>
                     </td>
                     <td className="p-4">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                          reg.role === 'QUALITY_CONTROL' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                          reg.role === 'QUALITY_CONTROL' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                         }`}
                       >
                         <Shield size={12} /> {reg.role}
@@ -175,14 +175,14 @@ export default function RegistrarsPage() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => openEditModal(reg)}
-                          className="text-slate-400 hover:text-brand-600 p-1.5 rounded-lg hover:bg-brand-50 transition"
+                          className="text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
                           title="Edit"
                         >
                           <Edit2 size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(reg.id)}
-                          className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition"
+                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
                           title="Delete"
                         >
                           <Trash2 size={18} />
@@ -199,27 +199,27 @@ export default function RegistrarsPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-40">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">{editingId ? 'Edit Person' : 'Add New Person'}</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">{editingId ? 'Edit Person' : 'Add New Person'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name</label>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Branch</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Branch</label>
                   <select
                     value={formData.branch}
                     onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="HQ">HQ</option>
                     <option value="KM5">KM5</option>
@@ -227,11 +227,11 @@ export default function RegistrarsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Role</label>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1">Role</label>
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="SALES">SALES</option>
                     <option value="QUALITY_CONTROL">QUALITY CONTROL</option>
@@ -243,7 +243,7 @@ export default function RegistrarsPage() {
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); setEditingId(null); }}
-                  className="px-4 py-2 border rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>

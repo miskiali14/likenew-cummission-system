@@ -172,7 +172,7 @@ function StaffSummaryReport({
               <button
                 onClick={() => { onDateFromChange(''); onDateToChange(''); }}
                 title="Clear date range — show all dates"
-                className="text-slate-400 hover:text-red-500 transition ml-1"
+                className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
               >
                 <X size={15} />
               </button>
@@ -829,7 +829,7 @@ export default function DashboardPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <Loader2 className="animate-spin text-brand-600" size={36} />
       </div>
     );
@@ -869,7 +869,7 @@ export default function DashboardPage() {
                   className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
                 >
                   {BRANCHES.map((b) => (
-                    <option key={b.id} value={b.id} className="bg-white text-slate-800">
+                    <option key={b.id} value={b.id} className="bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
                       {b.name}
                     </option>
                   ))}
@@ -982,7 +982,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => { setAnalyticsDateFrom(''); setAnalyticsDateTo(''); }}
                       title="Clear date range — show all dates"
-                      className="text-slate-400 hover:text-red-500 transition ml-1"
+                      className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
                     >
                       <X size={15} />
                     </button>
@@ -1019,31 +1019,31 @@ export default function DashboardPage() {
             />
 
             {/* ALL LOGS TABLE FOR ADMIN */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-800">All Registered Logs</h2>
-                  <p className="text-xs text-slate-500">View and manage all registered logs from KM5 and HQ branches</p>
+                  <h2 className="text-lg font-bold text-slate-800 dark:text-white">All Registered Logs</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">View and manage all registered logs from KM5 and HQ branches</p>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Filter size={16} className="text-slate-500" />
-                  <span className="text-xs font-semibold text-slate-600">Department:</span>
+                  <Filter size={16} className="text-slate-500 dark:text-slate-400" />
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Department:</span>
                   <select
                     value={selectedDept}
                     onChange={(e) => setSelectedDept(e.target.value)}
-                    className="border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 rounded-xl p-2 focus:outline-none cursor-pointer"
+                    className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none cursor-pointer"
                   >
                     <option value="All">All Departments</option>
                     <option value="WASHING">Washing</option>
                     <option value="IRONING">Ironing</option>
                   </select>
-                  <span className="text-xs font-semibold text-slate-600 ml-1">Date:</span>
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 ml-1">Date:</span>
                   <input
                     type="date"
                     value={allLogsDate}
                     onChange={(e) => setAllLogsDate(e.target.value)}
-                    className="border border-slate-200 bg-slate-50 text-sm font-medium text-slate-700 rounded-xl p-2 focus:outline-none"
+                    className="border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 rounded-xl p-2 focus:outline-none"
                   />
                   {allLogsDate && (
                     <button
@@ -1070,7 +1070,7 @@ export default function DashboardPage() {
                           }))
                         )
                       }
-                      className="flex items-center gap-2 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition"
+                      className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 transition"
                     >
                       <Download size={16} /> Export CSV
                     </button>
@@ -1081,7 +1081,7 @@ export default function DashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase bg-slate-50/50">
+                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase bg-slate-50/50 dark:bg-slate-700/40">
                       <th className="py-3 px-3">Order ID</th>
                       <th className="py-3 px-3">Branch</th>
                       <th className="py-3 px-3">Department</th>
@@ -1096,15 +1096,15 @@ export default function DashboardPage() {
                   <tbody>
                     {logs.length === 0 ? (
                       <tr>
-                        <td colSpan="9" className="text-center py-6 text-slate-400">
+                        <td colSpan="9" className="text-center py-6 text-slate-400 dark:text-slate-500">
                           No log records found.
                         </td>
                       </tr>
                     ) : (
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
-                          <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td className="py-3 px-3 font-extrabold text-slate-900 text-base">
+                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                            <td className="py-3 px-3 font-extrabold text-slate-900 dark:text-white text-base">
                               #{item.orderId}
                               {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
                                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
@@ -1113,7 +1113,7 @@ export default function DashboardPage() {
                               )}
                             </td>
                             <td className="py-3 px-3">
-                              <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                              <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                                 {item.branch || 'HQ'}
                               </span>
                             </td>
@@ -1121,8 +1121,8 @@ export default function DashboardPage() {
                               <span
                                 className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
                                   item.department === 'IRONING'
-                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                    ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                                    : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
                                 }`}
                               >
                                 {item.department}
@@ -1130,7 +1130,7 @@ export default function DashboardPage() {
                             </td>
                             {idx === 0 && (
                               <td
-                                className="py-3 px-3 font-medium text-slate-700 align-top border-l border-slate-100"
+                                className="py-3 px-3 font-medium text-slate-700 dark:text-slate-200 align-top border-l border-slate-100 dark:border-slate-700"
                                 rowSpan={group.orders.length}
                               >
                                 {group.staffName}
@@ -1147,27 +1147,27 @@ export default function DashboardPage() {
                               </span>
                             </td>
                             <td className="py-3 px-3">
-                              <span className="flex items-center gap-1 text-slate-600">
-                                <Clock size={14} className="text-slate-400" />
+                              <span className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                                <Clock size={14} className="text-slate-400 dark:text-slate-500" />
                                 {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                  <span className="text-slate-400 italic">Not set</span>
+                                  <span className="text-slate-400 dark:text-slate-500 italic">Not set</span>
                                 )}
                               </span>
                             </td>
-                            <td className="py-3 px-3 text-slate-500">{item.assignedBy}</td>
-                            <td className="py-3 px-3 text-slate-500">{item.date}</td>
+                            <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{item.assignedBy}</td>
+                            <td className="py-3 px-3 text-slate-500 dark:text-slate-400">{item.date}</td>
                             <td className="py-3 px-3 text-right">
                                 <div className="flex items-center justify-end gap-1">
                                   <button
                                     onClick={() => openEditOrderModal(item)}
-                                    className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition"
+                                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 rounded-lg transition"
                                     title="Edit Order"
                                   >
                                     <Edit2 size={16} />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteLog(item.id)}
-                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
                                     title="Delete Log"
                                   >
                                     <Trash2 size={16} />
@@ -1180,9 +1180,9 @@ export default function DashboardPage() {
                     )}
                   </tbody>
                   {logs.length > 0 && (
-                    <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
+                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
                       <tr>
-                        <td colSpan="4" className="py-3 px-3 text-slate-800">Total ({logs.length} Log Entries):</td>
+                        <td colSpan="4" className="py-3 px-3 text-slate-800 dark:text-white">Total ({logs.length} Log Entries):</td>
                         <td className="py-3 px-3 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
                         <td className="py-3 px-3 text-brand-800">{logsTotals.totalMinutes} Min</td>
                         <td colSpan="3"></td>
@@ -1199,59 +1199,59 @@ export default function DashboardPage() {
         {user?.role !== 'ADMIN' && user?.role !== 'VIEWER' && (
           <div className="space-y-8">
             {/* Form */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-              <div className="border-b border-slate-100 pb-3 mb-5 flex justify-between items-center">
-                <h2 className="text-lg font-bold text-slate-800">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+              <div className="border-b border-slate-100 dark:border-slate-700 pb-3 mb-5 flex justify-between items-center">
+                <h2 className="text-lg font-bold text-slate-800 dark:text-white">
                   Register New Log ({user?.role === 'QUALITY_CONTROL' ? 'Ironing' : 'Washing'})
                 </h2>
-                <span className="text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded-lg font-semibold border border-slate-200">
+                <span className="text-xs px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg font-semibold border border-slate-200 dark:border-slate-600">
                   Branch: {currentBranch}
                 </span>
               </div>
 
               <form onSubmit={handleSubmitLog} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">1. Order ID</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">1. Order ID</label>
                   <input
                     type="number"
                     required
                     placeholder="E.g. 1024"
                     value={formData.orderId}
                     onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">2. Quantity</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">2. Quantity</label>
                   <input
                     type="number"
                     required
                     placeholder="E.g. 12"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">3. Date (today only)</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">3. Date (today only)</label>
                   <input
                     type="date"
                     required
                     disabled
                     value={formData.date}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm bg-slate-100 text-slate-500 cursor-not-allowed"
+                    className="w-full border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 text-sm bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">4. Assigned By</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">4. Assigned By</label>
                   <select
                     required
                     value={formData.registrarId}
                     onChange={(e) => setFormData({ ...formData, registrarId: e.target.value })}
-                    className="w-full border border-slate-200 bg-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                   >
                     {registrars.length === 0 && <option value="">No one found — add one first</option>}
                     {registrars.map((reg) => (
@@ -1263,11 +1263,11 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">5. Shift</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">5. Shift</label>
                   <select
                     value={formData.shift}
                     onChange={(e) => setFormData({ ...formData, shift: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                   >
                     <option value="SHIFT_1">SHIFT 1</option>
                     <option value="SHIFT_2">SHIFT 2</option>
@@ -1275,12 +1275,12 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">6. Staff Member ({currentBranch})</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">6. Staff Member ({currentBranch})</label>
                   <select
                     required
                     value={formData.employeeId}
                     onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                    className="w-full border border-slate-200 bg-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                   >
                     {employees.length === 0 && <option value="">No employees found — add one first</option>}
                     {employees.map((emp) => (
@@ -1292,13 +1292,13 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">7. Duration (Min) — optional</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">7. Duration (Min) — optional</label>
                   <input
                     type="number"
                     placeholder="Leave blank if not known yet"
                     value={formData.durationMinutes}
                     onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
 
@@ -1353,15 +1353,15 @@ export default function DashboardPage() {
             />
 
             {/* LOGS LIST FOR STAFF */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-md font-bold text-slate-800 mb-4">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4">
                 Today's Logs — {currentBranch} Branch ({user?.role === 'QUALITY_CONTROL' ? 'Ironing' : 'Washing'})
               </h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase">
+                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase">
                       <th className="py-3 px-2">Order ID</th>
                       <th className="py-3 px-2">Staff</th>
                       <th className="py-3 px-2">Qty</th>
@@ -1372,15 +1372,15 @@ export default function DashboardPage() {
                   <tbody>
                     {logs.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="text-center py-6 text-slate-400">
+                        <td colSpan="5" className="text-center py-6 text-slate-400 dark:text-slate-500">
                           No logs registered today for {currentBranch} branch yet.
                         </td>
                       </tr>
                     ) : (
                       groupLogsByStaff(logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
-                          <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">
+                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                            <td className="py-3 px-2 font-extrabold text-slate-900 dark:text-white text-base">
                               #{item.orderId}
                               {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
                                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
@@ -1405,24 +1405,24 @@ export default function DashboardPage() {
                             </td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                <span className="text-slate-400 italic">Not set</span>
+                                <span className="text-slate-400 dark:text-slate-500 italic">Not set</span>
                               )}
                             </td>
                             <td className="py-3 px-2">
                               {item.date !== todayStr ? (
-                                <span className="text-[11px] text-slate-400 italic">Locked</span>
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500 italic">Locked</span>
                               ) : (
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => openEditOrderModal(item)}
-                                    className="p-1 text-slate-400 hover:text-brand-600 rounded"
+                                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 rounded"
                                     title="Edit Order"
                                   >
                                     <Edit2 size={16} />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteLog(item.id)}
-                                    className="p-1 text-slate-400 hover:text-red-600 rounded"
+                                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded"
                                     title="Delete Log"
                                   >
                                     <Trash2 size={16} />
@@ -1436,9 +1436,9 @@ export default function DashboardPage() {
                     )}
                   </tbody>
                   {logs.length > 0 && (
-                    <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
+                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
                       <tr>
-                        <td colSpan="2" className="py-3 px-2 text-slate-800">Total ({logs.length} Orders):</td>
+                        <td colSpan="2" className="py-3 px-2 text-slate-800 dark:text-white">Total ({logs.length} Orders):</td>
                         <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
                         <td className="py-3 px-2 text-brand-800">{logsTotals.totalMinutes} Min</td>
                         <td></td>
@@ -1463,14 +1463,14 @@ export default function DashboardPage() {
                 body { background: #fff !important; }
               }
             `}</style>
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+                <div className="p-3 bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 rounded-xl border border-brand-100 dark:border-brand-700">
                   <Users size={22} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-slate-800">{currentBranch} Branch — Read-Only View</h2>
-                  <p className="text-xs text-slate-500">
+                  <h2 className="text-lg font-bold text-slate-800 dark:text-white">{currentBranch} Branch — Read-Only View</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     You can view {user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing and Ironing'} activity for {currentBranch}. Viewing only — no changes can be made.
                   </p>
                 </div>
@@ -1481,32 +1481,32 @@ export default function DashboardPage() {
               >
                 <Printer size={16} /> Print / Save as PDF
               </button>
-              <div className="no-print flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
-                <Calendar size={15} className="text-brand-500 shrink-0" />
+              <div className="no-print flex items-center gap-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-3.5 py-2">
+                <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">From</span>
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">From</span>
                   <input
                     type="date"
                     value={viewerDateFrom}
                     onChange={(e) => setViewerDateFrom(e.target.value)}
-                    className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                    className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
                   />
                 </div>
-                <span className="w-3 h-px bg-slate-300" />
+                <span className="w-3 h-px bg-slate-300 dark:bg-slate-600" />
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">To</span>
+                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">To</span>
                   <input
                     type="date"
                     value={viewerDateTo}
                     onChange={(e) => setViewerDateTo(e.target.value)}
-                    className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+                    className="bg-transparent text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none"
                   />
                 </div>
                 {(viewerDateFrom || viewerDateTo) && (
                   <button
                     onClick={() => { setViewerDateFrom(''); setViewerDateTo(''); }}
                     title="Clear date range — show all dates"
-                    className="text-slate-400 hover:text-red-500 transition ml-1"
+                    className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition ml-1"
                   >
                     <X size={15} />
                   </button>
@@ -1515,13 +1515,13 @@ export default function DashboardPage() {
             </div>
 
             {/* STAFF FILTER — narrow everything below to one person's complete record */}
-            <div className="no-print bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm flex items-center gap-3">
-              <Users size={15} className="text-brand-500 shrink-0" />
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Staff</span>
+            <div className="no-print bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+              <Users size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Staff</span>
               <select
                 value={viewerStaffFilter}
                 onChange={(e) => setViewerStaffFilter(e.target.value)}
-                className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
               >
                 <option value="">Everyone</option>
                 {[...new Set(staffSummary.map((s) => s.staffName))].sort().map((name) => (
@@ -1532,7 +1532,7 @@ export default function DashboardPage() {
                 <button
                   onClick={() => setViewerStaffFilter('')}
                   title="Clear — show everyone again"
-                  className="text-slate-400 hover:text-red-500 transition"
+                  className="text-slate-400 dark:text-slate-500 hover:text-red-500 transition"
                 >
                   <X size={15} />
                 </button>
@@ -1549,15 +1549,15 @@ export default function DashboardPage() {
             />
 
             {/* LOGS — no actions */}
-            <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-md font-bold text-slate-800 mb-4">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4">
                 Logs — {viewerStaffFilter || `${currentBranch} Branch`} ({user?.department ? (user.department === 'IRONING' ? 'Ironing' : 'Washing') : 'Washing & Ironing'})
               </h3>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 text-slate-500 text-xs uppercase">
+                    <tr className="border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs uppercase">
                       <th className="py-3 px-2">Order ID</th>
                       {!user?.department && <th className="py-3 px-2">Department</th>}
                       <th className="py-3 px-2">Staff</th>
@@ -1568,15 +1568,15 @@ export default function DashboardPage() {
                   <tbody>
                     {(viewerStaffFilter ? logs.filter((l) => l.staffName === viewerStaffFilter) : logs).length === 0 ? (
                       <tr>
-                        <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400">
+                        <td colSpan={user?.department ? 4 : 5} className="text-center py-6 text-slate-400 dark:text-slate-500">
                           No logs found for {viewerStaffFilter || `${currentBranch} branch`} in this date range.
                         </td>
                       </tr>
                     ) : (
                       groupLogsByStaff(viewerStaffFilter ? logs.filter((l) => l.staffName === viewerStaffFilter) : logs).flatMap((group) =>
                         group.orders.map((item, idx) => (
-                          <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2 font-extrabold text-slate-900 text-base">
+                          <tr key={item.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/40">
+                            <td className="py-3 px-2 font-extrabold text-slate-900 dark:text-white text-base">
                               #{item.orderId}
                               {duplicateOrderKeys.has(`${item.orderId}|${item.department}|${item.branch}`) && (
                                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-200 align-middle">
@@ -1589,8 +1589,8 @@ export default function DashboardPage() {
                                 <span
                                   className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
                                     item.department === 'IRONING'
-                                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                      : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                      ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                                      : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
                                   }`}
                                 >
                                   {item.department}
@@ -1614,7 +1614,7 @@ export default function DashboardPage() {
                             </td>
                             <td className="py-3 px-2 font-medium">
                               {item.durationMinutes != null ? `${item.durationMinutes} Min` : (
-                                <span className="text-slate-400 italic">Not set</span>
+                                <span className="text-slate-400 dark:text-slate-500 italic">Not set</span>
                               )}
                             </td>
                           </tr>
@@ -1623,9 +1623,9 @@ export default function DashboardPage() {
                     )}
                   </tbody>
                   {logs.length > 0 && (
-                    <tfoot className="bg-slate-100/80 font-bold border-t border-slate-300">
+                    <tfoot className="bg-slate-100/80 dark:bg-slate-700/60 font-bold border-t border-slate-300 dark:border-slate-600">
                       <tr>
-                        <td colSpan={user?.department ? 2 : 3} className="py-3 px-2 text-slate-800">Total ({logs.length} Orders):</td>
+                        <td colSpan={user?.department ? 2 : 3} className="py-3 px-2 text-slate-800 dark:text-white">Total ({logs.length} Orders):</td>
                         <td className="py-3 px-2 text-emerald-700">{logsTotals.totalQuantity} Pcs</td>
                         <td className="py-3 px-2 text-brand-800">{logsTotals.totalMinutes} Min</td>
                       </tr>
@@ -1641,65 +1641,65 @@ export default function DashboardPage() {
       {/* EDIT ORDER MODAL */}
       {editingOrderLog && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
-            <h2 className="text-xl font-bold text-slate-800">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-white">
               Edit Order #{editingOrderLog.orderId}
             </h2>
             <form onSubmit={handleSaveOrderEdit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Order ID</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Order ID</label>
                   <input
                     type="number"
                     required
                     value={editOrderForm.orderId}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, orderId: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Quantity</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Quantity</label>
                   <input
                     type="number"
                     required
                     value={editOrderForm.quantity}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, quantity: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Shift</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Shift</label>
                   <select
                     value={editOrderForm.shift}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, shift: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="SHIFT_1">SHIFT 1</option>
                     <option value="SHIFT_2">SHIFT 2</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Duration (Min) — optional</label>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Duration (Min) — optional</label>
                   <input
                     type="number"
                     placeholder="Leave blank if not known yet"
                     value={editOrderForm.durationMinutes}
                     onChange={(e) => setEditOrderForm({ ...editOrderForm, durationMinutes: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">Staff Member</label>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Staff Member</label>
                 <select
                   required
                   value={editOrderForm.employeeId}
                   onChange={(e) => setEditOrderForm({ ...editOrderForm, employeeId: e.target.value })}
-                  className="w-full border border-slate-200 bg-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+                  className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
                 >
                   {editOrderEmployees.length === 0 && <option value="">Loading employees…</option>}
                   {editOrderEmployees.map((emp) => (
@@ -1714,7 +1714,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={closeEditOrderModal}
-                  className="px-4 py-2 border rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
