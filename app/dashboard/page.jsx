@@ -4,15 +4,16 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '../../lib/api';
 import { findDuplicateOrderKeys } from '../../lib/duplicates';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  Legend 
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
 } from 'recharts';
 import { 
   LogOut, 
@@ -836,19 +837,22 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50 text-slate-800 p-6">
       {/* Top Header */}
       <header className="max-w-7xl mx-auto flex justify-between items-center gap-4 pb-6 border-b border-slate-200 bg-white p-5 rounded-2xl shadow-sm">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-            <span className="text-slate-900">LIKE NEW</span>
-            <span className="text-xs px-3 py-1 rounded-full font-semibold text-brand-700 bg-brand-100 border border-brand-200">
-              {user?.role || 'STAFF'}
-            </span>
-          </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            Welcome back, <span className="text-slate-900 font-medium">{user?.fullName || 'User'}</span> 
-            {user?.role !== 'ADMIN' && (
-              <span className="ml-2 font-bold text-slate-700">({currentBranch})</span>
-            )}
-          </p>
+        <div className="flex items-center gap-3.5">
+          <img src="/likenew-logo.png" alt="" className="w-11 h-11 rounded-xl shadow-sm shrink-0" />
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+              <span className="text-slate-900">LIKE NEW</span>
+              <span className="text-xs px-3 py-1 rounded-full font-semibold text-brand-700 bg-brand-100 border border-brand-200">
+                {user?.role || 'STAFF'}
+              </span>
+            </h1>
+            <p className="text-slate-500 text-sm mt-1">
+              Welcome back, <span className="text-slate-900 font-medium">{user?.fullName || 'User'}</span>
+              {user?.role !== 'ADMIN' && (
+                <span className="ml-2 font-bold text-slate-700">({currentBranch})</span>
+              )}
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -897,43 +901,47 @@ export default function DashboardPage() {
           <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
+                <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-xl border border-blue-100 group-hover:scale-105 transition-transform">
                   <Shirt size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400">Washing Logs</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.washing}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Washing Logs</p>
+                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.washing}</h3>
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                <div className="p-3 bg-amber-50 text-amber-600 rounded-xl border border-amber-100">
+              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
+                <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 rounded-xl border border-amber-100 group-hover:scale-105 transition-transform">
                   <Flame size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400">Ironing Logs</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.ironing}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Ironing Logs</p>
+                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.ironing}</h3>
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                <div className="p-3 bg-brand-50 text-brand-600 rounded-xl border border-brand-100">
+              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-400 to-brand-600" />
+                <div className="p-3 bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 rounded-xl border border-brand-100 group-hover:scale-105 transition-transform">
                   <ShoppingBag size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400">Total Orders</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5">{stats.totalOrders}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Orders</p>
+                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">{stats.totalOrders}</h3>
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+              <div className="group relative bg-white border border-slate-200/80 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
+                <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 rounded-xl border border-emerald-100 group-hover:scale-105 transition-transform">
                   <DollarSign size={28} />
                 </div>
                 <div>
-                  <p className="text-xs uppercase font-semibold text-slate-400">Total Commission</p>
-                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5">${stats.totalCommission.toFixed(2)}</h3>
+                  <p className="text-xs uppercase font-semibold text-slate-400 tracking-wide">Total Commission</p>
+                  <h3 className="text-2xl font-bold text-slate-800 mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
                 </div>
               </div>
             </div>
@@ -941,7 +949,10 @@ export default function DashboardPage() {
             {/* Chart Graph */}
             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <h2 className="text-lg font-bold text-slate-800">Registration Analytics ({selectedBranch})</h2>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Registration Analytics</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Washing vs. Ironing volume — {selectedBranch}</p>
+                </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2">
                   <Calendar size={15} className="text-brand-500 shrink-0" />
                   <div className="flex items-center gap-1.5">
@@ -982,7 +993,10 @@ export default function DashboardPage() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="Logs" fill="#8884d2" radius={[10, 10, 0, 0]} />
+                    <Bar dataKey="Logs" radius={[10, 10, 0, 0]}>
+                      <Cell fill="#2563eb" />
+                      <Cell fill="#d97706" />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
