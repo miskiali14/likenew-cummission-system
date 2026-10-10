@@ -841,7 +841,7 @@ export default function DashboardPage() {
           <img src="/likenew-logo.png" alt="" className="w-11 h-11 rounded-xl shadow-sm shrink-0" />
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-              <span className="text-slate-900">LIKE NEW</span>
+              <span className="text-slate-900">Likenew</span>
               <span className="text-xs px-3 py-1 rounded-full font-semibold text-brand-700 bg-brand-100 border border-brand-200">
                 {user?.role || 'STAFF'}
               </span>
