@@ -21,6 +21,7 @@ const VALID_RESPONSIBLE_DEPARTMENTS = [
 export async function PATCH(request, { params }) {
   const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'SALES', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
+  const user = auth.user;
 
   try {
     const { id } = await params;
@@ -32,7 +33,7 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
     const {
       status, customerName, phone, orderId, category, description, date,
-      resolutionNotes, branch, responsibleDepartment, responsibleName, loggedByName, resolvedByName,
+      resolutionNotes, branch, responsibleDepartment, responsibleName, loggedByName,
     } = body;
 
     const responsibleDepartments = Array.isArray(responsibleDepartment) ? responsibleDepartment : [];
@@ -57,7 +58,10 @@ export async function PATCH(request, { params }) {
           resolvedAt: status === 'RESOLVED' ? new Date() : null,
           responsibleDepartment: status === 'RESOLVED' ? responsibleDepartments : [],
           responsibleName: status === 'RESOLVED' ? (responsibleName || null) : null,
-          resolvedByName: status === 'RESOLVED' ? (resolvedByName || null) : null,
+          // Always the actually-logged-in account, never client-supplied —
+          // branch/role logins can be shared, but whoever is authenticated
+          // right now is the one truly resolving it.
+          resolvedByName: status === 'RESOLVED' ? user.fullName : null,
         }),
         ...(customerName !== undefined && { customerName }),
         ...(phone !== undefined && { phone: phone || null }),

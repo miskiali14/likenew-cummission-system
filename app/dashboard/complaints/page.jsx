@@ -44,7 +44,7 @@ const toggleInArray = (arr, val) => (arr.includes(val) ? arr.filter((v) => v !==
 const emptyForm = {
   customerName: '', phone: '', orderId: '', category: ['OTHER'],
   description: '', date: '', branch: 'HQ', status: 'OPEN', resolutionNotes: '',
-  responsibleDepartment: [], responsibleName: '', loggedByName: '', resolvedByName: '',
+  responsibleDepartment: [], responsibleName: '', loggedByName: '',
 };
 
 export default function ComplaintsPage() {
@@ -63,7 +63,6 @@ export default function ComplaintsPage() {
   const [resolveNotes, setResolveNotes] = useState('');
   const [resolveDepartment, setResolveDepartment] = useState([]);
   const [resolveResponsibleName, setResolveResponsibleName] = useState('');
-  const [resolveByName, setResolveByName] = useState('');
   const [statusCounts, setStatusCounts] = useState(null);
 
   // Admin, Customer Care, and Call Center oversee complaints across both
@@ -171,7 +170,6 @@ export default function ComplaintsPage() {
       responsibleDepartment: c.responsibleDepartment || [],
       responsibleName: c.responsibleName || '',
       loggedByName: c.loggedByName || '',
-      resolvedByName: c.resolvedByName || '',
     });
     setShowModal(true);
   };
@@ -200,7 +198,6 @@ export default function ComplaintsPage() {
     setResolveNotes(c.resolutionNotes || '');
     setResolveDepartment(c.responsibleDepartment || []);
     setResolveResponsibleName(c.responsibleName || '');
-    setResolveByName(c.resolvedByName || '');
   };
 
   const handleResolveSubmit = async (e) => {
@@ -212,14 +209,12 @@ export default function ComplaintsPage() {
         resolutionNotes: resolveNotes,
         responsibleDepartment: resolveDepartment,
         responsibleName: resolveResponsibleName,
-        resolvedByName: resolveByName,
       });
       showToast('success', 'Complaint marked as resolved!');
       setResolveTarget(null);
       setResolveNotes('');
       setResolveDepartment([]);
       setResolveResponsibleName('');
-      setResolveByName('');
       fetchComplaints();
       fetchStatusCounts();
     } catch (err) {
@@ -623,16 +618,9 @@ export default function ComplaintsPage() {
                   </div>
                   {formData.status === 'RESOLVED' && (
                     <>
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolved By (your name)</label>
-                        <input
-                          type="text"
-                          placeholder="E.g. Samira"
-                          value={formData.resolvedByName}
-                          onChange={(e) => setFormData({ ...formData, resolvedByName: e.target.value })}
-                          className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                        />
-                      </div>
+                      <p className="text-xs text-slate-500 dark:text-ink-400 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-lg p-2.5">
+                        Will be recorded as resolved by <span className="font-semibold text-slate-700 dark:text-ink-200">{user?.fullName}</span> (you're logged in as them).
+                      </p>
                       <div>
                         <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolution Notes</label>
                         <textarea
@@ -718,18 +706,9 @@ export default function ComplaintsPage() {
               </p>
             </div>
             <form onSubmit={handleResolveSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
-                  Resolved By (your name)
-                </label>
-                <input
-                  type="text"
-                  placeholder="E.g. Samira"
-                  value={resolveByName}
-                  onChange={(e) => setResolveByName(e.target.value)}
-                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
+              <p className="text-xs text-slate-500 dark:text-ink-400 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-lg p-2.5">
+                Will be recorded as resolved by <span className="font-semibold text-slate-700 dark:text-ink-200">{user?.fullName}</span> (you're logged in as them).
+              </p>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
                   How was this resolved?
