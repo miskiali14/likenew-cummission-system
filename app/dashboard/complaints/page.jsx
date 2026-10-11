@@ -72,6 +72,10 @@ export default function ComplaintsPage() {
   const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user?.role);
   const canManage = ['ADMIN', 'CUSTOMER_CARE', 'SALES', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user?.role);
   const canDelete = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
+  // Only the people who actually pick up passed-along complaints need the
+  // "Passed" tab/count — Sales and Call Center can still pass one off (see
+  // the per-row action button), they just don't need this view themselves.
+  const canSeePassedTab = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -298,7 +302,7 @@ export default function ComplaintsPage() {
 
       {/* Status counts — always shows the full breakdown, independent of the active tab */}
       {statusCounts && (
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className={`grid grid-cols-2 ${canSeePassedTab ? 'sm:grid-cols-5' : 'sm:grid-cols-4'} gap-3`}>
           <div className="relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-400 to-slate-600" />
             <span className="text-sm text-slate-500 dark:text-ink-400">Total</span>
@@ -314,11 +318,13 @@ export default function ComplaintsPage() {
             <span className="text-sm text-amber-600 dark:text-amber-400">In Progress</span>
             <span className="text-lg font-bold text-amber-700 dark:text-amber-400 tabular-nums">{statusCounts.inProgress}</span>
           </div>
-          <div className="relative bg-white dark:bg-ink-800 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
-            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600" />
-            <span className="text-sm text-indigo-600 dark:text-indigo-400">Passed</span>
-            <span className="text-lg font-bold text-indigo-700 dark:text-indigo-400 tabular-nums">{statusCounts.passed}</span>
-          </div>
+          {canSeePassedTab && (
+            <div className="relative bg-white dark:bg-ink-800 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600" />
+              <span className="text-sm text-indigo-600 dark:text-indigo-400">Passed</span>
+              <span className="text-lg font-bold text-indigo-700 dark:text-indigo-400 tabular-nums">{statusCounts.passed}</span>
+            </div>
+          )}
           <div className="relative bg-white dark:bg-ink-800 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
             <span className="text-sm text-emerald-600 dark:text-emerald-400">Resolved</span>
@@ -330,7 +336,7 @@ export default function ComplaintsPage() {
       {/* Filters */}
       <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
         <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
-          {['OPEN', 'IN_PROGRESS', 'PASSED', 'RESOLVED', 'All'].map((tab) => (
+          {['OPEN', 'IN_PROGRESS', ...(canSeePassedTab ? ['PASSED'] : []), 'RESOLVED', 'All'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusTab(tab)}
