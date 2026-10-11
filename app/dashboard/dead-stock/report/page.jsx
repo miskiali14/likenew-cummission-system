@@ -58,7 +58,7 @@ export default function DeadStockReportPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'CUSTOMER_CARE'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }

@@ -253,6 +253,7 @@ export default function UsersPage() {
                     <option value="QUALITY_CONTROL">QUALITY CONTROL</option>
                     <option value="CUSTOMER_CARE">CUSTOMER CARE</option>
                     <option value="CALL_CENTER">CALL CENTER</option>
+                    <option value="CUSTOMER_OPS">CUSTOMER OPS (Items + Complaints + Dead Stock)</option>
                     <option value="VIEWER">VIEWER (read-only)</option>
                   </select>
                 </div>

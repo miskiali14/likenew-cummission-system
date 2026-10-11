@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Loader2, MessageSquareWarning, CheckCircle2, Clock, Calendar, Download, X, Timer } from 'lucide-react';
+import { Loader2, MessageSquareWarning, CheckCircle2, Clock, Calendar, Download, X, Timer, Forward } from 'lucide-react';
 
 const CATEGORY_LABEL = {
   DAMAGED: 'Damaged Item',
@@ -13,10 +13,11 @@ const CATEGORY_LABEL = {
   STAFF: 'Staff Behavior',
   OTHER: 'Other',
 };
-const STATUS_LABEL = { OPEN: 'Open', IN_PROGRESS: 'In Progress', RESOLVED: 'Resolved' };
+const STATUS_LABEL = { OPEN: 'Open', IN_PROGRESS: 'In Progress', PASSED: 'Passed to Customer Care', RESOLVED: 'Resolved' };
 const STATUS_STYLE = {
   OPEN: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
   IN_PROGRESS: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  PASSED: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800',
   RESOLVED: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
 };
 
@@ -57,7 +58,7 @@ export default function ComplaintsReportPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'CUSTOMER_CARE'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
@@ -88,6 +89,7 @@ export default function ComplaintsReportPage() {
     const total = complaints.length;
     const open = complaints.filter((c) => c.status === 'OPEN').length;
     const inProgress = complaints.filter((c) => c.status === 'IN_PROGRESS').length;
+    const passed = complaints.filter((c) => c.status === 'PASSED').length;
     const resolved = complaints.filter((c) => c.status === 'RESOLVED').length;
     const resolutionRate = total > 0 ? (resolved / total) * 100 : 0;
 
@@ -99,7 +101,7 @@ export default function ComplaintsReportPage() {
         }, 0) / resolvedWithTimes.length
       : null;
 
-    return { total, open, inProgress, resolved, resolutionRate, avgResolutionHours };
+    return { total, open, inProgress, passed, resolved, resolutionRate, avgResolutionHours };
   }, [complaints]);
 
   const byCategory = useMemo(() => {
@@ -151,12 +153,12 @@ export default function ComplaintsReportPage() {
       {/* Filters */}
       <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
         <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
-          {['All', 'OPEN', 'IN_PROGRESS', 'RESOLVED'].map((tab) => (
+          {['All', 'OPEN', 'IN_PROGRESS', 'PASSED', 'RESOLVED'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusFilter(tab)}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
-                statusFilter === tab ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                statusFilter === tab ? 'bg-white dark:bg-ink-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-ink-400 hover:text-slate-700 dark:hover:text-ink-200'
               }`}
             >
               {tab === 'All' ? 'All' : STATUS_LABEL[tab]}

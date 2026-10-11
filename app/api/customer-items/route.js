@@ -11,7 +11,7 @@ import { todayStr } from '@/lib/date';
 // private list. Legacy items logged before this tracking existed
 // (createdById is null) stay visible to everyone so nothing old disappears.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -21,7 +21,7 @@ export async function GET(request) {
     const status = searchParams.get('status');
 
     const whereClause = {};
-    if (user.role === 'ADMIN') {
+    if (['ADMIN', 'CUSTOMER_OPS'].includes(user.role)) {
       if (branchParam && branchParam !== 'All') whereClause.branch = branchParam;
     } else {
       whereClause.OR = [{ createdById: user.id }, { createdById: null }];
@@ -40,7 +40,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -55,7 +55,7 @@ export async function POST(request) {
       );
     }
 
-    const branch = ['ADMIN', 'CALL_CENTER'].includes(user.role)
+    const branch = ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user.role)
       ? (body.branch || user.branch || 'HQ')
       : user.branch;
 

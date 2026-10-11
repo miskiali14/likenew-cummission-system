@@ -6,7 +6,7 @@ import { todayStr } from '@/lib/date';
 // Dead Stock — old, uncollected orders sitting at a branch. Admin and
 // Customer Care only; both see every branch.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
 
   try {
@@ -30,7 +30,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 

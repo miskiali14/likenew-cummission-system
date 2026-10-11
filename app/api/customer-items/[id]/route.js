@@ -13,7 +13,7 @@ const RESOLVED_STATUSES = ['CLAIMED', 'DONATED', 'DISCARDED'];
 // Admin any item; Call Center only an item they personally logged (or a
 // legacy one with no owner). Sales has no access to Customer Items at all.
 export async function PATCH(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -23,7 +23,7 @@ export async function PATCH(request, { params }) {
     if (!existing) {
       return NextResponse.json({ message: 'Item not found' }, { status: 404 });
     }
-    if (user.role !== 'ADMIN' && existing.createdById && existing.createdById !== user.id) {
+    if (!['ADMIN', 'CUSTOMER_OPS'].includes(user.role) && existing.createdById && existing.createdById !== user.id) {
       return NextResponse.json({ message: 'This item was not logged by you' }, { status: 403 });
     }
 
@@ -43,8 +43,8 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    // Only Admin may move an item between branches.
-    const nextBranch = user.role === 'ADMIN' && branch !== undefined ? branch : undefined;
+    // Only Admin / Customer Ops may move an item between branches.
+    const nextBranch = ['ADMIN', 'CUSTOMER_OPS'].includes(user.role) && branch !== undefined ? branch : undefined;
 
     const item = await prisma.customerItem.update({
       where: { id },
@@ -75,7 +75,7 @@ export async function PATCH(request, { params }) {
 // Delete a Customer Item — Admin any item, Call Center only one they
 // logged (or a legacy one with no owner). Sales has no access at all.
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -85,7 +85,7 @@ export async function DELETE(request, { params }) {
     if (!existing) {
       return NextResponse.json({ message: 'Item not found' }, { status: 404 });
     }
-    if (user.role !== 'ADMIN' && existing.createdById && existing.createdById !== user.id) {
+    if (!['ADMIN', 'CUSTOMER_OPS'].includes(user.role) && existing.createdById && existing.createdById !== user.id) {
       return NextResponse.json({ message: 'This item was not logged by you' }, { status: 403 });
     }
 

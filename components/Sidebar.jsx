@@ -21,6 +21,7 @@ import {
   Headset,
   PhoneCall,
   ChevronDown,
+  Settings2,
 } from 'lucide-react';
 
 function NavLink({ href, icon: Icon, label, isActive, onClose, indent }) {
@@ -175,6 +176,21 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/customer-items" icon={Briefcase} label="Customer Items" isActive={isActive('/dashboard/customer-items')} />
               <NavLink href="/dashboard/customer-items/commission-report" icon={Coins} label="My Commission Report" isActive={isActive('/dashboard/customer-items/commission-report')} />
               <NavLink href="/dashboard/complaints" icon={MessageSquareWarning} label="Complaints" isActive={isActive('/dashboard/complaints')} />
+            </>
+          )}
+
+          {/* ================= CUSTOMER OPS (bespoke: Items + Complaints + Dead Stock) ================= */}
+          {userRole === 'CUSTOMER_OPS' && (
+            <>
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1 flex items-center gap-1.5">
+                <Settings2 size={14} /> Customer Ops
+              </div>
+              <NavLink href="/dashboard/customer-items" icon={Briefcase} label="Customer Items" isActive={isActive('/dashboard/customer-items')} />
+              <NavLink href="/dashboard/customer-items/commission-report" icon={Coins} label="Item Commission Report" isActive={isActive('/dashboard/customer-items/commission-report')} />
+              <NavLink href="/dashboard/complaints" icon={MessageSquareWarning} label="Complaints" isActive={isActive('/dashboard/complaints')} />
+              <NavLink href="/dashboard/complaints/report" icon={BarChart3} label="Complaints Report" isActive={isActive('/dashboard/complaints/report')} />
+              <NavLink href="/dashboard/dead-stock" icon={Boxes} label="Dead Stock" isActive={isActive('/dashboard/dead-stock')} />
+              <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} />
             </>
           )}
 

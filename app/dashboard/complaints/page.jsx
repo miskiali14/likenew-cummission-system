@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Loader2, Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, Clock, X } from 'lucide-react';
+import { Loader2, Search, PlusCircle, Edit2, Trash2, MessageSquareWarning, AlertCircle, CheckCircle2, CheckCheck, Clock, Forward, X } from 'lucide-react';
 
 const CATEGORIES = [
   { value: 'DAMAGED', label: 'Damaged Item' },
@@ -17,9 +17,10 @@ const CATEGORIES = [
 const STATUS_STYLE = {
   OPEN: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
   IN_PROGRESS: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+  PASSED: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800',
   RESOLVED: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
 };
-const STATUS_LABEL = { OPEN: 'Open', IN_PROGRESS: 'In Progress', RESOLVED: 'Resolved' };
+const STATUS_LABEL = { OPEN: 'Open', IN_PROGRESS: 'In Progress', PASSED: 'Passed to Customer Care', RESOLVED: 'Resolved' };
 
 // Which team/branch actually caused the issue — picked when resolving.
 const RESPONSIBLE_DEPARTMENTS = [
@@ -43,7 +44,7 @@ const toggleInArray = (arr, val) => (arr.includes(val) ? arr.filter((v) => v !==
 const emptyForm = {
   customerName: '', phone: '', orderId: '', category: ['OTHER'],
   description: '', date: '', branch: 'HQ', status: 'OPEN', resolutionNotes: '',
-  responsibleDepartment: [], responsibleName: '', loggedByName: '',
+  responsibleDepartment: [], responsibleName: '', loggedByName: '', resolvedByName: '',
 };
 
 export default function ComplaintsPage() {
@@ -62,13 +63,16 @@ export default function ComplaintsPage() {
   const [resolveNotes, setResolveNotes] = useState('');
   const [resolveDepartment, setResolveDepartment] = useState([]);
   const [resolveResponsibleName, setResolveResponsibleName] = useState('');
+  const [resolveByName, setResolveByName] = useState('');
   const [statusCounts, setStatusCounts] = useState(null);
 
   // Admin, Customer Care, and Call Center oversee complaints across both
-  // branches; only Admin and Customer Care can manage/resolve them — Sales
-  // and Call Center can only log a complaint.
-  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user?.role);
-  const canManage = ['ADMIN', 'CUSTOMER_CARE'].includes(user?.role);
+  // branches; everyone who can see complaints can also manage/resolve them —
+  // Sales/Call Center mark one PASSED when they can't resolve it themselves,
+  // so Customer Care can pick it up.
+  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user?.role);
+  const canManage = ['ADMIN', 'CUSTOMER_CARE', 'SALES', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user?.role);
+  const canDelete = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -82,7 +86,7 @@ export default function ComplaintsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
@@ -120,6 +124,7 @@ export default function ComplaintsPage() {
       setStatusCounts({
         open: all.filter((c) => c.status === 'OPEN').length,
         inProgress: all.filter((c) => c.status === 'IN_PROGRESS').length,
+        passed: all.filter((c) => c.status === 'PASSED').length,
         resolved: all.filter((c) => c.status === 'RESOLVED').length,
         total: all.length,
       });
@@ -166,6 +171,7 @@ export default function ComplaintsPage() {
       responsibleDepartment: c.responsibleDepartment || [],
       responsibleName: c.responsibleName || '',
       loggedByName: c.loggedByName || '',
+      resolvedByName: c.resolvedByName || '',
     });
     setShowModal(true);
   };
@@ -194,6 +200,7 @@ export default function ComplaintsPage() {
     setResolveNotes(c.resolutionNotes || '');
     setResolveDepartment(c.responsibleDepartment || []);
     setResolveResponsibleName(c.responsibleName || '');
+    setResolveByName(c.resolvedByName || '');
   };
 
   const handleResolveSubmit = async (e) => {
@@ -205,12 +212,14 @@ export default function ComplaintsPage() {
         resolutionNotes: resolveNotes,
         responsibleDepartment: resolveDepartment,
         responsibleName: resolveResponsibleName,
+        resolvedByName: resolveByName,
       });
       showToast('success', 'Complaint marked as resolved!');
       setResolveTarget(null);
       setResolveNotes('');
       setResolveDepartment([]);
       setResolveResponsibleName('');
+      setResolveByName('');
       fetchComplaints();
       fetchStatusCounts();
     } catch (err) {
@@ -222,6 +231,19 @@ export default function ComplaintsPage() {
     try {
       await API.patch(`/complaints/${id}`, { status: 'IN_PROGRESS' });
       showToast('success', 'Complaint marked as in progress');
+      fetchComplaints();
+      fetchStatusCounts();
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to update complaint');
+    }
+  };
+
+  // Sales/Call Center use this when they can't resolve a complaint
+  // themselves — it routes to Customer Care's "Passed" tab.
+  const handlePass = async (id) => {
+    try {
+      await API.patch(`/complaints/${id}`, { status: 'PASSED' });
+      showToast('success', 'Complaint passed to Customer Care');
       fetchComplaints();
       fetchStatusCounts();
     } catch (err) {
@@ -281,7 +303,7 @@ export default function ComplaintsPage() {
 
       {/* Status counts — always shows the full breakdown, independent of the active tab */}
       {statusCounts && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <div className="relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-slate-400 to-slate-600" />
             <span className="text-sm text-slate-500 dark:text-ink-400">Total</span>
@@ -297,6 +319,11 @@ export default function ComplaintsPage() {
             <span className="text-sm text-amber-600 dark:text-amber-400">In Progress</span>
             <span className="text-lg font-bold text-amber-700 dark:text-amber-400 tabular-nums">{statusCounts.inProgress}</span>
           </div>
+          <div className="relative bg-white dark:bg-ink-800 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+            <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600" />
+            <span className="text-sm text-indigo-600 dark:text-indigo-400">Passed</span>
+            <span className="text-lg font-bold text-indigo-700 dark:text-indigo-400 tabular-nums">{statusCounts.passed}</span>
+          </div>
           <div className="relative bg-white dark:bg-ink-800 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
             <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
             <span className="text-sm text-emerald-600 dark:text-emerald-400">Resolved</span>
@@ -308,7 +335,7 @@ export default function ComplaintsPage() {
       {/* Filters */}
       <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
         <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
-          {['OPEN', 'IN_PROGRESS', 'RESOLVED', 'All'].map((tab) => (
+          {['OPEN', 'IN_PROGRESS', 'PASSED', 'RESOLVED', 'All'].map((tab) => (
             <button
               key={tab}
               onClick={() => setStatusTab(tab)}
@@ -404,7 +431,14 @@ export default function ComplaintsPage() {
                     </td>
                     {canManage && (
                       <td className="p-4 text-gray-600 dark:text-ink-300 max-w-xs truncate" title={c.resolutionNotes || ''}>
-                        {c.resolutionNotes || <span className="text-slate-300 dark:text-ink-600">—</span>}
+                        {c.resolutionNotes ? (
+                          <>
+                            {c.resolutionNotes}
+                            {c.resolvedByName ? <span className="text-slate-400 dark:text-ink-500"> — {c.resolvedByName}</span> : ''}
+                          </>
+                        ) : (
+                          <span className="text-slate-300 dark:text-ink-600">—</span>
+                        )}
                       </td>
                     )}
                     {canManage && (
@@ -431,6 +465,15 @@ export default function ComplaintsPage() {
                               <Clock size={18} />
                             </button>
                           )}
+                          {(c.status === 'OPEN' || c.status === 'IN_PROGRESS') && (
+                            <button
+                              onClick={() => handlePass(c.id)}
+                              className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
+                              title="Pass to Customer Care — couldn't resolve it myself"
+                            >
+                              <Forward size={18} />
+                            </button>
+                          )}
                           {c.status !== 'RESOLVED' && (
                             <button
                               onClick={() => openResolveModal(c)}
@@ -447,13 +490,15 @@ export default function ComplaintsPage() {
                           >
                             <Edit2 size={18} />
                           </button>
-                          <button
-                            onClick={() => handleDelete(c.id)}
-                            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
-                            title="Delete"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          {canDelete && (
+                            <button
+                              onClick={() => handleDelete(c.id)}
+                              className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
+                              title="Delete"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     )}
@@ -578,11 +623,22 @@ export default function ComplaintsPage() {
                     >
                       <option value="OPEN">Open</option>
                       <option value="IN_PROGRESS">In Progress</option>
+                      <option value="PASSED">Passed to Customer Care</option>
                       <option value="RESOLVED">Resolved</option>
                     </select>
                   </div>
                   {formData.status === 'RESOLVED' && (
                     <>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolved By (your name)</label>
+                        <input
+                          type="text"
+                          placeholder="E.g. Samira"
+                          value={formData.resolvedByName}
+                          onChange={(e) => setFormData({ ...formData, resolvedByName: e.target.value })}
+                          className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        />
+                      </div>
                       <div>
                         <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolution Notes</label>
                         <textarea
@@ -668,6 +724,18 @@ export default function ComplaintsPage() {
               </p>
             </div>
             <form onSubmit={handleResolveSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
+                  Resolved By (your name)
+                </label>
+                <input
+                  type="text"
+                  placeholder="E.g. Samira"
+                  value={resolveByName}
+                  onChange={(e) => setResolveByName(e.target.value)}
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
                   How was this resolved?

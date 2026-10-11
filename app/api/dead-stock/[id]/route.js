@@ -12,7 +12,7 @@ const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
 // Update a Dead Stock entry (edit, or mark given out/donated/discarded) —
 // Admin/Customer Care.
 export async function PATCH(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -69,7 +69,7 @@ export async function PATCH(request, { params }) {
 
 // Delete a Dead Stock entry — Admin/Customer Care.
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
 
   try {

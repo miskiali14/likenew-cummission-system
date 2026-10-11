@@ -481,6 +481,13 @@ export default function DashboardPage() {
           return;
         }
 
+        // Customer Ops (bespoke role) has no washing/ironing logs either —
+        // their work lives on Customer Items, Complaints, and Dead Stock.
+        if (parsedUser.role === 'CUSTOMER_OPS') {
+          router.push('/dashboard/complaints');
+          return;
+        }
+
         setUser(parsedUser);
 
         if (parsedUser.role !== 'ADMIN') {

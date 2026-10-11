@@ -13,12 +13,13 @@ const VALID_RESPONSIBLE_DEPARTMENTS = [
   'DELIVERY_HQ', 'DELIVERY_KM5',
 ];
 
-// Update a complaint (status, resolution notes, details) — Admin and
-// Customer Care only, any branch. Sales can log complaints but does not
-// manage or see how they were resolved. Resolving requires saying which
-// team/branch was actually responsible for the issue.
+// Update a complaint (status, resolution notes, details) — Admin, Customer
+// Care, Sales, and Call Center can all manage/resolve complaints now; if
+// Sales or Call Center can't resolve one themselves, they mark it PASSED so
+// Customer Care picks it up. Resolving requires saying which team/branch was
+// actually responsible for the issue.
 export async function PATCH(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'SALES', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
 
   try {
@@ -31,7 +32,7 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
     const {
       status, customerName, phone, orderId, category, description, date,
-      resolutionNotes, branch, responsibleDepartment, responsibleName, loggedByName,
+      resolutionNotes, branch, responsibleDepartment, responsibleName, loggedByName, resolvedByName,
     } = body;
 
     const responsibleDepartments = Array.isArray(responsibleDepartment) ? responsibleDepartment : [];
@@ -56,6 +57,7 @@ export async function PATCH(request, { params }) {
           resolvedAt: status === 'RESOLVED' ? new Date() : null,
           responsibleDepartment: status === 'RESOLVED' ? responsibleDepartments : [],
           responsibleName: status === 'RESOLVED' ? (responsibleName || null) : null,
+          resolvedByName: status === 'RESOLVED' ? (resolvedByName || null) : null,
         }),
         ...(customerName !== undefined && { customerName }),
         ...(phone !== undefined && { phone: phone || null }),
@@ -82,7 +84,7 @@ export async function PATCH(request, { params }) {
 
 // Delete a complaint — Admin and Customer Care only, any branch.
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
 
   try {

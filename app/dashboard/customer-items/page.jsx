@@ -57,8 +57,8 @@ export default function CustomerItemsPage() {
   // Customer Items is Admin + Call Center only — Sales has no access at all.
   // Both remaining roles can claim, revert, edit, and delete, and both can
   // see/log against either branch.
-  const canManage = ['ADMIN', 'CALL_CENTER'].includes(user?.role);
-  const canSeeAllBranches = ['ADMIN', 'CALL_CENTER'].includes(user?.role);
+  const canManage = ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user?.role);
+  const canSeeAllBranches = ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -72,7 +72,7 @@ export default function CustomerItemsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'CALL_CENTER'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }

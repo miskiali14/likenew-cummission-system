@@ -14,6 +14,10 @@ enum Role {
   VIEWER
   CUSTOMER_CARE
   CALL_CENTER
+  // Full access to exactly three areas: Customer Items, Complaints, Dead
+  // Stock — a narrower, bespoke role (first used for Abdirsaq) rather than
+  // widening CUSTOMER_CARE's access for everyone.
+  CUSTOMER_OPS
 }
 
 enum Department {
@@ -41,6 +45,9 @@ enum ItemStatus {
 enum ComplaintStatus {
   OPEN
   IN_PROGRESS
+  // Sales/Call Center couldn't resolve it themselves, so it's passed along
+  // to Customer Care to take over.
+  PASSED
   RESOLVED
 }
 
@@ -231,6 +238,9 @@ model Complaint {
   // people day to day, so this is how a complaint gets traced back to whoever
   // actually filed it, in case it needs to be followed up with them later.
   loggedByName   String?
+  // The real staff member who personally resolved this complaint — same
+  // reasoning as loggedByName, since branch/role logins are shared.
+  resolvedByName String?
   date           String            // YYYY-MM-DD, when it was logged
   createdAt      DateTime          @default(now())
   resolvedAt     DateTime?

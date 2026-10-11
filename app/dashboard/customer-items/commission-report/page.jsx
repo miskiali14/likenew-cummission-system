@@ -53,7 +53,7 @@ export default function CustomerItemCommissionReportPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'CALL_CENTER'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
@@ -77,7 +77,7 @@ export default function CustomerItemCommissionReportPage() {
     fetchReport();
   }, [fetchReport]);
 
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = ['ADMIN', 'CUSTOMER_OPS'].includes(user?.role);
   const allItems = data?.items || [];
 
   // Admin can narrow the whole report down to one person (e.g. Abdifitah or

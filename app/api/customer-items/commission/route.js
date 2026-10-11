@@ -11,7 +11,7 @@ import { CUSTOMER_ITEM_CLAIM_COMMISSION } from '@/lib/commission';
 // total, and every resolved item. Optional dateFrom/dateTo (YYYY-MM-DD)
 // filter by when the item was actually resolved.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -21,7 +21,7 @@ export async function GET(request) {
     const dateTo = searchParams.get('dateTo');
 
     const whereClause = { status: { in: ['CLAIMED', 'DONATED', 'DISCARDED'] }, claimedById: { not: null } };
-    if (user.role !== 'ADMIN') {
+    if (!['ADMIN', 'CUSTOMER_OPS'].includes(user.role)) {
       whereClause.claimedById = user.id;
     }
     if (dateFrom || dateTo) {
@@ -51,7 +51,7 @@ export async function GET(request) {
 
     const items = claimed.map((c) => ({ ...c, commission: CUSTOMER_ITEM_CLAIM_COMMISSION }));
 
-    if (user.role !== 'ADMIN') {
+    if (!['ADMIN', 'CUSTOMER_OPS'].includes(user.role)) {
       const count = claimed.length;
       return NextResponse.json({
         myClaimedCount: count,

@@ -379,7 +379,7 @@ export default function ReportsPage() {
           <button
             onClick={() => setReportType('weekly')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
-              reportType === 'weekly' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              reportType === 'weekly' ? 'bg-white dark:bg-ink-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-ink-400 hover:text-slate-700 dark:hover:text-ink-200'
             }`}
           >
             <Users size={14} /> Weekly Operations Overview
@@ -387,7 +387,7 @@ export default function ReportsPage() {
           <button
             onClick={() => setReportType('individual')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
-              reportType === 'individual' ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              reportType === 'individual' ? 'bg-white dark:bg-ink-800 text-brand-700 dark:text-brand-300 shadow-sm' : 'text-slate-500 dark:text-ink-400 hover:text-slate-700 dark:hover:text-ink-200'
             }`}
           >
             <FileText size={14} /> Individual Staff Report

@@ -9,7 +9,7 @@ const VALID_CATEGORIES = ['DAMAGED', 'DELAYED', 'LOST', 'QUALITY', 'STAFF', 'OTH
 // branch; Sales sees and registers complaints for their own branch only
 // (Call Center can view/add but not edit, resolve, or delete — see [id]).
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -20,7 +20,7 @@ export async function GET(request) {
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
 
-    const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user.role)
+    const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user.role)
       ? (branchParam && branchParam !== 'All' ? branchParam : null)
       : user.branch;
 
@@ -45,7 +45,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER']);
+  const auth = requireAuth(request, ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
   const user = auth.user;
 
@@ -60,7 +60,7 @@ export async function POST(request) {
       );
     }
 
-    const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER'].includes(user.role)
+    const branch = ['ADMIN', 'CUSTOMER_CARE', 'CALL_CENTER', 'CUSTOMER_OPS'].includes(user.role)
       ? (body.branch || user.branch || 'HQ')
       : user.branch;
 
