@@ -238,6 +238,11 @@ model Complaint {
   // people day to day, so this is how a complaint gets traced back to whoever
   // actually filed it, in case it needs to be followed up with them later.
   loggedByName   String?
+  // The actual account (not the free-text name above) that created this —
+  // set automatically from the session, never client-supplied. Used to tell
+  // whether the current account is the one that originally logged it (e.g.
+  // Sales/Call Center can't "Pass" a complaint they logged themselves).
+  createdById    String?
   // The real staff member who personally resolved this complaint — same
   // reasoning as loggedByName, since branch/role logins are shared.
   resolvedByName String?

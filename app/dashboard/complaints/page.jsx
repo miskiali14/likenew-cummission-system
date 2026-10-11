@@ -454,7 +454,8 @@ export default function ComplaintsPage() {
                               <Clock size={18} />
                             </button>
                           )}
-                          {(c.status === 'OPEN' || c.status === 'IN_PROGRESS') && (
+                          {(c.status === 'OPEN' || c.status === 'IN_PROGRESS') &&
+                            !(['SALES', 'CALL_CENTER'].includes(user?.role) && c.createdById === user?.id) && (
                             <button
                               onClick={() => handlePass(c.id)}
                               className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 p-1 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"

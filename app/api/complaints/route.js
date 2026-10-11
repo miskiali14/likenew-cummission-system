@@ -76,6 +76,7 @@ export async function POST(request) {
         description,
         date: date || todayStr(),
         loggedByName: loggedByName || null,
+        createdById: user.id,
       },
     });
 

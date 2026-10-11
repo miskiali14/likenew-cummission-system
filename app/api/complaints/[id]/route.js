@@ -36,6 +36,19 @@ export async function PATCH(request, { params }) {
       resolutionNotes, branch, responsibleDepartment, responsibleName, loggedByName,
     } = body;
 
+    // Sales/Call Center can't pass off a complaint they logged themselves —
+    // they're expected to handle or resolve those directly.
+    if (
+      status === 'PASSED' &&
+      ['SALES', 'CALL_CENTER'].includes(user.role) &&
+      existing.createdById === user.id
+    ) {
+      return NextResponse.json(
+        { message: "You can't pass a complaint you logged yourself — please resolve it directly" },
+        { status: 403 }
+      );
+    }
+
     const responsibleDepartments = Array.isArray(responsibleDepartment) ? responsibleDepartment : [];
     if (
       status === 'RESOLVED' &&
