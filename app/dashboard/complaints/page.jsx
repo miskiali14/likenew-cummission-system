@@ -391,75 +391,69 @@ export default function ComplaintsPage() {
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-50 dark:bg-ink-700/40 border-b border-gray-100 dark:border-ink-700 text-xs text-gray-500 dark:text-ink-400 uppercase tracking-wider">
-                  {canSeeAllBranches && <th className="p-4">Branch</th>}
-                  <th className="p-4">Customer</th>
-                  <th className="p-4">Logged By</th>
-                  <th className="p-4">Phone</th>
-                  <th className="p-4">Order ID</th>
-                  <th className="p-4">Category</th>
-                  <th className="p-4">Details</th>
-                  <th className="p-4">Date</th>
-                  <th className="p-4">Status</th>
-                  {canManage && <th className="p-4">Resolution</th>}
-                  {canManage && <th className="p-4">Responsible</th>}
-                  {canManage && <th className="p-4 text-right">Actions</th>}
+                  <th className="p-3">Customer</th>
+                  <th className="p-3">Details</th>
+                  <th className="p-3">Date</th>
+                  <th className="p-3">Status</th>
+                  {canManage && <th className="p-3">Resolution</th>}
+                  {canManage && <th className="p-3 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-ink-700 text-sm text-gray-700 dark:text-ink-300">
                 {filteredComplaints.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50/50 dark:hover:bg-ink-700/40 transition">
-                    {canSeeAllBranches && <td className="p-4 text-gray-600 dark:text-ink-300">{c.branch}</td>}
-                    <td className="p-4 font-medium text-gray-900 dark:text-white">{c.customerName}</td>
-                    <td className="p-4 text-gray-600 dark:text-ink-300">{c.loggedByName || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
-                    <td className="p-4 text-gray-600 dark:text-ink-300">{c.phone || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
-                    <td className="p-4 text-gray-600 dark:text-ink-300">{c.orderId || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
-                    <td className="p-4">
-                      <div className="flex flex-wrap gap-1">
+                  <tr key={c.id} className="hover:bg-gray-50/50 dark:hover:bg-ink-700/40 transition align-top">
+                    <td className="p-3 min-w-[110px]">
+                      <div className="font-medium text-gray-900 dark:text-white">{c.customerName}</div>
+                      <div className="mt-1 text-xs text-gray-400 dark:text-ink-500 space-y-0.5">
+                        {canSeeAllBranches && <div>{c.branch}{c.phone ? ` · ${c.phone}` : ''}</div>}
+                        {!canSeeAllBranches && c.phone && <div>{c.phone}</div>}
+                        {c.orderId && <div>Order #{c.orderId}</div>}
+                        {c.loggedByName && <div>Logged by {c.loggedByName}</div>}
+                      </div>
+                    </td>
+                    <td className="p-3 min-w-[150px] max-w-sm">
+                      <div className="flex flex-wrap gap-1 mb-1.5">
                         {(Array.isArray(c.category) ? c.category : [c.category]).map((cat) => (
-                          <span key={cat} className="px-2.5 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-ink-700 text-slate-700 dark:text-ink-300 border border-slate-200 dark:border-ink-600">
+                          <span key={cat} className="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-slate-100 dark:bg-ink-700 text-slate-700 dark:text-ink-300 border border-slate-200 dark:border-ink-600">
                             {categoryLabel(cat)}
                           </span>
                         ))}
                       </div>
+                      <div className="text-gray-600 dark:text-ink-300 whitespace-normal break-words">{c.description}</div>
                     </td>
-                    <td className="p-4 text-gray-600 dark:text-ink-300 max-w-xs truncate" title={c.description}>{c.description}</td>
-                    <td className="p-4 text-gray-500 dark:text-ink-400">{c.date}</td>
-                    <td className="p-4">
-                      <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[c.status]}`}>
+                    <td className="p-3 text-gray-500 dark:text-ink-400 whitespace-nowrap">{c.date}</td>
+                    <td className="p-3">
+                      <span className={`inline-block px-2.5 py-1 text-xs font-semibold rounded-full border ${STATUS_STYLE[c.status]}`}>
                         {STATUS_LABEL[c.status]}
                       </span>
                     </td>
                     {canManage && (
-                      <td className="p-4 text-gray-600 dark:text-ink-300 max-w-xs truncate" title={c.resolutionNotes || ''}>
-                        {c.resolutionNotes ? (
-                          <>
-                            {c.resolutionNotes}
-                            {c.resolvedByName ? <span className="text-slate-400 dark:text-ink-500"> — {c.resolvedByName}</span> : ''}
-                          </>
+                      <td className="p-3 min-w-[130px] max-w-xs text-gray-600 dark:text-ink-300 whitespace-normal break-words">
+                        {c.resolutionNotes || c.responsibleDepartment?.length > 0 ? (
+                          <div className="space-y-1">
+                            {c.resolutionNotes && <div>{c.resolutionNotes}</div>}
+                            {c.resolvedByName && (
+                              <div className="text-xs text-slate-400 dark:text-ink-500">Resolved by {c.resolvedByName}</div>
+                            )}
+                            {c.responsibleDepartment?.length > 0 && (
+                              <div className="text-xs text-slate-400 dark:text-ink-500">
+                                Responsible: {responsibleLabels(c.responsibleDepartment)}
+                                {c.responsibleName ? ` — ${c.responsibleName}` : ''}
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <span className="text-slate-300 dark:text-ink-600">—</span>
                         )}
                       </td>
                     )}
                     {canManage && (
-                      <td className="p-4 text-gray-600 dark:text-ink-300" title={c.responsibleName || ''}>
-                        {c.responsibleDepartment?.length > 0 ? (
-                          <>
-                            {responsibleLabels(c.responsibleDepartment)}
-                            {c.responsibleName ? ` — ${c.responsibleName}` : ''}
-                          </>
-                        ) : (
-                          <span className="text-slate-300 dark:text-ink-600">—</span>
-                        )}
-                      </td>
-                    )}
-                    {canManage && (
-                      <td className="p-4 text-right">
+                      <td className="p-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {c.status === 'OPEN' && (
                             <button
                               onClick={() => handleMarkInProgress(c.id)}
-                              className="text-amber-500 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition"
+                              className="text-amber-500 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 p-1 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition"
                               title="Mark as In Progress"
                             >
                               <Clock size={18} />
@@ -468,7 +462,7 @@ export default function ComplaintsPage() {
                           {(c.status === 'OPEN' || c.status === 'IN_PROGRESS') && (
                             <button
                               onClick={() => handlePass(c.id)}
-                              className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
+                              className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 p-1 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
                               title="Pass to Customer Care — couldn't resolve it myself"
                             >
                               <Forward size={18} />
@@ -477,7 +471,7 @@ export default function ComplaintsPage() {
                           {c.status !== 'RESOLVED' && (
                             <button
                               onClick={() => openResolveModal(c)}
-                              className="text-emerald-500 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
+                              className="text-emerald-500 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 p-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
                               title="Resolve Complaint"
                             >
                               <CheckCheck size={18} />
@@ -485,7 +479,7 @@ export default function ComplaintsPage() {
                           )}
                           <button
                             onClick={() => openEditModal(c)}
-                            className="text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
+                            className="text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 p-1 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
                             title="Edit / Update Status"
                           >
                             <Edit2 size={18} />
@@ -493,7 +487,7 @@ export default function ComplaintsPage() {
                           {canDelete && (
                             <button
                               onClick={() => handleDelete(c.id)}
-                              className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
+                              className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
                               title="Delete"
                             >
                               <Trash2 size={18} />
