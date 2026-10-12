@@ -264,6 +264,10 @@ model StreakDiscount {
   branch        String   // HQ or KM5 — where it was claimed, not a scope restriction
   customerName  String
   phone         String
+  // Nullable in the schema only so existing rows from before these fields
+  // existed don't break — the API requires both on every new claim.
+  snapUsername  String?  // the customer's Snapchat username — proves whose streak it is
+  streakDays    Int?     // the actual streak length shown (30, 60, 90, ...) — not assumed
   date          String   // YYYY-MM-DD, when claimed
   createdAt     DateTime @default(now())
 

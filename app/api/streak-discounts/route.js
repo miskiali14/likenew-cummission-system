@@ -48,11 +48,11 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { customerName, phone, date } = body;
+    const { customerName, phone, snapUsername, streakDays, date } = body;
 
-    if (!customerName || !phone) {
+    if (!customerName || !phone || !snapUsername || !streakDays) {
       return NextResponse.json(
-        { message: 'Please fill in the customer name and phone number' },
+        { message: 'Please fill in the customer name, phone number, Snapchat username, and streak length' },
         { status: 400 }
       );
     }
@@ -60,6 +60,14 @@ export async function POST(request) {
     const normalized = normalizePhone(phone);
     if (normalized.length < 7) {
       return NextResponse.json({ message: 'Please enter a valid phone number' }, { status: 400 });
+    }
+
+    const streakDaysNum = Number(streakDays);
+    if (!Number.isInteger(streakDaysNum) || streakDaysNum < 30) {
+      return NextResponse.json(
+        { message: 'Streak length must be at least 30 days to qualify for the discount' },
+        { status: 400 }
+      );
     }
 
     const cutoff = new Date();
@@ -92,6 +100,8 @@ export async function POST(request) {
         branch: body.branch || user.branch || 'HQ',
         customerName,
         phone,
+        snapUsername: snapUsername.trim(),
+        streakDays: streakDaysNum,
         date: date || todayStr(),
         createdById: user.id,
         createdByName: user.fullName,

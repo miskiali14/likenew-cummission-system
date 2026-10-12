@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
 import { Loader2, Sparkles, Trash2, AlertCircle, CheckCircle2, X, Flame } from 'lucide-react';
 
-const emptyForm = { customerName: '', phone: '', branch: 'HQ', date: '' };
+const emptyForm = { customerName: '', phone: '', snapUsername: '', streakDays: '30', branch: 'HQ', date: '' };
 
 export default function StreakDiscountsPage() {
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function StreakDiscountsPage() {
     setSubmitting(true);
     try {
       await API.post('/streak-discounts', formData);
-      showToast('success', `${formData.customerName} logged — 30% streak discount recorded.`);
+      showToast('success', `${formData.customerName} logged — ${formData.streakDays}-day streak discount recorded.`);
       const today = new Date().toISOString().split('T')[0];
       setFormData((prev) => ({ ...emptyForm, date: today, branch: prev.branch }));
       fetchClaims();
@@ -113,8 +113,8 @@ export default function StreakDiscountsPage() {
           <Flame className="text-amber-500" size={24} /> Snapchat Streak Discount
         </h1>
         <p className="text-sm text-gray-500 dark:text-ink-400">
-          A 30-day Snapchat streak earns the customer 30% off. Log it here when claimed — the same phone number is
-          blocked from claiming again for 30 days.
+          A 30-day (or longer) Snapchat streak earns the customer 30% off. Record their Snapchat username and
+          streak length when claimed — the same phone number is blocked from claiming again for 30 days.
         </p>
       </div>
 
@@ -139,6 +139,29 @@ export default function StreakDiscountsPage() {
               placeholder="E.g. 0615xxxxxx"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <div className="min-w-[160px]">
+            <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Snapchat Username</label>
+            <input
+              type="text"
+              required
+              placeholder="E.g. miski.ali"
+              value={formData.snapUsername}
+              onChange={(e) => setFormData({ ...formData, snapUsername: e.target.value })}
+              className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <div className="w-28">
+            <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Streak (days)</label>
+            <input
+              type="number"
+              required
+              min={30}
+              step={1}
+              value={formData.streakDays}
+              onChange={(e) => setFormData({ ...formData, streakDays: e.target.value })}
               className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
@@ -205,7 +228,9 @@ export default function StreakDiscountsPage() {
               <thead>
                 <tr className="bg-gray-50 dark:bg-ink-700/40 border-b border-gray-100 dark:border-ink-700 text-xs text-gray-500 dark:text-ink-400 uppercase tracking-wider">
                   <th className="p-4">Customer</th>
+                  <th className="p-4">Snapchat</th>
                   <th className="p-4">Phone</th>
+                  <th className="p-4">Streak</th>
                   {canSeeAllBranches && <th className="p-4">Branch</th>}
                   <th className="p-4">Date Claimed</th>
                   <th className="p-4">Logged By</th>
@@ -216,7 +241,17 @@ export default function StreakDiscountsPage() {
                 {claims.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50/50 dark:hover:bg-ink-700/40 transition">
                     <td className="p-4 font-medium text-gray-900 dark:text-white">{c.customerName}</td>
+                    <td className="p-4 text-gray-600 dark:text-ink-300">{c.snapUsername || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
                     <td className="p-4 text-gray-600 dark:text-ink-300">{c.phone}</td>
+                    <td className="p-4">
+                      {c.streakDays ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                          <Flame size={12} /> {c.streakDays}d
+                        </span>
+                      ) : (
+                        <span className="text-slate-300 dark:text-ink-600">—</span>
+                      )}
+                    </td>
                     {canSeeAllBranches && <td className="p-4 text-gray-600 dark:text-ink-300">{c.branch}</td>}
                     <td className="p-4 text-gray-500 dark:text-ink-400">{c.date}</td>
                     <td className="p-4 text-gray-600 dark:text-ink-300">{c.createdByName || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
