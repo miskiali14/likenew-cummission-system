@@ -168,6 +168,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/complaints/report" icon={BarChart3} label="Complaints Report" isActive={isActive('/dashboard/complaints/report')} />
               <NavLink href="/dashboard/dead-stock" icon={Boxes} label="Dead Stock" isActive={isActive('/dashboard/dead-stock')} />
               <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} />
+              <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
             </>
           )}
 
@@ -195,6 +196,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/complaints/report" icon={BarChart3} label="Complaints Report" isActive={isActive('/dashboard/complaints/report')} />
               <NavLink href="/dashboard/dead-stock" icon={Boxes} label="Dead Stock" isActive={isActive('/dashboard/dead-stock')} />
               <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} />
+              <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
             </>
           )}
 

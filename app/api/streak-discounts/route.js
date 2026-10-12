@@ -8,7 +8,8 @@ import { todayStr } from '@/lib/date';
 // fooled by formatting differences.
 const normalizePhone = (phone) => String(phone || '').replace(/\D/g, '').slice(-9);
 
-const ALLOWED_ROLES = ['ADMIN', 'SALES'];
+const ALLOWED_ROLES = ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
+const SEES_ALL_BRANCHES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
 
 // Snapchat streak discount claims — logged when a customer presents a
 // 30-day streak, blocked from claiming again until 30 days after their
@@ -23,7 +24,7 @@ export async function GET(request) {
     const branchParam = searchParams.get('branch');
 
     const whereClause = {};
-    if (user.role === 'ADMIN') {
+    if (SEES_ALL_BRANCHES.includes(user.role)) {
       if (branchParam && branchParam !== 'All') whereClause.branch = branchParam;
     } else {
       whereClause.branch = user.branch;

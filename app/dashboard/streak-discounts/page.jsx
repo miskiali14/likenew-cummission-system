@@ -18,6 +18,7 @@ export default function StreakDiscountsPage() {
   const [notification, setNotification] = useState(null);
 
   const isAdmin = user?.role === 'ADMIN';
+  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -31,7 +32,7 @@ export default function StreakDiscountsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (!['ADMIN', 'SALES'].includes(parsedUser.role)) {
+    if (!['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
@@ -44,7 +45,7 @@ export default function StreakDiscountsPage() {
     if (!user) return;
     setLoading(true);
     try {
-      const branchParam = isAdmin && branchFilter !== 'All' ? branchFilter : '';
+      const branchParam = canSeeAllBranches && branchFilter !== 'All' ? branchFilter : '';
       const res = await API.get(`/streak-discounts?branch=${branchParam}`);
       setClaims(res.data || []);
     } catch (err) {
@@ -52,7 +53,7 @@ export default function StreakDiscountsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, isAdmin, branchFilter]);
+  }, [user, canSeeAllBranches, branchFilter]);
 
   useEffect(() => {
     fetchClaims();
@@ -141,7 +142,7 @@ export default function StreakDiscountsPage() {
               className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
-          {isAdmin && (
+          {canSeeAllBranches && (
             <div>
               <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Branch</label>
               <select
@@ -175,7 +176,7 @@ export default function StreakDiscountsPage() {
         </form>
       </div>
 
-      {isAdmin && (
+      {canSeeAllBranches && (
         <div className="flex items-center gap-2">
           <select
             value={branchFilter}
@@ -205,7 +206,7 @@ export default function StreakDiscountsPage() {
                 <tr className="bg-gray-50 dark:bg-ink-700/40 border-b border-gray-100 dark:border-ink-700 text-xs text-gray-500 dark:text-ink-400 uppercase tracking-wider">
                   <th className="p-4">Customer</th>
                   <th className="p-4">Phone</th>
-                  {isAdmin && <th className="p-4">Branch</th>}
+                  {canSeeAllBranches && <th className="p-4">Branch</th>}
                   <th className="p-4">Date Claimed</th>
                   <th className="p-4">Logged By</th>
                   {isAdmin && <th className="p-4 text-right">Actions</th>}
@@ -216,7 +217,7 @@ export default function StreakDiscountsPage() {
                   <tr key={c.id} className="hover:bg-gray-50/50 dark:hover:bg-ink-700/40 transition">
                     <td className="p-4 font-medium text-gray-900 dark:text-white">{c.customerName}</td>
                     <td className="p-4 text-gray-600 dark:text-ink-300">{c.phone}</td>
-                    {isAdmin && <td className="p-4 text-gray-600 dark:text-ink-300">{c.branch}</td>}
+                    {canSeeAllBranches && <td className="p-4 text-gray-600 dark:text-ink-300">{c.branch}</td>}
                     <td className="p-4 text-gray-500 dark:text-ink-400">{c.date}</td>
                     <td className="p-4 text-gray-600 dark:text-ink-300">{c.createdByName || <span className="text-slate-300 dark:text-ink-600">—</span>}</td>
                     {isAdmin && (
