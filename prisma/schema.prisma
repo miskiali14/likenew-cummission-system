@@ -252,3 +252,23 @@ model Complaint {
 
   @@index([branch, status])
 }
+
+// Snapchat "streak" promotion — a customer who keeps a 30-day Snapchat
+// streak with the business gets a 30% discount. Logged here when claimed so
+// the same customer can't redeem the same streak twice; phone is the
+// identifying field (name alone isn't reliable). A new claim is blocked only
+// while an earlier one is still within its 30-day window — once that's
+// passed, they've plausibly built a fresh streak and can claim again.
+model StreakDiscount {
+  id            String   @id @default(uuid())
+  branch        String   // HQ or KM5 — where it was claimed, not a scope restriction
+  customerName  String
+  phone         String
+  date          String   // YYYY-MM-DD, when claimed
+  createdAt     DateTime @default(now())
+
+  createdById   String?
+  createdByName String?
+
+  @@index([phone])
+}

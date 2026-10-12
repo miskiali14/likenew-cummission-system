@@ -22,6 +22,7 @@ import {
   PhoneCall,
   ChevronDown,
   Settings2,
+  Flame,
 } from 'lucide-react';
 
 function NavLink({ href, icon: Icon, label, isActive, onClose, indent }) {
@@ -141,6 +142,8 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
                 <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} indent />
               </NavGroup>
 
+              <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
+
               <div className="border-t border-white/10 pt-1" />
             </>
           )}
@@ -151,6 +154,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1">Sales Section</div>
               <NavLink href="/dashboard" icon={WashingMachine} label="Washing Logs & Report" isActive={isActive('/dashboard')} />
               <NavLink href="/dashboard/complaints" icon={MessageSquareWarning} label="Complaints" isActive={isActive('/dashboard/complaints')} />
+              <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
             </>
           )}
 
