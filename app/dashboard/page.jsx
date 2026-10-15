@@ -663,9 +663,7 @@ export default function DashboardPage() {
       );
       setStaffSummary(res.data || []);
     } catch (err) {
-      const debugInfo = `URL: ${err.config?.url}\nStatus: ${err.response?.status}\nBackend message: ${JSON.stringify(err.response?.data)}`;
-      console.error(debugInfo);
-      alert('STAFF SUMMARY DEBUG:\n\n' + debugInfo);
+      console.error('Failed to load staff summary:', err.response?.data || err.message);
     }
   }, [currentBranch, currentDept, user?.role, viewerDateFrom, viewerDateTo]);
 
