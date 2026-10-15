@@ -248,7 +248,7 @@ export default function FinancialReportPage() {
           <option value="WASHING">Washing</option>
           <option value="IRONING">Ironing</option>
         </select>
-        <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
+        <div className="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
           <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
@@ -464,7 +464,7 @@ export default function FinancialReportPage() {
             ))}
           </select>
 
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
+          <div className="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
             <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>

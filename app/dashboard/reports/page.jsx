@@ -359,7 +359,7 @@ export default function ReportsPage() {
           aside, .no-print { display: none !important; }
           main { margin: 0 !important; padding: 0 !important; width: 100% !important; }
           body { background: #fff !important; }
-          .print-page { box-shadow: none !important; border: none !important; padding: 0 !important; }
+          .print-page { box-shadow: none !important; border: none !important; padding: 0 !important; overflow: visible !important; }
           table { break-inside: auto; }
           tr { break-inside: avoid; }
           h2 { break-after: avoid; }
@@ -375,7 +375,7 @@ export default function ReportsPage() {
 
       {/* Controls */}
       <div className="no-print bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
+        <div className="flex flex-wrap items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
           <button
             onClick={() => setReportType('weekly')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition ${
@@ -460,7 +460,7 @@ export default function ReportsPage() {
 
       {/* ============================ WEEKLY REPORT ============================ */}
       {reportType === 'weekly' && weekly && (
-        <div className="print-page bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm space-y-8 text-slate-800">
+        <div className="print-page overflow-x-auto bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm space-y-8 text-slate-800">
           <div>
             <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Likenew Smart Laundry</p>
             <h1 className="text-2xl font-bold mt-1">Weekly Operations Overview</h1>
@@ -697,7 +697,7 @@ export default function ReportsPage() {
 
       {/* ========================= INDIVIDUAL REPORT ========================= */}
       {reportType === 'individual' && individual && selectedEmployee && (
-        <div className="print-page bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm space-y-8 text-slate-800">
+        <div className="print-page overflow-x-auto bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm space-y-8 text-slate-800">
           <div>
             <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Likenew Smart Laundry</p>
             <h1 className="text-2xl font-bold mt-1">{selectedEmployee.name}</h1>

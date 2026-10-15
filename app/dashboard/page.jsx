@@ -147,7 +147,7 @@ function StaffSummaryReport({
           </div>
         </div>
         {hasDateRangePicker && (
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
+          <div className="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
             <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
@@ -843,7 +843,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-ink-900 text-slate-800 dark:text-ink-100 p-6 transition-colors">
       {/* Top Header */}
-      <header className="max-w-7xl mx-auto flex justify-between items-center gap-4 pb-6 border-b border-slate-200 dark:border-ink-700 bg-white dark:bg-ink-800 p-5 rounded-2xl shadow-sm">
+      <header className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-slate-200 dark:border-ink-700 bg-white dark:bg-ink-800 p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3.5">
           <img src="/likenew-logo.png" alt="" className="w-11 h-11 rounded-xl shadow-sm shrink-0" />
           <div>
@@ -862,7 +862,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {user?.role === 'ADMIN' && (
             <>
               {/* Branch Filter Dropdown */}
@@ -895,7 +895,7 @@ export default function DashboardPage() {
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl transition text-sm font-medium"
+            className="flex items-center gap-2 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 px-4 py-2.5 rounded-xl transition text-sm font-medium"
           >
             <LogOut size={18} />
             <span>Logout</span>
@@ -962,7 +962,7 @@ export default function DashboardPage() {
                   <h2 className="text-lg font-bold text-slate-800 dark:text-white">Registration Analytics</h2>
                   <p className="text-xs text-slate-500 dark:text-ink-400 mt-0.5">Washing vs. Ironing volume — {selectedBranch}</p>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
+                <div className="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
                   <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                   <div className="flex items-center gap-1.5">
                     <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>
@@ -1486,7 +1486,7 @@ export default function DashboardPage() {
               >
                 <Printer size={16} /> Print / Save as PDF
               </button>
-              <div className="no-print flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
+              <div className="no-print flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2">
                 <Calendar size={15} className="text-brand-500 dark:text-brand-400 shrink-0" />
                 <div className="flex items-center gap-1.5">
                   <span className="text-[11px] font-semibold text-slate-400 dark:text-ink-500 uppercase tracking-wide">From</span>

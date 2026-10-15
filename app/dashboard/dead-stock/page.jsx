@@ -298,7 +298,7 @@ export default function DeadStockPage() {
 
       {/* Filters */}
       <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="flex items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1 flex-wrap">
+        <div className="flex flex-wrap items-center bg-slate-100 dark:bg-ink-700 rounded-xl p-1">
           {['IN_STOCK', 'GIVEN_OUT', 'DONATED', 'DISCARDED', 'All'].map((tab) => (
             <button
               key={tab}
@@ -322,7 +322,7 @@ export default function DeadStockPage() {
           <option value="KM5">KM5</option>
         </select>
 
-        <div className="flex items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2 flex-1 min-w-[220px]">
+        <div className="flex flex-wrap items-center gap-2 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-xl px-3.5 py-2 flex-1 min-w-[220px]">
           <Search size={15} className="text-slate-400 dark:text-ink-500 shrink-0" />
           <input
             type="text"
