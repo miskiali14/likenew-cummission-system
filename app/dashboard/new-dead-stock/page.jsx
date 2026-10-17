@@ -66,6 +66,11 @@ export default function NewDeadStockPage() {
 
   const canEdit = EDIT_ROLES.includes(user?.role);
   const canSeeAllBranches = ALL_BRANCH_ROLES.includes(user?.role);
+  // Sales/Call Center accounts are shared branch logins, so they pick their
+  // real name from the dropdown. Admin/Customer Care/Customer Ops accounts
+  // already belong to one specific person — use that name automatically
+  // instead of making them pick it from a (possibly empty) dropdown too.
+  const usesSharedLogin = ['SALES', 'CALL_CENTER'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -181,7 +186,13 @@ export default function NewDeadStockPage() {
   const openAddModal = () => {
     setEditingId(null);
     const today = new Date().toISOString().split('T')[0];
-    setFormData({ ...emptyForm, date: today, branch: user?.branch || 'HQ', category: categories[0]?.name || '' });
+    setFormData({
+      ...emptyForm,
+      date: today,
+      branch: user?.branch || 'HQ',
+      category: categories[0]?.name || '',
+      loggedByName: usesSharedLogin ? '' : (user?.fullName || ''),
+    });
     setShowModal(true);
   };
 
@@ -224,7 +235,7 @@ export default function NewDeadStockPage() {
     setResolveOutcome('GIVEN_OUT');
     setGiveOutMethod('');
     setGiveOutNotes('');
-    setGiveOutByName('');
+    setGiveOutByName(usesSharedLogin ? '' : (user?.fullName || ''));
   };
 
   const handleGiveOutSubmit = async (e) => {
@@ -575,25 +586,31 @@ export default function NewDeadStockPage() {
                   </div>
                 )}
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Logged By (your name)</label>
-                <select
-                  required
-                  value={formData.loggedByName}
-                  onChange={(e) => setFormData({ ...formData, loggedByName: e.target.value })}
-                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                >
-                  <option value="" disabled>Select your name...</option>
-                  {staffForBranch.map((s) => (
-                    <option key={s.id} value={s.name}>{s.name}</option>
-                  ))}
-                </select>
-                {staffForBranch.length === 0 && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                    No names set up for {formData.branch} yet — ask Admin to add one on the Staff page.
-                  </p>
-                )}
-              </div>
+              {usesSharedLogin ? (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Logged By (your name)</label>
+                  <select
+                    required
+                    value={formData.loggedByName}
+                    onChange={(e) => setFormData({ ...formData, loggedByName: e.target.value })}
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  >
+                    <option value="" disabled>Select your name...</option>
+                    {staffForBranch.map((s) => (
+                      <option key={s.id} value={s.name}>{s.name}</option>
+                    ))}
+                  </select>
+                  {staffForBranch.length === 0 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      No names set up for {formData.branch} yet — ask Admin to add one on the Staff page.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 dark:text-ink-400 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-lg p-2.5">
+                  Will be logged as <span className="font-semibold text-slate-700 dark:text-ink-200">{formData.loggedByName}</span> (you're logged in as them).
+                </p>
+              )}
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -626,25 +643,31 @@ export default function NewDeadStockPage() {
               </p>
             </div>
             <form onSubmit={handleGiveOutSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolved By (your name)</label>
-                <select
-                  required
-                  value={giveOutByName}
-                  onChange={(e) => setGiveOutByName(e.target.value)}
-                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                >
-                  <option value="" disabled>Select your name...</option>
-                  {staffForGiveOutBranch.map((s) => (
-                    <option key={s.id} value={s.name}>{s.name}</option>
-                  ))}
-                </select>
-                {staffForGiveOutBranch.length === 0 && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                    No names set up for {giveOutTarget.branch} yet — ask Admin to add one on the Staff page.
-                  </p>
-                )}
-              </div>
+              {usesSharedLogin ? (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolved By (your name)</label>
+                  <select
+                    required
+                    value={giveOutByName}
+                    onChange={(e) => setGiveOutByName(e.target.value)}
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="" disabled>Select your name...</option>
+                    {staffForGiveOutBranch.map((s) => (
+                      <option key={s.id} value={s.name}>{s.name}</option>
+                    ))}
+                  </select>
+                  {staffForGiveOutBranch.length === 0 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      No names set up for {giveOutTarget.branch} yet — ask Admin to add one on the Staff page.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 dark:text-ink-400 bg-slate-50 dark:bg-ink-700 border border-slate-200 dark:border-ink-600 rounded-lg p-2.5">
+                  Will be recorded as resolved by <span className="font-semibold text-slate-700 dark:text-ink-200">{giveOutByName}</span> (you're logged in as them).
+                </p>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Outcome</label>
                 <select
