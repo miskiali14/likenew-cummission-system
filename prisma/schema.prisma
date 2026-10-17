@@ -213,6 +213,39 @@ model DeadStock {
   @@index([branch, status])
 }
 
+// "New Dead Stock" — a second, parallel dead-stock list kept deliberately
+// separate from the original DeadStock above (which stays as-is). The
+// difference is who can log one: Sales and Call Center can log an entry
+// here (they have no access to the original), on top of everyone who
+// already could. Also carries the customer's identity (name/id/phone),
+// which the original never captured, so an item can be traced back to
+// whoever it belongs to. Same resolution workflow and category list as
+// the original (shares DeadStockCategoryOption), just a different table.
+model NewDeadStock {
+  id               String            @id @default(uuid())
+  branch           String            // HQ or KM5
+  customerName     String
+  customerId       String            // ticket/reference number from the paper log
+  phone            String
+  orderId          String            // raw order reference, e.g. "45327-1/1"
+  category         String            // free text, picked from DeadStockCategoryOption
+  quantity         Int               @default(1)
+  date             String            // YYYY-MM-DD, when it was logged
+  status           DeadStockStatus   @default(IN_STOCK)
+  createdAt        DateTime          @default(now())
+
+  createdById      String?
+  createdByName    String?
+
+  givenOutAt       DateTime?
+  givenOutById     String?
+  givenOutByName   String?
+  givenOutMethod   CollectionMethod?
+  givenOutNotes    String?
+
+  @@index([branch, status])
+}
+
 // Customer complaints — logged by Admin, Sales, or the dedicated Customer
 // Care role, and tracked through to resolution.
 model Complaint {

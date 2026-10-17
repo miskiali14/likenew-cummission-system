@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
-// Dead Stock category options — a user-managed list (not a fixed enum), so
-// Admin/Customer Care can add a new one from the UI whenever the existing
-// choices don't cover a case.
+// Dead Stock category options — a user-managed list (not a fixed enum),
+// shared by both the original Dead Stock and New Dead Stock. Everyone who
+// can log either one needs to read this list; only the roles that can
+// manage dead stock can add a new category.
 export async function GET(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER']);
   if (auth.response) return auth.response;
 
   try {
@@ -20,7 +21,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
   if (auth.response) return auth.response;
 
   try {
