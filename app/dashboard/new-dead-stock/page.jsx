@@ -140,16 +140,11 @@ export default function NewDeadStockPage() {
     fetchStaff();
   }, [fetchStaff]);
 
-  // Staff names scoped to the branch currently selected in the form — a
-  // branch-locked account (Sales) only ever sees their own branch's list.
-  const staffForBranch = useMemo(
-    () => staff.filter((s) => s.branch === formData.branch),
-    [staff, formData.branch]
-  );
-  const staffForGiveOutBranch = useMemo(
-    () => staff.filter((s) => s.branch === giveOutTarget?.branch),
-    [staff, giveOutTarget]
-  );
+  // Not filtered by branch — whoever is logging/resolving an entry can work
+  // across either branch, so every name in the list is always selectable
+  // regardless of which branch the entry itself is for.
+  const staffForBranch = staff;
+  const staffForGiveOutBranch = staff;
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
@@ -603,7 +598,7 @@ export default function NewDeadStockPage() {
                   </select>
                   {staffForBranch.length === 0 && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                      No names set up for {formData.branch} yet — ask Admin to add one on the Staff page.
+                      No names set up yet — ask Admin to add one on the Staff page.
                     </p>
                   )}
                 </div>
@@ -660,7 +655,7 @@ export default function NewDeadStockPage() {
                   </select>
                   {staffForGiveOutBranch.length === 0 && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                      No names set up for {giveOutTarget.branch} yet — ask Admin to add one on the Staff page.
+                      No names set up yet — ask Admin to add one on the Staff page.
                     </p>
                   )}
                 </div>
