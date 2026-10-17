@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Loader2, PackagePlus, CheckCircle2, Clock, Calendar, Download, X, DollarSign, Wallet } from 'lucide-react';
-import { DEAD_STOCK_GIVEN_OUT_COMMISSION } from '@/lib/commission';
+import { Loader2, PackagePlus, CheckCircle2, Clock, Calendar, Download, X } from 'lucide-react';
 
 const METHOD_LABEL = {
   IN_PERSON: 'Picked up in person',
@@ -18,8 +17,6 @@ const STATUS_STYLE = {
   DONATED: 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800',
   DISCARDED: 'bg-slate-100 dark:bg-ink-700 text-slate-600 dark:text-ink-300 border-slate-300 dark:border-ink-600',
 };
-// All three terminal outcomes earn the same commission — the person still
-// did the work of closing the entry out either way.
 const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
 
 const exportToCSV = (filename, rows) => {
@@ -94,27 +91,13 @@ export default function NewDeadStockReportPage() {
     const givenOutQty = givenOut.reduce((sum, it) => sum + Number(it.quantity || 0), 0);
     const givenOutRate = totalEntries > 0 ? (givenOut.length / totalEntries) * 100 : 0;
     const resolvedCount = items.filter((it) => RESOLVED_STATUSES.includes(it.status)).length;
-    const totalCommission = Number((resolvedCount * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2));
     return {
       totalEntries, totalQuantity,
       inStockCount: inStock.length, inStockQty,
       givenOutCount: givenOut.length, givenOutQty,
       donatedCount: donated.length, discardedCount: discarded.length,
-      resolvedCount, givenOutRate, totalCommission,
+      resolvedCount, givenOutRate,
     };
-  }, [items]);
-
-  const byUser = useMemo(() => {
-    const map = new Map();
-    for (const it of items) {
-      if (!RESOLVED_STATUSES.includes(it.status) || !it.givenOutById) continue;
-      const entry = map.get(it.givenOutById) || { userId: it.givenOutById, name: it.givenOutByName || 'Unknown', count: 0 };
-      entry.count += 1;
-      map.set(it.givenOutById, entry);
-    }
-    return [...map.values()]
-      .map((e) => ({ ...e, commission: Number((e.count * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2)) }))
-      .sort((a, b) => b.commission - a.commission);
   }, [items]);
 
   const byCategory = useMemo(() => {
@@ -218,7 +201,6 @@ export default function NewDeadStockReportPage() {
                   GivenOutBy: it.givenOutByName || '',
                   GivenOutMethod: METHOD_LABEL[it.givenOutMethod] || it.givenOutMethod || '',
                   GivenOutNotes: it.givenOutNotes || '',
-                  Commission: RESOLVED_STATUSES.includes(it.status) ? DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2) : '0.00',
                 }))
               )
             }
@@ -309,52 +291,13 @@ export default function NewDeadStockReportPage() {
             <div className="group relative bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 p-5 rounded-2xl flex items-center gap-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
               <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
               <div className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-105 transition-transform">
-                <DollarSign size={24} />
+                <CheckCircle2 size={24} />
               </div>
               <div>
-                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Resolution Commission</p>
-                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">${stats.totalCommission.toFixed(2)}</h3>
+                <p className="text-xs uppercase font-semibold text-slate-400 dark:text-ink-500 tracking-wide">Total Resolved</p>
+                <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-0.5 tabular-nums">{stats.resolvedCount}</h3>
               </div>
             </div>
-          </div>
-
-          {/* Commission breakdown by person — separate from every other commission */}
-          <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-6 shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-ink-200">
-              <Wallet size={16} className="text-brand-600 dark:text-brand-400" />
-              Commission by Person (${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)} per order resolved — given out, donated, or discarded)
-            </div>
-            {byUser.length === 0 ? (
-              <p className="text-sm text-slate-400 dark:text-ink-500">No orders resolved in this date range.</p>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-ink-700">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-ink-700 text-slate-500 dark:text-ink-400 text-xs uppercase bg-slate-50/70 dark:bg-ink-700/40">
-                      <th className="py-3 px-3">Name</th>
-                      <th className="py-3 px-3 text-right">Orders Resolved</th>
-                      <th className="py-3 px-3 text-right">Commission</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {byUser.map((u) => (
-                      <tr key={u.userId} className="border-b border-slate-100 dark:border-ink-700 hover:bg-slate-50/80 dark:hover:bg-ink-700/40 transition">
-                        <td className="py-3 px-3 font-semibold text-slate-800 dark:text-white">{u.name}</td>
-                        <td className="py-3 px-3 text-right text-slate-600 dark:text-ink-300">{u.count}</td>
-                        <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400">${u.commission.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot className="bg-slate-100/80 dark:bg-ink-700/60 font-bold border-t border-slate-300 dark:border-ink-600">
-                    <tr>
-                      <td className="py-3 px-3 text-slate-800 dark:text-white">Total</td>
-                      <td className="py-3 px-3 text-right text-slate-900 dark:text-white">{stats.resolvedCount}</td>
-                      <td className="py-3 px-3 text-right text-amber-800 dark:text-amber-400">${stats.totalCommission.toFixed(2)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            )}
           </div>
 
           {/* Breakdown by category / branch */}
@@ -397,7 +340,6 @@ export default function NewDeadStockReportPage() {
                     <th className="py-3 px-3">Date</th>
                     <th className="py-3 px-3">Status</th>
                     <th className="py-3 px-3">Resolved By</th>
-                    <th className="py-3 px-3 text-right">Commission</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -425,9 +367,6 @@ export default function NewDeadStockReportPage() {
                       </td>
                       <td className="py-3 px-3 text-slate-600 dark:text-ink-300">
                         {it.givenOutByName || <span className="text-slate-300 dark:text-ink-600">—</span>}
-                      </td>
-                      <td className="py-3 px-3 text-right font-bold text-amber-700 dark:text-amber-400 whitespace-nowrap">
-                        {RESOLVED_STATUSES.includes(it.status) ? `$${DEAD_STOCK_GIVEN_OUT_COMMISSION.toFixed(2)}` : <span className="text-slate-300 dark:text-ink-600">—</span>}
                       </td>
                     </tr>
                   ))}

@@ -4,15 +4,17 @@ import { requireAuth } from '@/lib/auth';
 
 const VALID_COLLECTION_METHODS = ['IN_PERSON', 'DELIVERY', 'INCLUDED_IN_ORDER'];
 const RESOLVED_STATUSES = ['GIVEN_OUT', 'DONATED', 'DISCARDED'];
-// Sales/Call Center can log an entry but not manage it afterward — editing,
-// resolving, and deleting stays with Admin/Customer Care/Customer Ops, same
-// as the original Dead Stock.
-const CAN_MANAGE = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
+// Sales/Call Center can log an entry AND resolve it (give out / donate /
+// discard, or move it back to in stock) — but editing the entry's own
+// details or deleting it stays with Admin/Customer Care/Customer Ops.
+const CAN_RESOLVE = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER'];
+const CAN_EDIT_DELETE = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
 
 export async function PATCH(request, { params }) {
-  const auth = requireAuth(request, CAN_MANAGE);
+  const auth = requireAuth(request, CAN_RESOLVE);
   if (auth.response) return auth.response;
   const user = auth.user;
+  const canEdit = CAN_EDIT_DELETE.includes(user.role);
 
   try {
     const { id } = await params;
@@ -42,6 +44,15 @@ export async function PATCH(request, { params }) {
     if (category !== undefined && !String(category).trim()) {
       return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
     }
+    // Sales/Call Center can resolve (status + its related fields) but not
+    // edit the entry's own details — ignore those fields entirely for them,
+    // regardless of what the request body contains.
+    if (!canEdit && (customerName !== undefined || customerId !== undefined || phone !== undefined || orderId !== undefined || category !== undefined || quantity !== undefined || date !== undefined || branch !== undefined)) {
+      return NextResponse.json(
+        { message: 'You can resolve this entry but not edit its details' },
+        { status: 403 }
+      );
+    }
 
     const item = await prisma.newDeadStock.update({
       where: { id },
@@ -54,14 +65,14 @@ export async function PATCH(request, { params }) {
           givenOutMethod: status === 'GIVEN_OUT' ? givenOutMethod : null,
           givenOutNotes: RESOLVED_STATUSES.includes(status) ? (givenOutNotes || null) : null,
         }),
-        ...(customerName !== undefined && { customerName }),
-        ...(customerId !== undefined && { customerId: String(customerId) }),
-        ...(phone !== undefined && { phone }),
-        ...(orderId !== undefined && { orderId: String(orderId) }),
-        ...(category !== undefined && { category }),
-        ...(quantity !== undefined && { quantity: Number(quantity) > 0 ? Number(quantity) : 1 }),
-        ...(date !== undefined && { date }),
-        ...(branch !== undefined && { branch }),
+        ...(canEdit && customerName !== undefined && { customerName }),
+        ...(canEdit && customerId !== undefined && { customerId: String(customerId) }),
+        ...(canEdit && phone !== undefined && { phone }),
+        ...(canEdit && orderId !== undefined && { orderId: String(orderId) }),
+        ...(canEdit && category !== undefined && { category }),
+        ...(canEdit && quantity !== undefined && { quantity: Number(quantity) > 0 ? Number(quantity) : 1 }),
+        ...(canEdit && date !== undefined && { date }),
+        ...(canEdit && branch !== undefined && { branch }),
       },
     });
 
@@ -72,7 +83,7 @@ export async function PATCH(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const auth = requireAuth(request, CAN_MANAGE);
+  const auth = requireAuth(request, CAN_EDIT_DELETE);
   if (auth.response) return auth.response;
 
   try {

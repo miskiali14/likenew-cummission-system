@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Loader2, Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, PackagePlus, AlertCircle, X, Wallet, AlertTriangle, Plus } from 'lucide-react';
-import { DEAD_STOCK_GIVEN_OUT_COMMISSION } from '@/lib/commission';
+import { Loader2, Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, PackagePlus, AlertCircle, X, AlertTriangle, Plus } from 'lucide-react';
 
 const emptyForm = { customerName: '', customerId: '', phone: '', orderId: '', category: '', quantity: 1, date: '', branch: 'HQ' };
 
@@ -37,7 +36,10 @@ const STATUS_STYLE = {
 const STATUS_LABEL = { IN_STOCK: 'In Stock', GIVEN_OUT: 'Given Out', DONATED: 'Donated', DISCARDED: 'Discarded' };
 
 const ALLOWED_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER'];
-const MANAGE_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
+// Everyone allowed on this page can resolve an entry (give out / donate /
+// discard, or move it back to in stock) — editing the entry's own details
+// or deleting it stays with the smaller management tier.
+const EDIT_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
 const ALL_BRANCH_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'CALL_CENTER'];
 
 export default function NewDeadStockPage() {
@@ -56,12 +58,11 @@ export default function NewDeadStockPage() {
   const [resolveOutcome, setResolveOutcome] = useState('GIVEN_OUT');
   const [giveOutMethod, setGiveOutMethod] = useState('');
   const [giveOutNotes, setGiveOutNotes] = useState('');
-  const [commission, setCommission] = useState(null);
   const [categories, setCategories] = useState([]);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
 
-  const canManage = MANAGE_ROLES.includes(user?.role);
+  const canEdit = EDIT_ROLES.includes(user?.role);
   const canSeeAllBranches = ALL_BRANCH_ROLES.includes(user?.role);
 
   const showToast = (type, message) => {
@@ -132,25 +133,6 @@ export default function NewDeadStockPage() {
       showToast('error', err.response?.data?.message || 'Failed to add category');
     }
   };
-
-  const fetchCommission = useCallback(async () => {
-    if (!user || !canManage) return;
-    try {
-      const branchParam = branchFilter !== 'All' ? branchFilter : '';
-      const res = await API.get(`/new-dead-stock?branch=${branchParam}&status=All`);
-      const resolvedCount = (res.data || []).filter((it) => RESOLVED_STATUSES.includes(it.status)).length;
-      setCommission({
-        count: resolvedCount,
-        total: Number((resolvedCount * DEAD_STOCK_GIVEN_OUT_COMMISSION).toFixed(2)),
-      });
-    } catch (err) {
-      console.error('Failed to load commission summary:', err);
-    }
-  }, [user, canManage, branchFilter]);
-
-  useEffect(() => {
-    fetchCommission();
-  }, [fetchCommission]);
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -228,19 +210,17 @@ export default function NewDeadStockPage() {
       showToast('success', `Marked as ${STATUS_LABEL[resolveOutcome].toLowerCase()}`);
       setGiveOutTarget(null);
       fetchItems();
-      fetchCommission();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to update entry');
     }
   };
 
   const handleMarkInStock = async (id) => {
-    if (!confirm('Move this back to In Stock? This removes the commission for it.')) return;
+    if (!confirm('Move this back to In Stock?')) return;
     try {
       await API.patch(`/new-dead-stock/${id}`, { status: 'IN_STOCK' });
       showToast('success', 'Moved back to In Stock');
       fetchItems();
-      fetchCommission();
     } catch (err) {
       showToast('error', 'Failed to update entry');
     }
@@ -297,19 +277,6 @@ export default function NewDeadStockPage() {
         <div className="flex items-center gap-2.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3 text-sm font-medium">
           <AlertTriangle size={18} className="shrink-0" />
           {agingCount} entr{agingCount > 1 ? 'ies have' : 'y has'} been in stock for over {AGING_THRESHOLD_DAYS} days — worth following up.
-        </div>
-      )}
-
-      {/* Resolution Commission (Given Out / Donated / Discarded) — managers only */}
-      {canManage && commission && (
-        <div className="bg-white dark:bg-ink-800 border border-slate-200/80 dark:border-ink-700 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-ink-200">
-            <Wallet size={16} className="text-brand-600 dark:text-brand-400" />
-            Resolution Commission
-          </div>
-          <span className="text-sm text-slate-600 dark:text-ink-300">
-            {commission.count} resolved — <span className="font-bold text-slate-900 dark:text-white">${commission.total.toFixed(2)}</span>
-          </span>
         </div>
       )}
 
@@ -379,7 +346,7 @@ export default function NewDeadStockPage() {
                   {canSeeAllBranches && <th className="p-3">Branch</th>}
                   <th className="p-3">Date</th>
                   <th className="p-3">Status</th>
-                  {canManage && <th className="p-3 text-right">Actions</th>}
+                  <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-ink-700 text-sm text-gray-700 dark:text-ink-300">
@@ -414,43 +381,45 @@ export default function NewDeadStockPage() {
                         {STATUS_LABEL[item.status]}
                       </span>
                     </td>
-                    {canManage && (
-                      <td className="p-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          {item.status === 'IN_STOCK' ? (
-                            <button
-                              onClick={() => openGiveOutModal(item)}
-                              className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 p-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
-                              title="Resolve (Given Out / Donated / Discarded)"
-                            >
-                              <CheckCircle2 size={18} />
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleMarkInStock(item.id)}
-                              className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 p-1 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition"
-                              title="Move back to In Stock"
-                            >
-                              <RotateCcw size={18} />
-                            </button>
-                          )}
+                    <td className="p-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {item.status === 'IN_STOCK' ? (
                           <button
-                            onClick={() => openEditModal(item)}
-                            className="text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 p-1 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
-                            title="Edit"
+                            onClick={() => openGiveOutModal(item)}
+                            className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 p-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
+                            title="Resolve (Given Out / Donated / Discarded)"
                           >
-                            <Edit2 size={18} />
+                            <CheckCircle2 size={18} />
                           </button>
+                        ) : (
                           <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
-                            title="Delete"
+                            onClick={() => handleMarkInStock(item.id)}
+                            className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 p-1 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30 transition"
+                            title="Move back to In Stock"
                           >
-                            <Trash2 size={18} />
+                            <RotateCcw size={18} />
                           </button>
-                        </div>
-                      </td>
-                    )}
+                        )}
+                        {canEdit && (
+                          <>
+                            <button
+                              onClick={() => openEditModal(item)}
+                              className="text-slate-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400 p-1 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
+                              title="Edit"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition"
+                              title="Delete"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -525,7 +494,7 @@ export default function NewDeadStockPage() {
                         <option key={c.id} value={c.name}>{c.name}</option>
                       ))}
                     </select>
-                    {canManage && (
+                    {canEdit && (
                       <button
                         type="button"
                         onClick={() => setShowAddCategory(true)}
