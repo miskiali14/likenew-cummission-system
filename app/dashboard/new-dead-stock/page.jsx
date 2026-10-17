@@ -66,11 +66,12 @@ export default function NewDeadStockPage() {
 
   const canEdit = EDIT_ROLES.includes(user?.role);
   const canSeeAllBranches = ALL_BRANCH_ROLES.includes(user?.role);
-  // Sales/Call Center accounts are shared branch logins, so they pick their
-  // real name from the dropdown. Admin/Customer Care/Customer Ops accounts
-  // already belong to one specific person — use that name automatically
-  // instead of making them pick it from a (possibly empty) dropdown too.
-  const usesSharedLogin = ['SALES', 'CALL_CENTER'].includes(user?.role);
+  // Sales/Call Center/Customer Care accounts are shared by more than one
+  // real person (e.g. Customer Care covers both Suad Abdi and Mudey), so
+  // they pick their real name from the dropdown. Admin and Customer Ops
+  // (Abdirsaq) are each one specific person — use that name automatically
+  // instead of making them pick it from a dropdown too.
+  const usesSharedLogin = ['SALES', 'CALL_CENTER', 'CUSTOMER_CARE'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
