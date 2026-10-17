@@ -35,12 +35,10 @@ const STATUS_STYLE = {
 };
 const STATUS_LABEL = { IN_STOCK: 'In Stock', GIVEN_OUT: 'Given Out', DONATED: 'Donated', DISCARDED: 'Discarded' };
 
+// Full access for everyone — log, resolve, edit, delete, and every branch.
 const ALLOWED_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER'];
-// Everyone allowed on this page can resolve an entry (give out / donate /
-// discard, or move it back to in stock) — editing the entry's own details
-// or deleting it stays with the smaller management tier.
-const EDIT_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
-const ALL_BRANCH_ROLES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'CALL_CENTER'];
+const EDIT_ROLES = ALLOWED_ROLES;
+const ALL_BRANCH_ROLES = ALLOWED_ROLES;
 
 export default function NewDeadStockPage() {
   const router = useRouter();

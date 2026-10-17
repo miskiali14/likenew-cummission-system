@@ -4,11 +4,11 @@ import { requireAuth } from '@/lib/auth';
 import { todayStr } from '@/lib/date';
 
 // "New Dead Stock" — a second, parallel list to the original Dead Stock
-// (kept separate and unchanged). Sales and Call Center can log an entry
-// here (they have no access to the original); Admin, Customer Care, and
-// Customer Ops have full access, same as the original.
+// (kept separate and unchanged). Admin, Customer Care, Customer Ops, Sales,
+// and Call Center all have full access — every branch, log, resolve, edit,
+// delete.
 const CAN_LOG = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER'];
-const SEES_ALL_BRANCHES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'CALL_CENTER'];
+const SEES_ALL_BRANCHES = CAN_LOG;
 
 export async function GET(request) {
   const auth = requireAuth(request, CAN_LOG);
