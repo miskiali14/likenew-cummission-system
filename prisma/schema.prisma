@@ -246,6 +246,18 @@ model NewDeadStock {
   @@index([branch, status])
 }
 
+// Admin-managed list of real staff names selectable (via dropdown) on a New
+// Dead Stock entry, both when logging it and when resolving it — Sales and
+// Call Center accounts are shared branch logins, so this is how an entry
+// traces back to the actual person. Same reasoning as Registrar for
+// regular logs, kept as its own list rather than reusing that one.
+model NewDeadStockStaff {
+  id        String   @id @default(uuid())
+  name      String
+  branch    String   // HQ or KM5
+  createdAt DateTime @default(now())
+}
+
 // Customer complaints — logged by Admin, Sales, or the dedicated Customer
 // Care role, and tracked through to resolution.
 model Complaint {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
 import { Loader2, Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, PackagePlus, AlertCircle, X, AlertTriangle, Plus } from 'lucide-react';
 
-const emptyForm = { customerName: '', customerId: '', phone: '', orderId: '', category: '', quantity: 1, date: '', branch: 'HQ' };
+const emptyForm = { customerName: '', customerId: '', phone: '', orderId: '', category: '', quantity: 1, date: '', branch: 'HQ', loggedByName: '' };
 
 // An order sitting IN_STOCK this long is easy to forget about — flag it.
 const AGING_THRESHOLD_DAYS = 30;
@@ -58,9 +58,11 @@ export default function NewDeadStockPage() {
   const [resolveOutcome, setResolveOutcome] = useState('GIVEN_OUT');
   const [giveOutMethod, setGiveOutMethod] = useState('');
   const [giveOutNotes, setGiveOutNotes] = useState('');
+  const [giveOutByName, setGiveOutByName] = useState('');
   const [categories, setCategories] = useState([]);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [staff, setStaff] = useState([]);
 
   const canEdit = EDIT_ROLES.includes(user?.role);
   const canSeeAllBranches = ALL_BRANCH_ROLES.includes(user?.role);
@@ -118,6 +120,31 @@ export default function NewDeadStockPage() {
     fetchCategories();
   }, [fetchCategories]);
 
+  const fetchStaff = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await API.get('/new-dead-stock/staff');
+      setStaff(res.data || []);
+    } catch (err) {
+      console.error('Failed to load staff list:', err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
+
+  // Staff names scoped to the branch currently selected in the form — a
+  // branch-locked account (Sales) only ever sees their own branch's list.
+  const staffForBranch = useMemo(
+    () => staff.filter((s) => s.branch === formData.branch),
+    [staff, formData.branch]
+  );
+  const staffForGiveOutBranch = useMemo(
+    () => staff.filter((s) => s.branch === giveOutTarget?.branch),
+    [staff, giveOutTarget]
+  );
+
   const handleAddCategory = async (e) => {
     e.preventDefault();
     const name = newCategoryName.trim();
@@ -169,6 +196,7 @@ export default function NewDeadStockPage() {
       quantity: item.quantity,
       date: item.date,
       branch: item.branch,
+      loggedByName: item.createdByName || '',
     });
     setShowModal(true);
   };
@@ -196,6 +224,7 @@ export default function NewDeadStockPage() {
     setResolveOutcome('GIVEN_OUT');
     setGiveOutMethod('');
     setGiveOutNotes('');
+    setGiveOutByName('');
   };
 
   const handleGiveOutSubmit = async (e) => {
@@ -206,9 +235,11 @@ export default function NewDeadStockPage() {
         status: resolveOutcome,
         givenOutMethod: resolveOutcome === 'GIVEN_OUT' ? giveOutMethod : undefined,
         givenOutNotes: giveOutNotes,
+        givenOutByName: giveOutByName,
       });
       showToast('success', `Marked as ${STATUS_LABEL[resolveOutcome].toLowerCase()}`);
       setGiveOutTarget(null);
+      setGiveOutByName('');
       fetchItems();
     } catch (err) {
       showToast('error', err.response?.data?.message || 'Failed to update entry');
@@ -357,6 +388,7 @@ export default function NewDeadStockPage() {
                       <div className="mt-1 text-xs text-gray-400 dark:text-ink-500 space-y-0.5">
                         <div>ID {item.customerId}</div>
                         <div>{item.phone}</div>
+                        {item.createdByName && <div>Logged by {item.createdByName}</div>}
                       </div>
                     </td>
                     <td className="p-3 font-extrabold text-slate-900 dark:text-white whitespace-nowrap">{item.orderId}</td>
@@ -543,6 +575,25 @@ export default function NewDeadStockPage() {
                   </div>
                 )}
               </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Logged By (your name)</label>
+                <select
+                  required
+                  value={formData.loggedByName}
+                  onChange={(e) => setFormData({ ...formData, loggedByName: e.target.value })}
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                >
+                  <option value="" disabled>Select your name...</option>
+                  {staffForBranch.map((s) => (
+                    <option key={s.id} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+                {staffForBranch.length === 0 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    No names set up for {formData.branch} yet — ask Admin to add one on the Staff page.
+                  </p>
+                )}
+              </div>
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -575,6 +626,25 @@ export default function NewDeadStockPage() {
               </p>
             </div>
             <form onSubmit={handleGiveOutSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Resolved By (your name)</label>
+                <select
+                  required
+                  value={giveOutByName}
+                  onChange={(e) => setGiveOutByName(e.target.value)}
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="" disabled>Select your name...</option>
+                  {staffForGiveOutBranch.map((s) => (
+                    <option key={s.id} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+                {staffForGiveOutBranch.length === 0 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    No names set up for {giveOutTarget.branch} yet — ask Admin to add one on the Staff page.
+                  </p>
+                )}
+              </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Outcome</label>
                 <select

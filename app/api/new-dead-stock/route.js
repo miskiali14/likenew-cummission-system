@@ -46,13 +46,18 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { customerName, customerId, phone, orderId, category, quantity, date } = body;
+    const { customerName, customerId, phone, orderId, category, quantity, date, loggedByName } = body;
 
     if (!customerName || !customerId || !phone || !orderId || !category || !String(category).trim()) {
       return NextResponse.json(
         { message: 'Please fill in the customer name, ID, phone, order reference, and category' },
         { status: 400 }
       );
+    }
+    // The account itself is often a shared branch login (e.g. "Sales HQ"),
+    // not one person — the real logger is picked from the staff dropdown.
+    if (!loggedByName || !String(loggedByName).trim()) {
+      return NextResponse.json({ message: 'Please select who is logging this entry' }, { status: 400 });
     }
 
     const branch = SEES_ALL_BRANCHES.includes(user.role)
@@ -70,7 +75,7 @@ export async function POST(request) {
         quantity: Number(quantity) > 0 ? Number(quantity) : 1,
         date: date || todayStr(),
         createdById: user.id,
-        createdByName: user.fullName,
+        createdByName: loggedByName.trim(),
       },
     });
 

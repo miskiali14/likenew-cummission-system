@@ -24,7 +24,7 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const { status, customerName, customerId, phone, orderId, category, quantity, date, branch, givenOutMethod, givenOutNotes } = body;
+    const { status, customerName, customerId, phone, orderId, category, quantity, date, branch, loggedByName, givenOutMethod, givenOutNotes, givenOutByName } = body;
 
     if (status === 'GIVEN_OUT' && !VALID_COLLECTION_METHODS.includes(givenOutMethod)) {
       return NextResponse.json(
@@ -41,13 +41,19 @@ export async function PATCH(request, { params }) {
         { status: 400 }
       );
     }
+    // Same reasoning as createdByName at logging time — the account is
+    // often a shared branch login, so the real person is picked from the
+    // staff dropdown rather than assumed from whoever is authenticated.
+    if (RESOLVED_STATUSES.includes(status) && !(givenOutByName && givenOutByName.trim())) {
+      return NextResponse.json({ message: 'Please select who is resolving this entry' }, { status: 400 });
+    }
     if (category !== undefined && !String(category).trim()) {
       return NextResponse.json({ message: 'Invalid category' }, { status: 400 });
     }
     // Sales/Call Center can resolve (status + its related fields) but not
     // edit the entry's own details — ignore those fields entirely for them,
     // regardless of what the request body contains.
-    if (!canEdit && (customerName !== undefined || customerId !== undefined || phone !== undefined || orderId !== undefined || category !== undefined || quantity !== undefined || date !== undefined || branch !== undefined)) {
+    if (!canEdit && (customerName !== undefined || customerId !== undefined || phone !== undefined || orderId !== undefined || category !== undefined || quantity !== undefined || date !== undefined || branch !== undefined || loggedByName !== undefined)) {
       return NextResponse.json(
         { message: 'You can resolve this entry but not edit its details' },
         { status: 403 }
@@ -61,7 +67,7 @@ export async function PATCH(request, { params }) {
           status,
           givenOutAt: RESOLVED_STATUSES.includes(status) ? new Date() : null,
           givenOutById: RESOLVED_STATUSES.includes(status) ? user.id : null,
-          givenOutByName: RESOLVED_STATUSES.includes(status) ? user.fullName : null,
+          givenOutByName: RESOLVED_STATUSES.includes(status) ? givenOutByName.trim() : null,
           givenOutMethod: status === 'GIVEN_OUT' ? givenOutMethod : null,
           givenOutNotes: RESOLVED_STATUSES.includes(status) ? (givenOutNotes || null) : null,
         }),
@@ -73,6 +79,7 @@ export async function PATCH(request, { params }) {
         ...(canEdit && quantity !== undefined && { quantity: Number(quantity) > 0 ? Number(quantity) : 1 }),
         ...(canEdit && date !== undefined && { date }),
         ...(canEdit && branch !== undefined && { branch }),
+        ...(canEdit && loggedByName !== undefined && { createdByName: loggedByName }),
       },
     });
 

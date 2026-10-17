@@ -143,6 +143,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
                 <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} indent />
                 <NavLink href="/dashboard/new-dead-stock" icon={PackagePlus} label="New Dead Stock" isActive={isActive('/dashboard/new-dead-stock')} indent />
                 <NavLink href="/dashboard/new-dead-stock/report" icon={BarChart3} label="New Dead Stock Report" isActive={isActive('/dashboard/new-dead-stock/report')} indent />
+                <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} indent />
               </NavGroup>
 
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
@@ -174,6 +175,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} />
               <NavLink href="/dashboard/new-dead-stock" icon={PackagePlus} label="New Dead Stock" isActive={isActive('/dashboard/new-dead-stock')} />
               <NavLink href="/dashboard/new-dead-stock/report" icon={BarChart3} label="New Dead Stock Report" isActive={isActive('/dashboard/new-dead-stock/report')} />
+              <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} />
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
             </>
           )}
@@ -205,6 +207,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/dead-stock/report" icon={BarChart3} label="Dead Stock Report" isActive={isActive('/dashboard/dead-stock/report')} />
               <NavLink href="/dashboard/new-dead-stock" icon={PackagePlus} label="New Dead Stock" isActive={isActive('/dashboard/new-dead-stock')} />
               <NavLink href="/dashboard/new-dead-stock/report" icon={BarChart3} label="New Dead Stock Report" isActive={isActive('/dashboard/new-dead-stock/report')} />
+              <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} />
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
             </>
           )}
