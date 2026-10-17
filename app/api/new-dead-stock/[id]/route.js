@@ -30,9 +30,12 @@ export async function PATCH(request, { params }) {
         { status: 400 }
       );
     }
-    if ((status === 'DONATED' || status === 'DISCARDED') && !(givenOutNotes && givenOutNotes.trim())) {
+    // A note is required for every resolution outcome here (unlike the
+    // original Dead Stock, where it's optional for GIVEN_OUT) — always
+    // leave a record of what happened when something is resolved.
+    if (RESOLVED_STATUSES.includes(status) && !(givenOutNotes && givenOutNotes.trim())) {
       return NextResponse.json(
-        { message: 'Please describe how/why the order was donated or discarded' },
+        { message: 'Please add a note describing how this was resolved' },
         { status: 400 }
       );
     }

@@ -639,10 +639,10 @@ export default function NewDeadStockPage() {
               )}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">
-                  {resolveOutcome === 'GIVEN_OUT' ? 'Notes (optional)' : 'How/why was it donated or discarded?'}
+                  {resolveOutcome === 'GIVEN_OUT' ? 'Notes (required)' : 'How/why was it donated or discarded?'}
                 </label>
                 <textarea
-                  required={resolveOutcome !== 'GIVEN_OUT'}
+                  required
                   rows={2}
                   placeholder={resolveOutcome === 'GIVEN_OUT' ? 'E.g. where/how it was collected' : 'E.g. donated to the mosque, or thrown out — damaged beyond use'}
                   value={giveOutNotes}
