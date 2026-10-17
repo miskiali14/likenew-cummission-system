@@ -225,7 +225,9 @@ model NewDeadStock {
   id               String            @id @default(uuid())
   branch           String            // HQ or KM5
   customerName     String
-  customerId       String            // ticket/reference number from the paper log
+  // Nullable — turned out not to be needed; kept only so existing rows
+  // logged before it was dropped from the form don't lose data.
+  customerId       String?
   phone            String
   orderId          String            // raw order reference, e.g. "45327-1/1"
   category         String            // free text, picked from DeadStockCategoryOption

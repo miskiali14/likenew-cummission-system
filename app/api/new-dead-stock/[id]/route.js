@@ -22,7 +22,7 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const { status, customerName, customerId, phone, orderId, category, quantity, date, branch, loggedByName, givenOutMethod, givenOutNotes, givenOutByName } = body;
+    const { status, customerName, phone, orderId, category, quantity, date, branch, loggedByName, givenOutMethod, givenOutNotes, givenOutByName } = body;
 
     if (status === 'GIVEN_OUT' && !VALID_COLLECTION_METHODS.includes(givenOutMethod)) {
       return NextResponse.json(
@@ -61,7 +61,6 @@ export async function PATCH(request, { params }) {
           givenOutNotes: RESOLVED_STATUSES.includes(status) ? (givenOutNotes || null) : null,
         }),
         ...(customerName !== undefined && { customerName }),
-        ...(customerId !== undefined && { customerId: String(customerId) }),
         ...(phone !== undefined && { phone }),
         ...(orderId !== undefined && { orderId: String(orderId) }),
         ...(category !== undefined && { category }),

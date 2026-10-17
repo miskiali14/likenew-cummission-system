@@ -46,11 +46,11 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { customerName, customerId, phone, orderId, category, quantity, date, loggedByName } = body;
+    const { customerName, phone, orderId, category, quantity, date, loggedByName } = body;
 
-    if (!customerName || !customerId || !phone || !orderId || !category || !String(category).trim()) {
+    if (!customerName || !phone || !orderId || !category || !String(category).trim()) {
       return NextResponse.json(
-        { message: 'Please fill in the customer name, ID, phone, order reference, and category' },
+        { message: 'Please fill in the customer name, phone, order reference, and category' },
         { status: 400 }
       );
     }
@@ -68,7 +68,6 @@ export async function POST(request) {
       data: {
         branch,
         customerName,
-        customerId: String(customerId),
         phone,
         orderId: String(orderId),
         category,

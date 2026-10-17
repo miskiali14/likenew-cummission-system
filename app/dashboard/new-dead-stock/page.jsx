@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
 import { Loader2, Search, PlusCircle, CheckCircle2, Trash2, Edit2, RotateCcw, PackagePlus, AlertCircle, X, AlertTriangle, Plus } from 'lucide-react';
 
-const emptyForm = { customerName: '', customerId: '', phone: '', orderId: '', category: '', quantity: 1, date: '', branch: 'HQ', loggedByName: '' };
+const emptyForm = { customerName: '', phone: '', orderId: '', category: '', quantity: 1, date: '', branch: 'HQ', loggedByName: '' };
 
 // An order sitting IN_STOCK this long is easy to forget about — flag it.
 const AGING_THRESHOLD_DAYS = 30;
@@ -167,7 +167,6 @@ export default function NewDeadStockPage() {
       (it) =>
         it.orderId.toLowerCase().includes(q) ||
         it.customerName.toLowerCase().includes(q) ||
-        it.customerId.toLowerCase().includes(q) ||
         (it.phone || '').toLowerCase().includes(q)
     );
   }, [items, search]);
@@ -194,7 +193,6 @@ export default function NewDeadStockPage() {
     setEditingId(item.id);
     setFormData({
       customerName: item.customerName,
-      customerId: item.customerId,
       phone: item.phone,
       orderId: item.orderId,
       category: item.category,
@@ -298,7 +296,7 @@ export default function NewDeadStockPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">New Dead Stock</h1>
-          <p className="text-sm text-gray-500 dark:text-ink-400">Old, uncollected orders — tied to the customer's name, ID, and phone</p>
+          <p className="text-sm text-gray-500 dark:text-ink-400">Old, uncollected orders — tied to the customer's name and phone</p>
         </div>
         <button
           onClick={openAddModal}
@@ -348,7 +346,7 @@ export default function NewDeadStockPage() {
           <Search size={15} className="text-slate-400 dark:text-ink-500 shrink-0" />
           <input
             type="text"
-            placeholder="Search by customer name, ID, phone, or order reference..."
+            placeholder="Search by customer name, phone, or order reference..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent text-sm font-medium text-slate-700 dark:text-ink-200 focus:outline-none w-full"
@@ -391,7 +389,6 @@ export default function NewDeadStockPage() {
                     <td className="p-3 min-w-[150px]">
                       <div className="font-medium text-gray-900 dark:text-white">{item.customerName}</div>
                       <div className="mt-1 text-xs text-gray-400 dark:text-ink-500 space-y-0.5">
-                        <div>ID {item.customerId}</div>
                         <div>{item.phone}</div>
                         {item.createdByName && <div>Logged by {item.createdByName}</div>}
                       </div>
@@ -481,29 +478,16 @@ export default function NewDeadStockPage() {
                   className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Customer ID</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ticket / reference #"
-                    value={formData.customerId}
-                    onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Phone Number</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="E.g. 0615xxxxxx"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="E.g. 0615xxxxxx"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Order Reference</label>

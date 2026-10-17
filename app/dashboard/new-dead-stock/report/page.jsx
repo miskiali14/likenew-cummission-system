@@ -191,7 +191,6 @@ export default function NewDeadStockReportPage() {
                   Date: it.date,
                   Branch: it.branch,
                   CustomerName: it.customerName,
-                  CustomerId: it.customerId,
                   Phone: it.phone,
                   OrderRef: it.orderId,
                   Category: it.category,
@@ -348,7 +347,7 @@ export default function NewDeadStockReportPage() {
                       <td className="py-3 px-3 min-w-[150px]">
                         <div className="font-semibold text-slate-800 dark:text-white">{it.customerName}</div>
                         <div className="text-xs text-slate-400 dark:text-ink-500 space-y-0.5">
-                          <div>{it.branch} · ID {it.customerId}</div>
+                          <div>{it.branch}</div>
                           <div>{it.phone}</div>
                         </div>
                       </td>
