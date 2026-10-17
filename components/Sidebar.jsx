@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Users,
@@ -24,6 +24,7 @@ import {
   Settings2,
   Flame,
   PackagePlus,
+  LogOut,
 } from 'lucide-react';
 
 function NavLink({ href, icon: Icon, label, isActive, onClose, indent }) {
@@ -83,9 +84,19 @@ function NavGroup({ storageKey, label, children, defaultOpen = true }) {
 
 export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
   const pathname = usePathname();
+  const router = useRouter();
   const userRole = user?.role;
 
   const isActive = (path) => pathname === path;
+
+  // Lives here (not on individual pages) so it's reachable from every page,
+  // for every role — several roles (Customer Care, Call Center, Customer
+  // Ops) have no nav link back to the one page that used to carry this.
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
 
   return (
     <>
@@ -235,10 +246,17 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">
           {(user?.fullName || 'U').trim().charAt(0).toUpperCase()}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold truncate">{user?.fullName || 'User'}</div>
           <div className="text-xs text-brand-300 capitalize truncate">{user?.role} — {user?.branch || 'HQ'}</div>
         </div>
+        <button
+          onClick={handleLogout}
+          title="Logout"
+          className="shrink-0 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition"
+        >
+          <LogOut size={18} />
+        </button>
       </div>
       </aside>
     </>
