@@ -4,8 +4,8 @@ import { requireAuth } from '@/lib/auth';
 
 // Dead Stock category options — a user-managed list (not a fixed enum),
 // shared by both the original Dead Stock and New Dead Stock. Everyone who
-// can log either one needs to read this list; only the roles that can
-// manage dead stock can add a new category.
+// can log either one can also add a new category — the New Dead Stock
+// form's "+" button is shown to all of them, so POST needs to match.
 export async function GET(request) {
   const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER']);
   if (auth.response) return auth.response;
@@ -21,7 +21,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS']);
+  const auth = requireAuth(request, ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS', 'SALES', 'CALL_CENTER']);
   if (auth.response) return auth.response;
 
   try {
