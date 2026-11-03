@@ -341,3 +341,35 @@ model StreakDiscount {
 
   @@index([phone])
 }
+
+// Loyalty check-in calls — a small batch of long-time customers get called,
+// asked whether they have an open complaint, invited in for a short tour of
+// the branch, and sent off with a package. Logged here so the 4 standard
+// questions asked during the call have somewhere to live, and so a
+// complaint raised on the call isn't lost (recorded here; filed as a real
+// Complaint separately if it needs following up).
+model CustomerCallSurvey {
+  id                String   @id @default(uuid())
+  branch            String   // HQ or KM5
+  customerName      String
+  phone             String
+  date              String   // YYYY-MM-DD, when the call/visit happened
+
+  hasComplaint      Boolean  @default(false)
+  complaintNotes    String?  // what the complaint was, if hasComplaint is true
+  tourGiven         Boolean  @default(false)
+  packageGiven      Boolean  @default(false)
+
+  // The 4 standard questions asked on every call — kept as named fields
+  // (not a generic key/value list) since the question set is fixed.
+  satisfaction      String?  // Q1: overall satisfaction with Likenew's service
+  qualityRating     String?  // Q2: rating of washing & ironing quality
+  desiredService    String?  // Q3: what new service they'd like Likenew to add
+  suggestedChanges  String?  // Q4: anything they'd want changed
+
+  createdAt         DateTime @default(now())
+  createdById       String?
+  createdByName     String?
+
+  @@index([branch])
+}

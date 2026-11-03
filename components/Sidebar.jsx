@@ -24,6 +24,7 @@ import {
   Settings2,
   Flame,
   PackagePlus,
+  ClipboardCheck,
   LogOut,
 } from 'lucide-react';
 
@@ -158,6 +159,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               </NavGroup>
 
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
+              <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
 
               <div className="border-t border-white/10 pt-1" />
             </>
@@ -188,6 +190,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/new-dead-stock/report" icon={BarChart3} label="New Dead Stock Report" isActive={isActive('/dashboard/new-dead-stock/report')} />
               <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} />
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
+              <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
             </>
           )}
 
@@ -220,6 +223,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/new-dead-stock/report" icon={BarChart3} label="New Dead Stock Report" isActive={isActive('/dashboard/new-dead-stock/report')} />
               <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} />
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
+              <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
             </>
           )}
 
