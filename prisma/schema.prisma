@@ -300,6 +300,24 @@ model Complaint {
   @@index([branch, status])
 }
 
+// Customer satisfaction rating collected by the WhatsApp bot (separate
+// project, likenew-web) after an order is marked Completed. Bot asks a
+// 1-5 question over WhatsApp and posts the reply here; a rating of 1-2
+// also triggers the bot's complaint flow, but that complaint is filed
+// separately (via /api/public/complaints) — this table only holds the
+// raw rating itself.
+model Feedback {
+  id        String   @id @default(uuid())
+  branch    String?  // HQ or KM5 — null if it couldn't be determined from the order ID
+  orderId   String
+  phone     String   // customer's WhatsApp number (waId)
+  rating    Int      // 1-5
+  createdAt DateTime @default(now())
+
+  @@index([branch])
+  @@index([orderId])
+}
+
 // Snapchat "streak" promotion — a customer who keeps a 30-day Snapchat
 // streak with the business gets a 30% discount. Logged here when claimed so
 // the same customer can't redeem the same streak twice; phone is the
