@@ -18,7 +18,10 @@ export default function StreakDiscountsPage() {
   const [notification, setNotification] = useState(null);
 
   const isAdmin = user?.role === 'ADMIN';
-  const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
+  // Everyone who can log a claim sees every branch's claims — a customer can
+  // claim at either branch, so Sales needs to see what's already been
+  // claimed elsewhere, not just their own branch.
+  const canSeeAllBranches = ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });

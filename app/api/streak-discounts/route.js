@@ -9,7 +9,10 @@ import { todayStr } from '@/lib/date';
 const normalizePhone = (phone) => String(phone || '').replace(/\D/g, '').slice(-9);
 
 const ALLOWED_ROLES = ['ADMIN', 'SALES', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
-const SEES_ALL_BRANCHES = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'];
+// Everyone who can log a claim can also see every branch's claims — a
+// customer can claim at either branch, so Sales at one branch needs to see
+// what was already claimed at the other, not just duplicate-blocked on it.
+const SEES_ALL_BRANCHES = ALLOWED_ROLES;
 
 // Snapchat streak discount claims — logged when a customer presents a
 // 30-day streak, blocked from claiming again until 30 days after their
