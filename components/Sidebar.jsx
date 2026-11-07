@@ -160,6 +160,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
 
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
+              <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
 
               <div className="border-t border-white/10 pt-1" />
             </>
@@ -191,6 +192,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} />
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
+              <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
             </>
           )}
 
@@ -224,6 +226,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/new-dead-stock/staff" icon={ClipboardList} label="New Dead Stock Staff" isActive={isActive('/dashboard/new-dead-stock/staff')} />
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
+              <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
             </>
           )}
 

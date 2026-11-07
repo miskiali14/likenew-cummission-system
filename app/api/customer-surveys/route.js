@@ -16,12 +16,19 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const branchParam = searchParams.get('branch');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
 
     const whereClause = {};
     if (SEES_ALL_BRANCHES.includes(user.role)) {
       if (branchParam && branchParam !== 'All') whereClause.branch = branchParam;
     } else {
       whereClause.branch = user.branch;
+    }
+    if (dateFrom || dateTo) {
+      whereClause.date = {};
+      if (dateFrom) whereClause.date.gte = dateFrom;
+      if (dateTo) whereClause.date.lte = dateTo;
     }
 
     const items = await prisma.customerCallSurvey.findMany({

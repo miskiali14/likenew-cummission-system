@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
-import { Loader2, ClipboardCheck, Trash2, AlertCircle, CheckCircle2, X, MessageSquareWarning, Eye } from 'lucide-react';
+import { Loader2, ClipboardCheck, Trash2, AlertCircle, CheckCircle2, X, MessageSquareWarning, Eye, Pencil, BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 
 const QUESTIONS = [
   { key: 'satisfaction', label: 'Q1. Overall, how satisfied are you with Likenew’s service?' },
@@ -29,9 +30,12 @@ export default function CustomerSurveysPage() {
   const [submitting, setSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   const [viewing, setViewing] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   const isAdmin = user?.role === 'ADMIN';
   const canSeeAllBranches = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
+  const canManage = ['ADMIN', 'CUSTOMER_CARE', 'CUSTOMER_OPS'].includes(user?.role);
 
   const showToast = (type, message) => {
     setNotification({ type, message });
@@ -99,6 +103,40 @@ export default function CustomerSurveysPage() {
     }
   };
 
+  const openEditModal = (s) => {
+    setEditing({
+      id: s.id,
+      customerName: s.customerName,
+      phone: s.phone,
+      branch: s.branch,
+      date: s.date,
+      hasComplaint: s.hasComplaint,
+      complaintNotes: s.complaintNotes || '',
+      tourGiven: s.tourGiven,
+      packageGiven: s.packageGiven,
+      satisfaction: s.satisfaction || '',
+      qualityRating: s.qualityRating || '',
+      desiredService: s.desiredService || '',
+      suggestedChanges: s.suggestedChanges || '',
+    });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditSubmitting(true);
+    try {
+      const { id, ...data } = editing;
+      await API.patch(`/customer-surveys/${id}`, data);
+      showToast('success', `${editing.customerName} updated.`);
+      setEditing(null);
+      fetchSurveys();
+    } catch (err) {
+      showToast('error', err.response?.data?.message || 'Failed to update this entry');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6 relative">
       {notification && (
@@ -121,14 +159,22 @@ export default function CustomerSurveysPage() {
         </div>
       )}
 
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <ClipboardCheck className="text-brand-500" size={24} /> Customer Loyalty Calls
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-ink-400">
-          Check-in calls to long-time customers — ask about complaints, invite them in for a tour, send them off with
-          a package, and log the 4 standard questions.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+            <ClipboardCheck className="text-brand-500" size={24} /> Customer Loyalty Calls
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-ink-400">
+            Check-in calls to long-time customers — ask about complaints, invite them in for a tour, send them off with
+            a package, and log the 4 standard questions.
+          </p>
+        </div>
+        <Link
+          href="/dashboard/customer-surveys/report"
+          className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border border-slate-300 dark:border-ink-600 text-gray-700 dark:text-ink-200 hover:bg-gray-50 dark:hover:bg-ink-700 transition"
+        >
+          <BarChart3 size={16} /> View Report
+        </Link>
       </div>
 
       {/* Log call form */}
@@ -321,6 +367,15 @@ export default function CustomerSurveysPage() {
                         >
                           <Eye size={18} />
                         </button>
+                        {canManage && (
+                          <button
+                            onClick={() => openEditModal(s)}
+                            className="text-slate-500 dark:text-ink-400 hover:text-brand-600 dark:hover:text-brand-400 p-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 transition"
+                            title="Edit"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                        )}
                         {isAdmin && (
                           <button
                             onClick={() => handleDelete(s.id)}
@@ -378,6 +433,143 @@ export default function CustomerSurveysPage() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal — Edit Entry */}
+      {editing && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-ink-800 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">Edit Entry</h2>
+              <button onClick={() => setEditing(null)} className="text-gray-400 dark:text-ink-500 hover:text-gray-600 dark:hover:text-ink-300">
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Customer Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editing.customerName}
+                    onChange={(e) => setEditing({ ...editing, customerName: e.target.value })}
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={editing.phone}
+                    onChange={(e) => setEditing({ ...editing, phone: e.target.value })}
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+                {canSeeAllBranches && (
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Branch</label>
+                    <select
+                      value={editing.branch}
+                      onChange={(e) => setEditing({ ...editing, branch: e.target.value })}
+                      className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    >
+                      <option value="HQ">HQ</option>
+                      <option value="KM5">KM5</option>
+                    </select>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={editing.date}
+                    onChange={(e) => setEditing({ ...editing, date: e.target.value })}
+                    className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-5 py-1">
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-ink-200 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editing.tourGiven}
+                    onChange={(e) => setEditing({ ...editing, tourGiven: e.target.checked })}
+                    className="rounded border-slate-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
+                  />
+                  Tour given
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-ink-200 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editing.packageGiven}
+                    onChange={(e) => setEditing({ ...editing, packageGiven: e.target.checked })}
+                    className="rounded border-slate-300 dark:border-ink-600 text-brand-600 focus:ring-brand-500"
+                  />
+                  Package given
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-ink-200 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editing.hasComplaint}
+                    onChange={(e) => setEditing({ ...editing, hasComplaint: e.target.checked })}
+                    className="rounded border-slate-300 dark:border-ink-600 text-red-600 focus:ring-red-500"
+                  />
+                  Had a complaint
+                </label>
+              </div>
+
+              {editing.hasComplaint && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">What was the complaint?</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={editing.complaintNotes}
+                    onChange={(e) => setEditing({ ...editing, complaintNotes: e.target.value })}
+                    className="w-full border border-red-300 dark:border-red-800 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-ink-700">
+                {QUESTIONS.map((q) => (
+                  <div key={q.key}>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-ink-300 mb-1">{q.label}</label>
+                    <textarea
+                      rows={2}
+                      value={editing[q.key]}
+                      onChange={(e) => setEditing({ ...editing, [q.key]: e.target.value })}
+                      className="w-full border border-slate-300 dark:border-ink-600 dark:bg-ink-700 dark:text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditing(null)}
+                  className="px-4 py-2 border border-slate-300 dark:border-ink-600 rounded-lg text-sm font-medium text-gray-600 dark:text-ink-300 hover:bg-gray-50 dark:hover:bg-ink-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editSubmitting}
+                  className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-medium transition shadow-sm"
+                >
+                  {editSubmitting ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
