@@ -25,6 +25,7 @@ import {
   Flame,
   PackagePlus,
   ClipboardCheck,
+  Star,
   LogOut,
 } from 'lucide-react';
 
@@ -161,6 +162,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
               <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
+              <NavLink href="/dashboard/feedback" icon={Star} label="Customer Feedback" isActive={isActive('/dashboard/feedback')} />
 
               <div className="border-t border-white/10 pt-1" />
             </>
@@ -193,6 +195,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
               <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
+              <NavLink href="/dashboard/feedback" icon={Star} label="Customer Feedback" isActive={isActive('/dashboard/feedback')} />
             </>
           )}
 
@@ -227,6 +230,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/streak-discounts" icon={Flame} label="Snapchat Streak Discount" isActive={isActive('/dashboard/streak-discounts')} />
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
               <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
+              <NavLink href="/dashboard/feedback" icon={Star} label="Customer Feedback" isActive={isActive('/dashboard/feedback')} />
             </>
           )}
 
