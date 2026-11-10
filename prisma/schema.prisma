@@ -318,6 +318,38 @@ model Feedback {
   @@index([orderId])
 }
 
+// Job applications submitted through the public careers form on the
+// website (separate project, likenew-web — e.g. /careers/marketing-manager).
+// No login exists for applicants, so this is the only way a filled-in form
+// reaches staff; cvLink is a link (Drive/Dropbox/etc) rather than an
+// uploaded file, since there's no file storage wired up for this.
+model JobApplication {
+  id              String   @id @default(uuid())
+  role            String   // job title applied for, e.g. "Marketing Manager"
+
+  fullName        String
+  phone           String
+  email           String
+  location        String
+  educationLevel  String   // highest education level + field of study
+
+  yearsExperience String   // "Less than 2" / "2-3" / "3-5" / "5+"
+  lastTitle       String?
+  lastCompany     String?
+  ledTeam         Boolean  @default(false)
+  teamSize        String?
+  portfolioLinks  String?
+  cvLink          String
+
+  aiTools         String[] @default([])
+  thirtyDayPlan   String
+  whyFit          String
+
+  createdAt       DateTime @default(now())
+
+  @@index([role])
+}
+
 // Snapchat "streak" promotion — a customer who keeps a 30-day Snapchat
 // streak with the business gets a 30% discount. Logged here when claimed so
 // the same customer can't redeem the same streak twice; phone is the

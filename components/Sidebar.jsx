@@ -27,6 +27,7 @@ import {
   ClipboardCheck,
   Star,
   LogOut,
+  FileText,
 } from 'lucide-react';
 
 function NavLink({ href, icon: Icon, label, isActive, onClose, indent }) {
@@ -163,6 +164,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/customer-surveys" icon={ClipboardCheck} label="Customer Loyalty Calls" isActive={isActive('/dashboard/customer-surveys')} />
               <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
               <NavLink href="/dashboard/feedback" icon={Star} label="Customer Feedback" isActive={isActive('/dashboard/feedback')} />
+              <NavLink href="/dashboard/job-applications" icon={FileText} label="Job Applications" isActive={isActive('/dashboard/job-applications')} />
 
               <div className="border-t border-white/10 pt-1" />
             </>
