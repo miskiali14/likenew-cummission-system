@@ -488,6 +488,13 @@ export default function DashboardPage() {
           return;
         }
 
+        // Recruiter (bespoke role) has no washing/ironing logs either —
+        // their entire job lives on the Job Applications page.
+        if (parsedUser.role === 'RECRUITER') {
+          router.push('/dashboard/job-applications');
+          return;
+        }
+
         setUser(parsedUser);
 
         if (parsedUser.role !== 'ADMIN') {
