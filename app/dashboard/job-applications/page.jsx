@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import API from '@/lib/api';
 import {
-  Loader2, FileText, Users, Download, X, ExternalLink, CheckCircle2,
+  Loader2, FileText, Users, Download, X, ExternalLink, CheckCircle2, Trash2,
 } from 'lucide-react';
 
 const exportToCSV = (filename, rows) => {
@@ -27,7 +27,7 @@ const exportToCSV = (filename, rows) => {
   URL.revokeObjectURL(url);
 };
 
-function Modal({ app, onClose }) {
+function Modal({ app, onClose, onDelete }) {
   if (!app) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
@@ -40,9 +40,18 @@ function Modal({ app, onClose }) {
             <h3 className="text-lg font-bold text-slate-800 dark:text-white">{app.fullName}</h3>
             <p className="text-sm text-slate-500 dark:text-ink-400">{app.role}</p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-red-500 transition">
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onDelete(app)}
+              title="Delete application"
+              className="text-slate-400 hover:text-red-500 transition"
+            >
+              <Trash2 size={18} />
+            </button>
+            <button onClick={onClose} className="text-slate-400 hover:text-red-500 transition">
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -113,7 +122,7 @@ export default function JobApplicationsPage() {
       return;
     }
     const parsedUser = JSON.parse(storedUser);
-    if (parsedUser.role !== 'ADMIN') {
+    if (!['ADMIN', 'RECRUITER'].includes(parsedUser.role)) {
       router.push('/dashboard');
       return;
     }
@@ -137,6 +146,18 @@ export default function JobApplicationsPage() {
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
+
+  const handleDelete = useCallback(async (app) => {
+    if (!window.confirm(`Delete the application from ${app.fullName}? This can't be undone.`)) return;
+    try {
+      await API.delete(`/job-applications/${app.id}`);
+      setApplications((prev) => prev.filter((a) => a.id !== app.id));
+      setSelected(null);
+    } catch (err) {
+      console.error('Failed to delete application:', err);
+      alert('Failed to delete the application. Please try again.');
+    }
+  }, []);
 
   const roles = useMemo(() => {
     const set = new Set(applications.map((a) => a.role));
@@ -261,9 +282,14 @@ export default function JobApplicationsPage() {
                         ) : '—'}
                       </td>
                       <td className="py-3 px-3 text-right">
-                        <button onClick={() => setSelected(a)} className="text-xs font-semibold text-brand-600 dark:text-brand-300 hover:underline">
-                          View Details
-                        </button>
+                        <div className="flex items-center justify-end gap-3">
+                          <button onClick={() => setSelected(a)} className="text-xs font-semibold text-brand-600 dark:text-brand-300 hover:underline">
+                            View Details
+                          </button>
+                          <button onClick={() => handleDelete(a)} title="Delete application" className="text-slate-400 hover:text-red-500 transition">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -274,7 +300,7 @@ export default function JobApplicationsPage() {
         </>
       )}
 
-      <Modal app={selected} onClose={() => setSelected(null)} />
+      <Modal app={selected} onClose={() => setSelected(null)} onDelete={handleDelete} />
     </div>
   );
 }

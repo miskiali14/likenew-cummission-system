@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAuth } from '@/lib/auth';
 
-// Read-only — rows are only ever created by the public careers form intake
-// (/api/public/job-applications), never from the dashboard itself.
-const CAN_ACCESS = ['ADMIN'];
+// Rows are only ever created by the public careers form intake
+// (/api/public/job-applications), never from the dashboard itself — this
+// route is read-only; deleting one happens via /api/job-applications/[id].
+const CAN_ACCESS = ['ADMIN', 'RECRUITER'];
 
 export async function GET(request) {
   const auth = requireAuth(request, CAN_ACCESS);

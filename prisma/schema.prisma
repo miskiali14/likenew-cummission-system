@@ -18,6 +18,10 @@ enum Role {
   // Stock — a narrower, bespoke role (first used for Abdirsaq) rather than
   // widening CUSTOMER_CARE's access for everyone.
   CUSTOMER_OPS
+  // Full access to exactly one area: Job Applications (the careers form
+  // intake) — a bespoke role, same reasoning as CUSTOMER_OPS, rather than
+  // widening ADMIN's access for everyone who just needs to review resumes.
+  RECRUITER
 }
 
 enum Department {

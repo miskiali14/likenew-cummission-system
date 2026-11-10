@@ -254,6 +254,7 @@ export default function UsersPage() {
                     <option value="CUSTOMER_CARE">CUSTOMER CARE</option>
                     <option value="CALL_CENTER">CALL CENTER</option>
                     <option value="CUSTOMER_OPS">CUSTOMER OPS (Items + Complaints + Dead Stock)</option>
+                    <option value="RECRUITER">RECRUITER (Job Applications)</option>
                     <option value="VIEWER">VIEWER (read-only)</option>
                   </select>
                 </div>

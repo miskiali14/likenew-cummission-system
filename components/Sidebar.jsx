@@ -236,6 +236,16 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
             </>
           )}
 
+          {/* ================= RECRUITER (bespoke: Job Applications only) ================= */}
+          {userRole === 'RECRUITER' && (
+            <>
+              <div className="text-xs font-semibold text-slate-500 uppercase px-3 py-1 flex items-center gap-1.5">
+                <FileText size={14} /> Recruiting
+              </div>
+              <NavLink href="/dashboard/job-applications" icon={FileText} label="Job Applications" isActive={isActive('/dashboard/job-applications')} />
+            </>
+          )}
+
           {/* ================= QUALITY CONTROL ================= */}
           {userRole === 'QUALITY_CONTROL' && (
             <>
