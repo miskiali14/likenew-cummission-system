@@ -51,7 +51,26 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json({ message: 'action must be "set" or "consume"' }, { status: 400, headers: CORS_HEADERS });
+    // Atomic once-only claim — unlike set/consume (read-then-write, racy
+    // under two near-simultaneous callers), this relies on the primary key
+    // unique constraint: only the first of two concurrent claims on the same
+    // waId can succeed. Used to dedupe a WhatsApp provider delivering the
+    // same inbound message more than once, so the bot doesn't reply twice.
+    if (action === 'claim') {
+      try {
+        await prisma.botSession.create({
+          data: { waId: String(waId), awaiting: String(awaiting || 'CLAIMED') },
+        });
+        return NextResponse.json({ claimed: true }, { headers: CORS_HEADERS });
+      } catch (error) {
+        if (error.code === 'P2002') {
+          return NextResponse.json({ claimed: false }, { headers: CORS_HEADERS });
+        }
+        throw error;
+      }
+    }
+
+    return NextResponse.json({ message: 'action must be "set", "consume" or "claim"' }, { status: 400, headers: CORS_HEADERS });
   } catch (error) {
     return NextResponse.json(
       { message: 'A server error occurred', error: error.message },
