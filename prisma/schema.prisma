@@ -109,6 +109,19 @@ model CleanCloudLoyalty {
   updatedAt  DateTime @updatedAt
 }
 
+// CleanCloud has no "find customer by phone" API call — only lookup by
+// customerID, or a signup-date range. This index is built by walking that
+// date range once (read-only against CleanCloud) and caching phone ->
+// customerID here, so the public points-lookup page can resolve a phone
+// number instantly instead of re-scanning CleanCloud's whole customer list
+// on every request.
+model CleanCloudCustomerIndex {
+  phone      String   @id
+  customerID String
+  name       String?
+  updatedAt  DateTime @updatedAt
+}
+
 model User {
   id         String      @id @default(uuid())
   fullName   String
