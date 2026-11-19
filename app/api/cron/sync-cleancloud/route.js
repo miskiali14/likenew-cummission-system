@@ -1,0 +1,208 @@
+import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+import prisma from '@/lib/prisma';
+
+/*
+ * LikeNew — CleanCloud sync (polling)
+ * Method: GET
+ *
+ * CleanCloud's own webhook push turned out to be unreliable (never
+ * confirmed firing), and Vercel's Hobby cron only runs once a day — so an
+ * external scheduler (GitHub Actions) calls this endpoint every 15-30 min
+ * instead. For every order that's reached Completed since the last run:
+ *   1) sends the customer a WhatsApp feedback request (1-5), same as the
+ *      webhook-based flow would have.
+ *   2) posts a signed "sale" event to bilyeeti so the order earns loyalty
+ *      points automatically.
+ * Both are best-effort per order — one failing doesn't stop the rest.
+ *
+ * Auth: ?secret=<FEEDBACK_API_SECRET>
+ * Query: ?windowSeconds=1800 (optional, default 1800 = 30 min lookback —
+ *   should comfortably cover the gap between two runs plus some slack)
+ */
+
+const CLEANCLOUD_API = 'https://cleancloudapp.com/api';
+const BILYEETI_EVENTS_URL = 'https://bilyeeti.so/api/public/pos/v1/events';
+const COMPLETED_STATUS = '2';
+
+const FEEDBACK_REQUEST = {
+  so: (orderId) =>
+    `Mahadsanid! Dalabkaaga *${orderId}* waa la dhammeeyay.\n\n` +
+    'Sideed u qiimeeyaysaa adeeggan? Jawaab hal number 1-5.\n' +
+    '(1 = aad u xun, 5 = aad u fiican)',
+};
+
+async function sendWatiMessage(waId, text) {
+  const endpoint = process.env.WATI_API_ENDPOINT;
+  const token = process.env.WATI_API_TOKEN;
+  if (!endpoint || !token) {
+    console.error('WATI_API_ENDPOINT / WATI_API_TOKEN not configured');
+    return { sent: false, reason: 'not_configured' };
+  }
+  const rawTok = String(token).replace(/[^\x20-\x7E]/g, '').trim();
+  const bare = rawTok.replace(/^bearer\s+/i, '');
+  const base = endpoint.replace(/[^\x20-\x7E]/g, '').replace(/\/$/, '');
+  const digits = String(waId).replace(/\D/g, '');
+  const qs = new URLSearchParams({ messageText: String(text) }).toString();
+  const url = `${base}/api/v1/sendSessionMessage/${digits}?${qs}`;
+
+  const attempts = [`Bearer ${bare}`, bare];
+  let last = null;
+  for (const auth of attempts) {
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { Authorization: auth, accept: '*/*' } });
+      const raw = await res.text();
+      let data = null;
+      try { data = JSON.parse(raw); } catch { data = raw; }
+      if (res.ok && !(data && data.result === false)) return { sent: true, data };
+      last = { sent: false, status: res.status, data: String(raw).slice(0, 200) };
+      if (res.status !== 401 && res.status !== 403) break;
+    } catch (e) {
+      last = { sent: false, error: String(e) };
+      break;
+    }
+  }
+  return last || { sent: false };
+}
+
+// Atomic once-only claim, same pattern as /api/public/bot-session's
+// "claim" action — relies on the waId primary key's unique constraint so a
+// re-run within the lookback window never double-processes an order.
+async function claimOnce(key) {
+  try {
+    await prisma.botSession.create({ data: { waId: key, awaiting: 'SYNCED' } });
+    return true;
+  } catch (error) {
+    if (error.code === 'P2002') return false;
+    throw error;
+  }
+}
+
+async function cleanCloudCall(path, body) {
+  const res = await fetch(`${CLEANCLOUD_API}/${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return res.json().catch(() => null);
+}
+
+function signBilyeetiEvent(secret, timestamp, rawBody) {
+  return crypto.createHmac('sha256', secret).update(`${timestamp}.${rawBody}`).digest('hex');
+}
+
+async function sendBilyeetiSaleEvent({ orderId, amount, phone }) {
+  const key = process.env.BILYEETI_API_KEY;
+  const secret = process.env.BILYEETI_API_SECRET;
+  if (!key || !secret) return { sent: false, reason: 'not_configured' };
+
+  const ts = Math.floor(Date.now() / 1000).toString();
+  const body = JSON.stringify({
+    event: 'sale',
+    idempotency_key: `cleancloud-${orderId}`,
+    external_id: String(orderId),
+    amount: Number(amount),
+    phone,
+  });
+  const sig = signBilyeetiEvent(secret, ts, body);
+
+  try {
+    const res = await fetch(BILYEETI_EVENTS_URL, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-loyal-key': key,
+        'x-loyal-timestamp': ts,
+        'x-loyal-signature': sig,
+      },
+      body,
+    });
+    const data = await res.json().catch(() => null);
+    return { sent: res.ok, status: res.status, data };
+  } catch (e) {
+    return { sent: false, error: String(e) };
+  }
+}
+
+export async function GET(request) {
+  const secret = process.env.FEEDBACK_API_SECRET;
+  const url = new URL(request.url);
+  const givenSecret = url.searchParams.get('secret') || request.headers.get('x-api-secret');
+  if (!secret || givenSecret !== secret) {
+    return NextResponse.json({ ok: false, error: 'UNAUTHORIZED' }, { status: 401 });
+  }
+
+  const cleanCloudToken = process.env.CLEANCLOUD_API_TOKEN;
+  if (!cleanCloudToken) {
+    return NextResponse.json({ ok: false, error: 'CLEANCLOUD_API_TOKEN not configured' }, { status: 500 });
+  }
+
+  const windowSeconds = Number(url.searchParams.get('windowSeconds')) || 1800;
+
+  let ordersData;
+  try {
+    ordersData = await cleanCloudCall('getOrders', {
+      api_token: cleanCloudToken,
+      completed: 1,
+      updatedSecondsAgoFrom: windowSeconds,
+    });
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: 'CLEANCLOUD_FETCH_FAILED', detail: String(e) }, { status: 502 });
+  }
+
+  const orders = Array.isArray(ordersData?.Orders) ? ordersData.Orders : [];
+  const results = [];
+
+  for (const order of orders) {
+    if (String(order.status) !== COMPLETED_STATUS) continue;
+
+    const dedupKey = `cc:${order.id}`;
+    const claimed = await claimOnce(dedupKey);
+    if (!claimed) {
+      results.push({ orderId: order.id, skipped: 'already_processed' });
+      continue;
+    }
+
+    let customer;
+    try {
+      customer = await cleanCloudCall('getCustomer', { api_token: cleanCloudToken, customerID: order.customerID });
+    } catch (e) {
+      results.push({ orderId: order.id, skipped: 'customer_lookup_failed', detail: String(e) });
+      continue;
+    }
+
+    const tel = customer?.Tel;
+    if (!tel) {
+      results.push({ orderId: order.id, skipped: 'no_phone' });
+      continue;
+    }
+    const waId = '252' + String(tel).replace(/\D/g, '').slice(-9);
+
+    // 1) WhatsApp feedback request — mark the session so the bot knows the
+    // customer's next 1-5 reply is a rating for this order.
+    await prisma.botSession.upsert({
+      where: { waId },
+      create: { waId, awaiting: `FEEDBACK:${order.id}` },
+      update: { awaiting: `FEEDBACK:${order.id}` },
+    });
+    const feedbackSend = await sendWatiMessage(waId, FEEDBACK_REQUEST.so(order.id));
+
+    // 2) bilyeeti loyalty — best-effort, independent of whether the
+    // feedback message sent successfully.
+    const bilyeetiResult = await sendBilyeetiSaleEvent({
+      orderId: order.id,
+      amount: order.total,
+      phone: waId,
+    });
+
+    results.push({
+      orderId: order.id,
+      waId,
+      amount: order.total,
+      feedbackSent: feedbackSend.sent,
+      bilyeetiSent: bilyeetiResult.sent,
+    });
+  }
+
+  return NextResponse.json({ ok: true, windowSeconds, fetched: orders.length, processed: results.length, results });
+}

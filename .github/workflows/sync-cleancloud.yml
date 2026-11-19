@@ -1,0 +1,21 @@
+name: Sync CleanCloud orders
+
+# Vercel's Hobby plan only allows cron jobs to run once a day, which is far
+# too slow for feedback requests / loyalty credits that should follow an
+# order within minutes. GitHub Actions has no such limit, so it drives the
+# polling instead — this workflow just calls our own endpoint on a
+# schedule; all the real logic lives in app/api/cron/sync-cleancloud.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call sync-cleancloud endpoint
+        run: |
+          curl -sf "https://www.haadlinks.com/api/cron/sync-cleancloud?secret=${{ secrets.FEEDBACK_API_SECRET }}&windowSeconds=1800" \
+            -o response.json -w "HTTP %{http_code}\n"
+          cat response.json
