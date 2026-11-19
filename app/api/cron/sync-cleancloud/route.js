@@ -12,8 +12,9 @@ import prisma from '@/lib/prisma';
  * instead. For every order that's reached Completed since the last run:
  *   1) sends the customer a WhatsApp feedback request (1-5), same as the
  *      webhook-based flow would have.
- *   2) posts a signed "sale" event to bilyeeti so the order earns loyalty
- *      points automatically.
+ *   2) mirrors CleanCloud's own loyaltyPointsAvailable balance into
+ *      bilyeeti (not an amount-based credit off the order total) by
+ *      posting the delta as a signed "sale" event.
  * Both are best-effort per order — one failing doesn't stop the rest.
  *
  * Auth: ?secret=<FEEDBACK_API_SECRET>
@@ -91,7 +92,14 @@ function signBilyeetiEvent(secret, timestamp, rawBody) {
   return crypto.createHmac('sha256', secret).update(`${timestamp}.${rawBody}`).digest('hex');
 }
 
-async function sendBilyeetiSaleEvent({ orderId, amount, phone }) {
+// bilyeeti has no "set absolute balance" call — a Points program only
+// accrues via the "amount" on a "sale" event (rate configured in bilyeeti).
+// CleanCloud already has its own authoritative, non-currency loyaltyPoints
+// balance per customer, so the only way to make bilyeeti's total match it
+// is: configure the bilyeeti program's rate at 1 point per 1 unit of
+// "amount", then send the delta in CleanCloud's points balance as "amount"
+// each time it moves. A unique idempotency_key per delta keeps re-runs safe.
+async function sendBilyeetiPointsDelta({ customerID, deltaPoints, phone }) {
   const key = process.env.BILYEETI_API_KEY;
   const secret = process.env.BILYEETI_API_SECRET;
   if (!key || !secret) return { sent: false, reason: 'not_configured' };
@@ -99,9 +107,9 @@ async function sendBilyeetiSaleEvent({ orderId, amount, phone }) {
   const ts = Math.floor(Date.now() / 1000).toString();
   const body = JSON.stringify({
     event: 'sale',
-    idempotency_key: `cleancloud-${orderId}`,
-    external_id: String(orderId),
-    amount: Number(amount),
+    idempotency_key: `cc-loyalty-${customerID}-${ts}`,
+    external_id: String(customerID),
+    amount: Number(deltaPoints),
     phone,
   });
   const sig = signBilyeetiEvent(secret, ts, body);
@@ -187,18 +195,35 @@ export async function GET(request) {
     });
     const feedbackSend = await sendWatiMessage(waId, FEEDBACK_REQUEST.so(order.id));
 
-    // 2) bilyeeti loyalty — best-effort, independent of whether the
-    // feedback message sent successfully.
-    const bilyeetiResult = await sendBilyeetiSaleEvent({
-      orderId: order.id,
-      amount: order.total,
-      phone: waId,
-    });
+    // 2) bilyeeti loyalty — mirror CleanCloud's own loyaltyPointsAvailable
+    // balance, not the order amount. Best-effort, independent of whether
+    // the feedback message sent successfully.
+    const currentPoints = Number(customer?.loyaltyPointsAvailable) || 0;
+    const known = await prisma.cleanCloudLoyalty.findUnique({ where: { customerID: String(order.customerID) } });
+    const lastKnown = known?.points ?? 0;
+    const deltaPoints = currentPoints - lastKnown;
+
+    let bilyeetiResult = { sent: false, reason: 'no_change' };
+    if (deltaPoints > 0) {
+      bilyeetiResult = await sendBilyeetiPointsDelta({
+        customerID: order.customerID,
+        deltaPoints,
+        phone: waId,
+      });
+      if (bilyeetiResult.sent) {
+        await prisma.cleanCloudLoyalty.upsert({
+          where: { customerID: String(order.customerID) },
+          create: { customerID: String(order.customerID), points: currentPoints },
+          update: { points: currentPoints },
+        });
+      }
+    }
 
     results.push({
       orderId: order.id,
       waId,
-      amount: order.total,
+      currentPoints,
+      deltaPoints,
       feedbackSent: feedbackSend.sent,
       bilyeetiSent: bilyeetiResult.sent,
     });

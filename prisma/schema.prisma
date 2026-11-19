@@ -98,6 +98,17 @@ model BotSession {
   updatedAt DateTime @updatedAt
 }
 
+// Tracks the last-known CleanCloud native loyaltyPointsAvailable per customer
+// so the sync can push only the delta to bilyeeti (bilyeeti accrues per
+// "sale" event — it has no "set absolute balance" call — so the only way to
+// make its running total match CleanCloud's own point balance is to send the
+// difference each time CleanCloud's number moves).
+model CleanCloudLoyalty {
+  customerID String   @id
+  points     Int      @default(0)
+  updatedAt  DateTime @updatedAt
+}
+
 model User {
   id         String      @id @default(uuid())
   fullName   String
