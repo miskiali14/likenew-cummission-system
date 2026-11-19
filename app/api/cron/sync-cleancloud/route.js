@@ -12,9 +12,13 @@ import prisma from '@/lib/prisma';
  * instead. For every order that's reached Completed since the last run:
  *   1) sends the customer a WhatsApp feedback request (1-5), same as the
  *      webhook-based flow would have.
- *   2) mirrors CleanCloud's own loyaltyPointsAvailable balance into
- *      bilyeeti (not an amount-based credit off the order total) by
- *      posting the delta as a signed "sale" event.
+ *   2) registers the customer in bilyeeti if they don't have a card yet
+ *      (idempotent — returns the existing card otherwise), then mirrors
+ *      CleanCloud's own loyaltyPointsAvailable balance into bilyeeti (not
+ *      an amount-based credit off the order total) by posting the delta
+ *      as a signed "sale" event. Registering first matters: an event for
+ *      a phone bilyeeti doesn't know yet is silently "ignored", not an
+ *      error, so points would otherwise be lost with no sign of failure.
  * Both are best-effort per order — one failing doesn't stop the rest.
  *
  * Auth: ?secret=<FEEDBACK_API_SECRET>
@@ -24,6 +28,7 @@ import prisma from '@/lib/prisma';
 
 const CLEANCLOUD_API = 'https://cleancloudapp.com/api';
 const BILYEETI_EVENTS_URL = 'https://bilyeeti.so/api/public/pos/v1/events';
+const BILYEETI_REGISTER_URL = 'https://bilyeeti.so/api/method/bilyeeti_backend.api.pos_ingest.customers';
 const COMPLETED_STATUS = '2';
 
 const FEEDBACK_REQUEST = {
@@ -31,6 +36,10 @@ const FEEDBACK_REQUEST = {
     `Mahadsanid! Dalabkaaga *${orderId}* waa la dhammeeyay.\n\n` +
     'Sideed u qiimeeyaysaa adeeggan? Jawaab hal number 1-5.\n' +
     '(1 = aad u xun, 5 = aad u fiican)',
+  newCard: (cardUrl) =>
+    'Waxaan kuu diyaarinay kaarkaaga Likenew Rewards! ' +
+    'Dhibcihii aad horey ugu heshay waa lagu daray.\n\n' +
+    `Halkan ka daawo: ${cardUrl}`,
 };
 
 async function sendWatiMessage(waId, text) {
@@ -99,7 +108,7 @@ function signBilyeetiEvent(secret, timestamp, rawBody) {
 // is: configure the bilyeeti program's rate at 1 point per 1 unit of
 // "amount", then send the delta in CleanCloud's points balance as "amount"
 // each time it moves. A unique idempotency_key per delta keeps re-runs safe.
-async function sendBilyeetiPointsDelta({ customerID, deltaPoints, phone }) {
+async function sendBilyeetiPointsDelta({ customerID, deltaPoints, phoneE164 }) {
   const key = process.env.BILYEETI_API_KEY;
   const secret = process.env.BILYEETI_API_SECRET;
   if (!key || !secret) return { sent: false, reason: 'not_configured' };
@@ -110,7 +119,7 @@ async function sendBilyeetiPointsDelta({ customerID, deltaPoints, phone }) {
     idempotency_key: `cc-loyalty-${customerID}-${ts}`,
     external_id: String(customerID),
     amount: Number(deltaPoints),
-    phone,
+    phone: phoneE164,
   });
   const sig = signBilyeetiEvent(secret, ts, body);
 
@@ -129,6 +138,42 @@ async function sendBilyeetiPointsDelta({ customerID, deltaPoints, phone }) {
     return { sent: res.ok, status: res.status, data };
   } catch (e) {
     return { sent: false, error: String(e) };
+  }
+}
+
+// Ensures the customer has a bilyeeti card before we try to credit them —
+// a "sale" event for a phone bilyeeti doesn't recognize yet is silently
+// "ignored" (per bilyeeti's docs), not an error, so points would be lost
+// with no sign anything went wrong. Idempotent: if the customer already has
+// a card in the program, bilyeeti just returns it — nothing new is made.
+async function registerBilyeetiCustomer({ phoneE164, firstName }) {
+  const key = process.env.BILYEETI_API_KEY;
+  const secret = process.env.BILYEETI_API_SECRET;
+  if (!key || !secret) return { ok: false, reason: 'not_configured' };
+
+  const ts = Math.floor(Date.now() / 1000).toString();
+  const body = JSON.stringify({
+    phone: phoneE164,
+    first_name: firstName || 'Customer',
+    notify: false,
+  });
+  const sig = signBilyeetiEvent(secret, ts, body);
+
+  try {
+    const res = await fetch(BILYEETI_REGISTER_URL, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-loyal-key': key,
+        'x-loyal-timestamp': ts,
+        'x-loyal-signature': sig,
+      },
+      body,
+    });
+    const data = await res.json().catch(() => null);
+    return { ok: res.ok, status: res.status, data };
+  } catch (e) {
+    return { ok: false, error: String(e) };
   }
 }
 
@@ -185,6 +230,7 @@ export async function GET(request) {
       continue;
     }
     const waId = '252' + String(tel).replace(/\D/g, '').slice(-9);
+    const phoneE164 = `+${waId}`;
 
     // 1) WhatsApp feedback request — mark the session so the bot knows the
     // customer's next 1-5 reply is a rating for this order.
@@ -195,9 +241,17 @@ export async function GET(request) {
     });
     const feedbackSend = await sendWatiMessage(waId, FEEDBACK_REQUEST.so(order.id));
 
-    // 2) bilyeeti loyalty — mirror CleanCloud's own loyaltyPointsAvailable
-    // balance, not the order amount. Best-effort, independent of whether
-    // the feedback message sent successfully.
+    // 2) bilyeeti loyalty — make sure the customer has a card (register is
+    // idempotent: returns the existing one if they already have it), then
+    // mirror CleanCloud's own loyaltyPointsAvailable balance as a delta —
+    // not the order amount. Best-effort either way.
+    const firstName = String(customer?.Name || '').trim().split(/\s+/)[0] || 'Customer';
+    const registerResult = await registerBilyeetiCustomer({ phoneE164, firstName });
+    const newCard = registerResult.ok && registerResult.data?.created === true;
+    if (newCard && registerResult.data?.card?.card_url) {
+      await sendWatiMessage(waId, FEEDBACK_REQUEST.newCard(registerResult.data.card.card_url));
+    }
+
     const currentPoints = Number(customer?.loyaltyPointsAvailable) || 0;
     const known = await prisma.cleanCloudLoyalty.findUnique({ where: { customerID: String(order.customerID) } });
     const lastKnown = known?.points ?? 0;
@@ -208,7 +262,7 @@ export async function GET(request) {
       bilyeetiResult = await sendBilyeetiPointsDelta({
         customerID: order.customerID,
         deltaPoints,
-        phone: waId,
+        phoneE164,
       });
       if (bilyeetiResult.sent) {
         await prisma.cleanCloudLoyalty.upsert({
@@ -225,6 +279,8 @@ export async function GET(request) {
       currentPoints,
       deltaPoints,
       feedbackSent: feedbackSend.sent,
+      registered: registerResult.ok,
+      newCard,
       bilyeetiSent: bilyeetiResult.sent,
     });
   }
