@@ -15,7 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call sync-cleancloud endpoint
+        env:
+          FEEDBACK_API_SECRET: ${{ secrets.FEEDBACK_API_SECRET }}
         run: |
-          curl -sf "https://www.haadlinks.com/api/cron/sync-cleancloud?secret=${{ secrets.FEEDBACK_API_SECRET }}&windowSeconds=1800" \
+          # Strip any stray whitespace/newlines from the secret (a common
+          # copy-paste artifact in GitHub's secret UI) before it goes into
+          # the URL — a raw newline there breaks curl with "URL malformed".
+          CLEAN_SECRET=$(printf '%s' "$FEEDBACK_API_SECRET" | tr -d '[:space:]')
+          curl -sf "https://www.haadlinks.com/api/cron/sync-cleancloud?secret=${CLEAN_SECRET}&windowSeconds=1800" \
             -o response.json -w "HTTP %{http_code}\n"
           cat response.json
