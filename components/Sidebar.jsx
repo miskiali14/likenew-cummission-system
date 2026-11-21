@@ -26,6 +26,7 @@ import {
   PackagePlus,
   ClipboardCheck,
   Star,
+  Gift,
   LogOut,
   FileText,
 } from 'lucide-react';
@@ -165,6 +166,7 @@ export default function Sidebar({ user, isOpen = false, onClose = () => {} }) {
               <NavLink href="/dashboard/customer-surveys/report" icon={BarChart3} label="Loyalty Calls Report" isActive={isActive('/dashboard/customer-surveys/report')} />
               <NavLink href="/dashboard/feedback" icon={Star} label="Customer Feedback" isActive={isActive('/dashboard/feedback')} />
               <NavLink href="/dashboard/job-applications" icon={FileText} label="Job Applications" isActive={isActive('/dashboard/job-applications')} />
+              <NavLink href="/dashboard/bilyeeti-backfill" icon={Gift} label="bilyeeti Backfill" isActive={isActive('/dashboard/bilyeeti-backfill')} />
 
               <div className="border-t border-white/10 pt-1" />
             </>
