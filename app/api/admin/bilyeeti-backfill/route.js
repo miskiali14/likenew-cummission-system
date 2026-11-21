@@ -27,6 +27,12 @@ export const maxDuration = 60;
 const CLEANCLOUD_API = 'https://cleancloudapp.com/api';
 const BILYEETI_EVENTS_URL = 'https://bilyeeti.so/api/public/pos/v1/events';
 const BILYEETI_REGISTER_URL = 'https://bilyeeti.so/api/method/bilyeeti_backend.api.pos_ingest.customers';
+// bilyeeti's docs mark `program` optional "when the connection has a
+// default program" — in practice every request without it failed (register:
+// 401 invalid_signature, credit: 404 DoesNotExistError), so the connection
+// has no default and this must be sent explicitly. From the Likenew Rewards
+// program's dashboard URL (bilyeeti.so/dashboard/programs/bs6s564ojn).
+const BILYEETI_PROGRAM_ID = 'bs6s564ojn';
 const BATCH_SIZE = 25;
 
 async function cleanCloudCall(path, body) {
@@ -109,6 +115,7 @@ export async function POST(request) {
 
       const firstName = String(customer?.Name || row.name || '').trim().split(/\s+/)[0] || 'Customer';
       const regResult = await bilyeetiPost(BILYEETI_REGISTER_URL, bilyeetiKey, bilyeetiSecret, {
+        program: BILYEETI_PROGRAM_ID,
         phone: phoneE164,
         first_name: firstName,
         notify: false,
@@ -130,6 +137,7 @@ export async function POST(request) {
           external_id: row.customerID,
           amount: delta,
           phone: phoneE164,
+          program: BILYEETI_PROGRAM_ID,
         });
         if (creditResult.ok) {
           await prisma.cleanCloudLoyalty.upsert({
