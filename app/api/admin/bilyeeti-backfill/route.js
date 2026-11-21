@@ -113,7 +113,11 @@ export async function POST(request) {
         first_name: firstName,
         notify: false,
       });
-      if (regResult.ok) registeredCount++;
+      if (regResult.ok) {
+        registeredCount++;
+      } else {
+        console.error('bilyeeti register failed', row.customerID, regResult.status, JSON.stringify(regResult.data || regResult.error));
+      }
 
       const known = await prisma.cleanCloudLoyalty.findUnique({ where: { customerID: row.customerID } });
       const lastKnown = known?.points ?? 0;
@@ -138,6 +142,7 @@ export async function POST(request) {
           results.push({ customerID: row.customerID, credited: delta });
         } else {
           errorCount++;
+          console.error('bilyeeti credit failed', row.customerID, creditResult.status, JSON.stringify(creditResult.data || creditResult.error));
           results.push({ customerID: row.customerID, error: 'credit_failed', detail: creditResult.data || creditResult.error });
         }
       } else {
